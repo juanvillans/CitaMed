@@ -3,514 +3,690 @@
     import clickOutside from "../../components/ClickOutside";
     import { inertia, router } from "@inertiajs/svelte";
     import ColorsPayMethods from "../../components/ColorsPayMethods";
+    import Input from "../../components/Input.svelte";
+    import Modal from "../../components/Modal.svelte";
 
     import Alert from "../../components/Alert.svelte";
     import { displayAlert } from "../../stores/alertStore";
     export let data;
+    let acordion = { franja: false, ajustesCitasReservadas: false };
     console.log({ data });
+    let showModal = false;
 
-    const institution = useForm({
-        name: "Maestro José Marti",
-        active_students: "400",
-        promotions: "33",
-        years: "34",
-        slogan: "Formando mentes brillantes para un mañana prometedor",
-        courses: [1, 2, 3],
+    let form = useForm({
+        title: "",
+        allow_max_reservation_time_before_appointment: true,
+        allow_min_reservation_time_before_appointment: true,
+        allow_max_appointment_per_day: false,
+        allow_time_between_appointment: false,
+        duration_per_appointment: "",
+        prev_value_duration_per_appointment: "",
+        duration_per_appointment_type: "",
+        max_reservation_time_before_appointment: 60,
+        min_reservation_time_before_appointment: 40,
+        time_between_appointment_type: "minutes",
+        time_between_appointment: 30,
+        max_appointment_per_day: 4,
+        availability: {
+            mon: [{ start: "7:00am", end: "4pm" }],
+            tue: [
+                { start: "8am", end: "12pm" },
+                { start: "2pm", end: "6pm" },
+            ],
+            wed: [{ start: "8am", end: "4pm" }],
+            thu: [{ start: "8am", end: "4pm" }],
+            fri: [{ start: "8am", end: "4pm" }],
+            sat: [],
+            sun: [],
+        },
+        time_available_type: 1,
     });
-    // function resizeInput(event) {
-    //     event.target.style.width = event.target.value.length + "ch";
-    // }
-
-    const prices = useForm({
-        ...data.prices
-    });
-
-    function updatePrices(e) {
-        e.preventDefault()
-        $prices.put(`/dashboard/configuracion/pagos`, {
-            onBefore: () => confirm("¿Está seguro de guardar estos cambios?"),
-            onSuccess: (mensaje) => {
-                $prices.reset()
-                displayAlert({
-                    type: "success",
-                    message: "Precios actualizados",
-                });
-               
-            },
-            onError: (errors) => {
-                if (errors.data) {
-                    displayAlert({ type: "error", message: errors.data });
-                }
-            },
-        });
+    $: {
+        console.log($form);
+        
     }
-
-
-    function deleteAccount(id) {
-        router.delete(`/dashboard/configuracion/eliminar-cuenta/${id}`, {
-            onBefore: () => confirm("¿Está seguro de eliminar este metodo de pago?"),
-            onSuccess: (mensaje) => {
-                
-                displayAlert({
-                    type: "success",
-                    message: "Método de pago eliminado",
-                });
-               
-            },
-            onError: (errors) => {
-                if (errors.data) {
-                    displayAlert({ type: "error", message: errors.data });
-                }
-            },
-        });
-    }
-
+    const customTimePerAppointment = {
+        time: "3",
+        type: "horas",
+    };
+    const translateDays = {
+        mon: "Lun",
+        tue: "Mar",
+        wed: "Mié",
+        thu: "Jue",
+        fri: "Vie",
+        sat: "Sáb",
+        sun: "Dom",
+    };
     let showPaymentOptions = false;
+    function handleCloseCustomTime() {
+        console.log($form.prev_value_duration_per_appointment);
+        $form.duration_per_appointment =
+            $form.prev_value_duration_per_appointment;
+    }
+    let durationOptions = [
+        { value: "15", label: "15 minutos" },
+        { value: "30", label: "30 minutos" },
+        { value: "45", label: "45 minutos" },
+        { value: "60", label: "1 hora" },
+        { value: "90", label: "1,5 horas" },
+        { value: "120", label: "2 horas" },
+        { value: "999999", label: "personalizar..." },
+    ];
 </script>
 
-<Alert />
+<section>
+    <Modal
+        bind:showModal
+        onClose={() => {
+            handleCloseCustomTime();
 
-<section class="bg-background">
-    <div class="py-5"></div>
-
-    <h2 class="font-bold text-xl">Configuración del perfil</h2>
-    
-    <form
-        class="bg-background px-1 mx-4 md:py-9 md:pb-12 md:grid justify-between grid-flow-col md:gap-x-10 lg:gap-x-24 items-center relative"
+            // $form.duration_per_appointment=  $form.prev_value_duration_per_appointmen
+        }}
     >
-        <div class="md:min-w-[600px] max-w-[690px]">
-            <span class="md:text-5xl text-color1 font-bold">
-                Colegio
-                <br />
-                <input
-                    class="md:text-5xl bg-transparent"
-                    type="text"
-                    bind:value={$institution.name}
-                    style={`width:${$institution.name.length - 3}ch`}
-                />
-            </span>
-            <textarea
-                class="block w-full bg-transparent md:text-xl"
-                type="text"
-                bind:value={$institution.slogan}
+        <p slot="header" class="font-bold text-lg text-gray-500">
+            Duración personalizada
+        </p>
+        <div class="flex gap-3">
+            <Input
+                type="number"
+                classes={"mt-0 border-none w-24"}
+                inputClasses={"bg-gray-200 p-3 border-none  appearance-none"}
+                bind:value={customTimePerAppointment.time}
             />
 
-            <div class="flex justify-between mt-4 md:mt-14 text-color1">
-                <div>
-                    <label
-                        class="flex items-center gap-2 mb-2 lg:mb-3 cursor-pointer"
-                    >
-                        <input
-                            type="checkbox"
-                            bind:group={$institution.courses}
-                            value={1}
-                            class="hidden"
-                        />
-
-                        {#if $institution.courses.includes(1)}
-                            <div
-                                class="bg-color1 w-6 md:w-8 aspect-square rounded-full overflow-hidden flex items-center justify-center"
-                            >
-                                <iconify-icon
-                                    class="text-color4 text-4xl"
-                                    icon="pajamas:check-xs"
-                                ></iconify-icon>
-                            </div>
-                            <b>Prescolar</b>
-                        {:else}
-                            <div
-                                class="bg-gray-400 w-6 md:w-8 aspect-square rounded-full overflow-hidden flex items-center justify-center"
-                            >
-                                <iconify-icon
-                                    icon="octicon:no-entry-16"
-                                    class="text-gray-300"
-                                ></iconify-icon>
-                            </div>
-                            <b class="text-gray-400">Prescolar</b>
-                        {/if}
-                    </label>
-                    <ul class="grid grid-cols-2 gap-x-3">
-                        <li>1er nivel</li>
-                        <li>2do nivel</li>
-                        <li>3er nivel</li>
-                    </ul>
-                </div>
-                <div>
-                    <label
-                        class="flex items-center gap-2 mb-2 lg:mb-3 cursor-pointer"
-                    >
-                        <input
-                            type="checkbox"
-                            bind:group={$institution.courses}
-                            value={2}
-                            class="hidden"
-                        />
-                        {#if $institution.courses.includes(2)}
-                            <div
-                                class="bg-color1 w-6 md:w-8 aspect-square rounded-full overflow-hidden flex items-center justify-center"
-                            >
-                                <iconify-icon
-                                    class="text-color4 text-4xl"
-                                    icon="pajamas:check-xs"
-                                ></iconify-icon>
-                            </div>
-                            <b>Primaria</b>
-                        {:else}
-                            <div
-                                class="bg-gray-400 w-6 md:w-8 aspect-square rounded-full overflow-hidden flex items-center justify-center"
-                            >
-                                <iconify-icon
-                                    icon="octicon:no-entry-16"
-                                    class="text-gray-300"
-                                ></iconify-icon>
-                            </div>
-                            <b class="text-gray-400">Primaria</b>
-                        {/if}
-                    </label>
-                    <ul class="grid grid-cols-2 gap-x-3">
-                        <li>1er grado</li>
-                        <li>2do grado</li>
-                        <li>3er grado</li>
-                        <li>4to grado</li>
-                        <li>5to grado</li>
-                        <li>6to grado</li>
-                    </ul>
-                </div>
-                <div>
-                    <label
-                        class="flex items-center gap-2 mb-2 lg:mb-3 cursor-pointer"
-                    >
-                        <input
-                            type="checkbox"
-                            bind:group={$institution.courses}
-                            value={3}
-                            class="hidden"
-                        />
-
-                        {#if $institution.courses.includes(3)}
-                            <div
-                                class="bg-color1 w-6 md:w-8 aspect-square rounded-full overflow-hidden flex items-center justify-center"
-                            >
-                                <iconify-icon
-                                    class="text-color4 text-4xl"
-                                    icon="pajamas:check-xs"
-                                ></iconify-icon>
-                            </div>
-                            <b>Secundaria</b>
-                        {:else}
-                            <div
-                                class="bg-gray-400 w-6 md:w-8 aspect-square rounded-full overflow-hidden flex items-center justify-center"
-                            >
-                                <iconify-icon
-                                    icon="octicon:no-entry-16"
-                                    class="text-gray-300"
-                                ></iconify-icon>
-                            </div>
-                            <b class="text-gray-400">Secundaria</b>
-                        {/if}
-                    </label>
-                    <ul class="grid grid-cols-2 gap-x-3">
-                        <li>1er año</li>
-                        <li>2do año</li>
-                        <li>3er año</li>
-                        <li>4to año</li>
-                        <li>5to año</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div
-                class="flex justify-between w-full mt-4 md:mt-16 md:gap-10 text-color1"
+            <Input
+                type="select"
+                classes={"mt-0 w-36  border-none"}
+                inputClasses={"p-3  bg-gray-200 "}
+                bind:value={customTimePerAppointment.type}
             >
-                <div class="flex divide-x divide-dark">
-                    <input
-                        class="px-1 text-4xl bg-transparent"
-                        bind:value={$institution.years}
-                        style={`width:${$institution.years.length}ch`}
-                    />
-                    <p class="pl-3 col-span-2 leading-5 font-semibold">
-                        AÑOS DE
-                        <br />
-                        FORMACIÓN
-                    </p>
-                </div>
-
-                <div class="flex divide-x divide-dark">
-                    <input
-                        class="px-1 text-4xl bg-transparent"
-                        bind:value={$institution.promotions}
-                        style={`width:${$institution.promotions.length + 0.5}ch`}
-                    />
-                    <p class="pl-3 col-span-2 leading-5 font-semibold">
-                        PROMOCIONES
-                        <br />
-                        GRADUADAS
-                    </p>
-                </div>
-
-                <div class="flex divide-x divide-dark">
-                    <input
-                        class="px-1 text-4xl bg-transparent"
-                        bind:value={$institution.active_students}
-                        style={`width:${$institution.active_students.length + 0.5}ch`}
-                    />
-                    <p class="pl-3 col-span-2 leading-5 font-semibold">
-                        ESTUDIANTES
-                        <br />
-                        ACTIVOS
-                    </p>
-                </div>
-            </div>
+                <option value="minutos">minutos</option>
+                <option value="horas">horas</option>
+            </Input>
         </div>
-
-        <label
-            class="pl-5 relative pr-2 max-w-[500px] flex items-center justify-center rounded-full big_picture_label cursor-pointer"
-        >
-            <img
-                class="absolute w-full"
-                src="https://cdn.discordapp.com/attachments/1238903237218930802/1244452251028688906/Iconos.png?ex=6655d2b9&is=66548139&hm=13ffaaa80051f10b14f4ac464ba1edc1a2b82a9546f069c85de0dfde2da6309a&"
-                alt=""
-            />
-
-            <img
-                class="rounded-full aspect-square border-4 object-cover border-color1 bg-blend-overlay hover:bg-blend-darken"
-                src="http://127.0.0.1:8000/storage/institution/institution.jpeg"
-                alt=""
-            />
-
-            <iconify-icon
-                icon="line-md:edit"
-                class="text-dark text-6xl bg-white bg-opacity-40 p-20 md:p-32 xl:p-48 hidden absolute rounded-full mx-auto"
-            ></iconify-icon>
-            <input type="file" name="" id="" class="hidden" />
-        </label>
-    </form>
-    {#if $institution.isDirty}
         <button
-            class="shadow-xl slideIn flex items-center justify-center mb-3 ml-auto py-4 rounded w-64 bg-color1 gap-3 text-color4"
+            on:click={() => {
+                console.log(customTimePerAppointment.type);
+                let valueFixed =
+                    customTimePerAppointment.type == "horas"
+                        ? customTimePerAppointment.time * 60
+                        : customTimePerAppointment.time;
+                if (!durationOptions.some((obj) => obj.value == valueFixed)) {
+                    let copyDurations = [...durationOptions];
+                    (copyDurations[7] = {
+                        value: valueFixed,
+
+                        label: `${customTimePerAppointment.time} ${customTimePerAppointment.type} `,
+                    }),
+                        (durationOptions = copyDurations);
+                }
+                // if (customTimePerAppointment.)
+
+                ($form.prev_value_duration_per_appointment = valueFixed),
+                    ($form.duration_per_appointment = valueFixed),
+                    console.log(durationOptions, $form);
+                showModal = false;
+            }}
+            slot="btn_footer"
+            type="button"
+            class="text-color2 font-bold hover:bg-color2 p-2 hover:font-extrabold px-4 rounded-xl hover:bg-opacity-10"
+            >Hecho</button
         >
-            <span> GUARDAR PERFIL </span>
-            <iconify-icon icon="material-symbols:save" class="text-3xl"
-            ></iconify-icon>
-        </button>
-    {/if}
-
-    <hr class=" border-gray-300" />
-
-    <form class="Configuracion_tarifas my-10 py-3" id="pricesForm" on:submit={updatePrices}>
-        <h2 class="font-bold text-xl mb-4">Configuración de tarifas</h2>
-
-        <div class="flex gap-4 pl-4">
-            <label class="flex flex-col">
-                <span> Mensualidad ($): </span>
-                <input
-                    type="number"
-                    required={true}
-                    bind:value={$prices.monthly_payment}
-                    class={"z-50  p-2 mt-1 md:w-60 bg-color6 text-black border rounded-md"}
-                />
-            </label>
-
-            <label class="flex flex-col">
-                <span> Inscripción nuevo ingreso ($): </span>
-                <input
-                    type="number"
-                    required={true}
-                    bind:value={$prices.new_inscription_price}
-                    class={"z-50  p-2 mt-1 md:w-60 bg-color6 text-black border rounded-md"}
-                />
-            </label>
-
-            <label class="flex flex-col">
-                <span> Inscripción de regulares ($): </span>
-                <input
-                    type="number"
-                    bind:value={$prices.regular_inscription_price}
-                    required={true}
-                    class={"z-50  p-2 mt-1 md:w-60 bg-color6 text-black border rounded-md"}
-                />
-            </label>
-        </div>
-    </form>
-    {#if $prices.isDirty}
-
-    <button
-        class="shadow-xl slideIn flex items-center justify-center mb-3 ml-auto py-4 rounded w-64 bg-color1 gap-3 text-color4"
-        type="submit"
-        form={"pricesForm"}
+    </Modal>
+    <form
+        class="max-w-[410px] bg-gray-100 p-3 rounded pt-5"
+        action=""
+        on:submit={(e) => {
+            e.preventDefault();
+        }}
     >
-        <span> GUARDAR TARIFAS </span>
-        <iconify-icon icon="material-symbols:save" class="text-3xl"
-        ></iconify-icon>
-    </button>
-    {/if}
-    <hr class=" border-gray-300" />
-    <section class="my-10">
-        <header class="flex justify-between mb-6">
-            <h2 class="font-bold text-xl mb-4">
-                Configuración de metodos de pago
-            </h2>
-            <div class="relative z-30">
-                <button
-                    on:click={() => (showPaymentOptions = !showPaymentOptions)}
-                    class="btn_create gap-3 flex items-center"
-                    use:clickOutside={() => {
-                        showPaymentOptions = false;
+        <fieldset class="border-b border-gray-300 items-center pl-8 pb-4">
+            <h2>CONFIGURAR CITAS DISPONIBLES</h2>
+
+            <Input
+                type="text"
+                required={true}
+                label={"Titulo"}
+                labelClasses={"font-bold"}
+                inputClasses={"text-2xl  p-1 px-3"}
+                bind:value={$form.title}
+                error={$form.errors?.title}
+            />
+        </fieldset>
+
+        <fieldset class="border-b border-gray-300 flex gap-4 pb-4">
+            <iconify-icon icon="lets-icons:time-atack" class="mt-4"
+            ></iconify-icon>
+            <Input
+                type="select"
+                required={true}
+                labelClasses={"font-bold"}
+                label={"Duración de cada cita"}
+                classes={"mt-3 w-auto"}
+                on:change={(e) => {
+                    if (e.target.value == "999999") {
+                        $form.prev_value_duration_per_appointment =
+                            $form.duration_per_appointment;
+                        showModal = true;
+                        $form.duration_per_appointment = "";
+                    }
+                }}
+                bind:value={$form.duration_per_appointment}
+                error={$form.errors?.duration_per_appointment}
+            >
+                {#each durationOptions.slice().sort((a, b) => {
+                    return parseInt(a.value) - parseInt(b.value);
+                }) as { value, label }}
+                    <option {value}>{label}</option>
+                {/each}
+            </Input>
+        </fieldset>
+
+        <fieldset class="mt-6 border-b border-gray-300 pb-5 flex gap-4">
+            <span>
+                <iconify-icon icon="icon-park-outline:time"></iconify-icon>
+            </span>
+            <section>
+                <legend class="font-bold">Disponibilidad general</legend>
+                <small>Indica qué disponibilidad sueles tener para citas</small>
+                <ul class=" flex flex-col space-y-2 mt-4 gap-y-1 ">
+                    <!-- svelte-ignore empty-block -->
+                    {#each Object.entries($form.availability) as [day, shifts]}
+                        <li class="flex gap-4 justify-between">
+                            <span class="w-9">{translateDays[day]}</span>
+                            {#if shifts.length >= 1}
+                                <div class="gap-2 flex flex-col">
+                                    {#each shifts as shift, indx}
+                                        <div class="flex gap-3">
+                                            <span
+                                                class="flex w-48 items-center justify-between bg-gray-200"
+                                            >
+                                                <Input
+                                                    type="select"
+                                                    classes={"mt-0 border-none"}
+                                                    inputClasses={"bg-gray-200 p-3 border-none appearance-none"}
+                                                    bind:value={$form
+                                                        .availability[day][indx]
+                                                        .start}
+                                                    error={$form.errors
+                                                        ?.start_schedulte}
+                                                >
+                                                    <option value="7:00am"
+                                                        >7:00am</option
+                                                    >
+                                                    <option value="8:00am"
+                                                        >8:00am</option
+                                                    >
+                                                </Input>
+                                                <span
+                                                    class="p-1 px-2 font-bold"
+                                                >
+                                                    -
+                                                </span>
+                                                <Input
+                                                    type="select"
+                                                    classes={"mt-0"}
+                                                    inputClasses={"bg-gray-200 p-3 border-none appearance-none"}
+                                                    bind:value={$form
+                                                        .availability[day][indx]
+                                                        .end}
+                                                    error={$form.errors
+                                                        ?.start_schedulte}
+                                                >
+                                                    <option value="7:00am"
+                                                        >7:00am</option
+                                                    >
+                                                    <option value="8:00am"
+                                                        >8:00am</option
+                                                    >
+                                                </Input>
+                                            </span>
+                                            <span
+                                                class="grid grid-cols-3 items-center gap-3 text-xl flex-auto"
+                                            >
+                                                <button
+                                                    on:click={(e) => {
+                                                        $form.availability[
+                                                            day
+                                                        ] = [
+                                                            ...$form.availability[
+                                                                day
+                                                            ].filter(
+                                                                (v, i) =>
+                                                                    i != indx,
+                                                            ),
+                                                        ];
+                                                    }}
+                                                    type="button"
+                                                    class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
+                                                    title="No disponible"
+                                                >
+                                                    <iconify-icon
+                                                        icon="mdi:remove"
+                                                    ></iconify-icon>
+                                                </button>
+                                                {#if indx == 0}
+                                                    <button
+                                                        on:click={(e) => {
+                                                            $form.availability[
+                                                                day
+                                                            ] = [
+                                                                ...$form
+                                                                    .availability[
+                                                                    day
+                                                                ],
+                                                                {
+                                                                    start: "7:00am",
+                                                                    end: "8:00am",
+                                                                },
+                                                            ];
+                                                        }}
+                                                        type="button"
+                                                        class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
+                                                        title="Añadir otro turno a este día"
+                                                    >
+                                                        <iconify-icon
+                                                            icon="gala:add"
+                                                        ></iconify-icon>
+                                                    </button>
+                                                    <button
+                                                        on:click={(e) => {
+                                                            let copyDay = [
+                                                                ...$form
+                                                                    .availability[
+                                                                    day
+                                                                ],
+                                                            ]; // Shallow copy for array of objects
+                                                            Object.keys(
+                                                                $form.availability,
+                                                            ).forEach(
+                                                                (days) => {
+                                                                    $form.availability[
+                                                                        days
+                                                                    ] =
+                                                                        copyDay.map(
+                                                                            (
+                                                                                shift,
+                                                                            ) => ({
+                                                                                ...shift,
+                                                                            }),
+                                                                        ); // Create a new object for each shift
+                                                                },
+                                                            );
+                                                        }}
+                                                        type="button"
+                                                        class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
+                                                        title="Copiar este horario en todos"
+                                                    >
+                                                        <iconify-icon
+                                                            class="text-2xl"
+                                                            icon="material-symbols-light:content-copy-outline"
+                                                        ></iconify-icon>
+                                                    </button>
+                                                {/if}
+                                            </span>
+                                        </div>
+                                    {/each}
+                                </div>
+                            {:else}
+                                <p class="opacity-60 w-48">No disponible</p>
+                                <span
+                                    class="grid grid-cols-3 items-center gap-3 text-xl"
+                                >
+                                    <span> </span>
+
+                                    <button
+                                        on:click={(e) => {
+                                            $form.availability[day] = [
+                                                ...$form.availability[day],
+                                                {
+                                                    start: "7:00am",
+                                                    end: "8:00am",
+                                                },
+                                            ];
+                                            console.log($form.availability);
+                                        }}
+                                        type="button"
+                                        class="relative -left-1.5 cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
+                                        title="Añadir otro turno a este día"
+                                    >
+                                        <iconify-icon icon="gala:add"
+                                        ></iconify-icon>
+                                    </button>
+                                    <span> </span>
+                                </span>
+                            {/if}
+                        </li>
+                    {/each}
+                </ul>
+            </section>
+        </fieldset>
+
+        <fieldset class="mt-2 border-b border-gray-300 pb-4 flex gap-4">
+            <span>
+                <iconify-icon icon="fa-solid:exchange-alt" class="pt-2"
+                ></iconify-icon>
+            </span>
+            <section class="w-full">
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <div
+                    class="p-2 flex justify-between hover:bg-gray-200 cursor-pointer w-full"
+                    on:click={(e) => {
+                        acordion.franja = !acordion.franja;
                     }}
                 >
-                    <span> Nuevo Método </span>
-                    <iconify-icon icon="line-md:plus"></iconify-icon>
-                    <iconify-icon icon="mingcute:down-line"></iconify-icon>
-                </button>
-                {#if showPaymentOptions}
-                    <div
-                        class="payment_options slideIn absolute top-12 w-full bg-gray-100 text-dark shadow-xl p-1 rounded"
-                    >
-                        <ul class="flex flex-col gap-1">
-                            {#each data.methods as method}
-                                <li>
-                                    <a
-                                        class={`hover:bg-${ColorsPayMethods()[method.name]} hover:font-bold hover:text-gray-100 duration-100  border-l-4 border-${ColorsPayMethods()[method.name]} `}
-                                        use:inertia
-                                        href={`/dashboard/configuracion/crear-cuenta/${method.id}`}
-                                    >
-                                        {method.name}</a
-                                    >
-                                </li>
-                            {/each}
-                            <!-- <li>
-                                <a
-                                    class={` hover:bg-binance hover:font-bold hover:text-gray-100 duration-100  border-l-4 border-${ColorsPayMethods()[method.name]} `}
-                                    use:inertia
-                                    href={`/dashboard/configuracion/crear-cuenta/${method.id}`}
+                    <div>
+                        <legend class="font-bold">Franja de programación</legend
+                        >
+                        <small class="inline-block"
+                            >Desde 60 días de antelación hasta 4 horas antes</small
+                        >
+                    </div>
+                    <iconify-icon icon="iconamoon:arrow-down-2-duotone"
+                    ></iconify-icon>
+                </div>
+                {#if acordion.franja}
+                    <div class="p-2 mt-1">
+                        <label class="flex gap-3 items-center mb-3">
+                            <input
+                                bind:group={$form.time_available_type}
+                                type="radio"
+                                class="w-5 h-5"
+                                name="time_available_type"
+                                value={1}
+                            />
+                            <span>Ya disponible</span>
+                        </label>
+                        <label class="flex gap-3 items-center mb-3">
+                            <input
+                                bind:group={$form.time_available_type}
+                                type="radio"
+                                class="w-5 h-5"
+                                name="time_available_type"
+                                value={2}
+                            />
+                            <div class="leading-4">
+                                <p>Fechas de inicio y finalización</p>
+                                <small
+                                    >Limita el intervalo de fechas en todas las
+                                    citas</small
                                 >
-                                    {method.name}</a
-                                >
-                            </li> -->
-                        </ul>
+                            </div>
+                        </label>
+
+                        <small class="mt-4 mb-2 inline-block"
+                            >Tiempo máximo antes de la cita con el que se puede
+                            reservar
+                        </small>
+                        <span
+                            class={`${!$form.allow_max_reservation_time_before_appointment ? "opacity-80" : ""} flex items-center gap-3`}
+                        >
+                            <input
+                                type="checkbox"
+                                class="w-6 h-6"
+                                bind:checked={$form.allow_max_reservation_time_before_appointment}
+                            />
+                            <Input
+                                type="number"
+                                disabled={!$form.allow_max_reservation_time_before_appointment}
+                                classes={"w-16 mt-0"}
+                                bind:value={$form.max_reservation_time_before_appointment}
+                                error={$form.errors
+                                    ?.max_reservation_time_before_appointment}
+                            /> <span> días </span>
+                        </span>
+                        <small class="mt-4 mb-2 inline-block"
+                            >Tiempo máximo antes de la cita con el que se puede
+                            reservar
+                        </small>
+                        <span
+                            class={`${!$form.allow_min_reservation_time_before_appointment ? "opacity-80" : ""} flex items-center gap-3`}
+                        >
+                            <input
+                                type="checkbox"
+                                class="w-6 h-6"
+                                bind:checked={$form.allow_min_reservation_time_before_appointment}
+                            />
+                            <Input
+                                type="number"
+                                classes={"w-16 mt-0"}
+                                bind:value={$form.min_reservation_time_before_appointment}
+                                error={$form.errors
+                                    ?.min_reservation_time_before_appointment}
+                            /> <span> horas </span>
+                        </span>
                     </div>
                 {/if}
-            </div>
-        </header>
-        <div class="flex flex-col gap-4">
-            {#each data.accounts.data as payMethod}
-                <article
-                    id={`account-${payMethod.id}`}
-                    class={`rounded-md bg-white border-l-8 border-${ColorsPayMethods()[payMethod.payment_method_name]} pb-5 pt-3 md:px-8`}
-                >
-                    <header class="flex justify-between">
-                        <h3 class="text-color1 font-semibold">
-                            {payMethod.payment_method_name}
-                        </h3>
-                        {#if payMethod.payment_method_name != "Efectivo"}
-                            <div class="butons flex gap-3 text-gray-600">
-                                <a
-                                    href={`/dashboard/configuracion/editar-cuenta/${payMethod.id}`}
-                                    class="hover:bg-color3 bg-opacity-10 hover:bg-opacity-20 cursor-pointer text-xl rounded border hover:border-color3 px-4 py-1"
-                                    title="Editar"
-                                >
-                                    <iconify-icon
-                                        class="relative -bottom-1"
-                                        icon="ic:outline-edit"
-                                    ></iconify-icon>
-                                </a>
+            </section>
+        </fieldset>
 
-                                <button
-                                    on:click={() => deleteAccount(payMethod.id)}
-                                    class="hover:bg-red bg-opacity-10 hover:bg-opacity-20 cursor-pointer text-xl rounded border hover:border-red px-4 py-1"
-                                    title="Eliminar"
+        <fieldset class="mt-2 border-b border-gray-300 pb-4 flex gap-4">
+            <span class="pt-2">
+                <iconify-icon icon="ant-design:reload-time-outline"
+                ></iconify-icon>
+            </span>
+            <section class="p-2">
+                <legend class="font-bold">Disponibilidad ajustada</legend>
+                <small class="mb-5 inline-block"
+                    >Indica a qué horas estás disponible en fechas concretas</small
+                >
+                <ul class="hidden flex flex-col space-y-2 mt-2 gap-y-1 relative -left-10">
+                    <li class="flex gap-4 justify-between">
+                        <input
+                            type="date"
+                            name=""
+                            id="date1"
+                            class="px-2 p-1"
+                        />
+
+                        <!-- {#if shifts.length >= 1} -->
+                        <div class="gap-2 flex flex-col">
+                            <!-- {#each shifts as shift, indx} -->
+                            <div class="flex gap-3">
+                                <span
+                                    class="flex w-48 items-center justify-between bg-gray-200"
                                 >
-                                    <iconify-icon
-                                        class="text-xl relative top-1"
-                                        icon="ph:trash"
-                                    ></iconify-icon>
-                                </button>
+                                    <Input
+                                        type="select"
+                                        classes={"mt-0 border-none"}
+                                        inputClasses={"bg-gray-200 p-3 border-none appearance-none"}
+                                    >
+                                        <option value="7:00am">7:00am</option>
+                                        <option value="8:00am">8:00am</option>
+                                    </Input>
+                                    <span class="p-1 px-2 font-bold"> - </span>
+                                    <Input
+                                        type="select"
+                                        classes={"mt-0"}
+                                        inputClasses={"bg-gray-200 p-3 border-none appearance-none"}
+                                    >
+                                        <option value="7:00am">7:00am</option>
+                                        <option value="8:00am">8:00am</option>
+                                    </Input>
+                                </span>
+                                <span
+                                    class="grid grid-cols-3 items-center gap-3 text-xl flex-auto"
+                                >
+                                    <button
+                                        on:click={(e) => {
+                                            $form.availability[day] = [
+                                                ...$form.availability[
+                                                    day
+                                                ].filter((v, i) => i != indx),
+                                            ];
+                                        }}
+                                        type="button"
+                                        class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
+                                        title="No disponible"
+                                    >
+                                        <iconify-icon icon="mdi:remove"
+                                        ></iconify-icon>
+                                    </button>
+                                    <button
+                                        on:click={(e) => {
+                                            $form.availability[day] = [
+                                                ...$form.availability[day],
+                                                {
+                                                    start: "7:00am",
+                                                    end: "8:00am",
+                                                },
+                                            ];
+                                        }}
+                                        type="button"
+                                        class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
+                                        title="Añadir otro turno a este día"
+                                    >
+                                        <iconify-icon icon="gala:add"
+                                        ></iconify-icon>
+                                    </button>
+                                    <button
+                                        on:click={(e) => {
+                                            let copyDay = [
+                                                ...$form.availability[day],
+                                            ]; // Shallow copy for array of objects
+                                            Object.keys(
+                                                $form.availability,
+                                            ).forEach((days) => {
+                                                $form.availability[days] =
+                                                    copyDay.map((shift) => ({
+                                                        ...shift,
+                                                    })); // Create a new object for each shift
+                                            });
+                                        }}
+                                        type="button"
+                                        class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
+                                        title="Copiar este horario en todos"
+                                    >
+                                        <iconify-icon
+                                            class="text-2xl"
+                                            icon="material-symbols-light:content-copy-outline"
+                                        ></iconify-icon>
+                                    </button>
+                                </span>
                             </div>
-                        {/if}
-                    </header>
-                    <div
-                        class="grid grid-cols-3 justify-items-start gap-4 py-2"
-                    >
-                        {#if payMethod?.bank}
-                            <div>
-                                <h4 class="text-gray-500">Banco:</h4>
-                                <p>{payMethod.bank}</p>
-                            </div>
-                        {/if}
-                        {#if payMethod?.phone_number}
-                            <div>
-                                <h4 class="text-gray-500">Teléfono:</h4>
-                                <p>{payMethod.phone_number}</p>
-                            </div>
-                        {/if}
-                        {#if payMethod?.ci}
-                            <div>
-                                <h4 class="text-gray-500">Cédula:</h4>
-                                <p>{payMethod.ci}</p>
-                            </div>
-                        {/if}
-                        {#if payMethod?.person_name}
-                            <div>
-                                <h4 class="text-gray-500">Titular:</h4>
-                                <p>{payMethod.person_name}</p>
-                            </div>
-                        {/if}
-                        {#if payMethod?.account_number}
-                            <div>
-                                <h4 class="text-gray-500">N° de cuenta:</h4>
-                                <p>{payMethod.account_number}</p>
-                            </div>
-                        {/if}
-                        {#if payMethod?.email}
-                            <div>
-                                <h4 class="text-gray-500">Correo:</h4>
-                                <p>{payMethod.email}</p>
-                            </div>
-                        {/if}
-                        {#if payMethod?.username}
-                            <div>
-                                <h4 class="text-gray-500">
-                                    Nombre de usuario:
-                                </h4>
-                                <p>{payMethod.username}</p>
-                            </div>
-                        {/if}
+                        </div>
+                    </li>
+                </ul>
+                <label
+                    for="date1"
+                    class="text-color2 font-bold p-1 px-3 rounded hover:bg-color2 hover:bg-opacity-10"
+                    >Cambiar la diponibilidad en una fecha</label
+                >
+            </section>
+        </fieldset>
+
+        <fieldset class="mt-2 pb-4 flex gap-4">
+            <span>
+                <iconify-icon class="pt-2" icon="mdi:calendar-check"
+                ></iconify-icon>
+            </span>
+            <section>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <div
+                    class="p-2 flex  justify-between hover:bg-gray-200 cursor-pointer w-full"
+                    on:click={(e) => {
+                        acordion.ajustesCitasReservadas =
+                            !acordion.ajustesCitasReservadas;
+                    }}
+                >
+                    <div>
+                        <legend class="font-bold"
+                            >Ajustes de citas reservadas</legend
+                        >
+                        <small class="leading-4 inline-block">
+                            Gestionar las citas reservadas que aparecerán en tu calendario</small
+                        >
                     </div>
-                </article>
-            {/each}
-        </div>
-    </section>
+                    {#if acordion.ajustesCitasReservadas}
+                        <iconify-icon icon="iconamoon:arrow-up-2-duotone"
+                        ></iconify-icon>
+                    {:else}
+                        <iconify-icon icon="iconamoon:arrow-down-2-duotone"
+                        ></iconify-icon>
+                    {/if}
+                </div>
+                {#if acordion.ajustesCitasReservadas}
+                    <div class="p-2 mt-1">
+                        <div>
+                            <div class="leading-5 mb-1">
+                                <p class="mt-2 inline-block font-bold">
+                                    Duración del periodo entre citas
+                                </p>
+                                <small class="inline-block">
+                                    Añade tiempo entre una cita y otra
+                                </small>
+                            </div>
+
+                            <span class={`${!$form.allow_time_between_appointment ? "opacity-80" : ""} flex items-center gap-3`}>
+
+                                <input
+                                    type="checkbox"
+                                    class="w-6 h-6"
+                                    name=""
+                                    id=""
+                                    bind:checked={$form.allow_time_between_appointment}
+
+                                />
+                                <Input
+                                    type="number"
+                                    classes={"w-16 mt-0"}
+                                    disabled={!$form.allow_time_between_appointment}
+                                    inputClasses={"p-3ray-50 w-16"}
+                                    bind:value={$form.time_between_appointment}
+                                    error={$form.errors
+                                        ?.time_between_appointment}
+                                />
+                                <Input
+                                    type="select"
+                                    classes={"mt-0 w-36  border-none"}
+                                    inputClasses={"p-3er-none"}
+                                    bind:value={$form.time_between_appointment_type}
+                                    error={$form.errors
+                                        ?.time_between_appointment_type}
+                                >
+                                    <option value="minutes">minutos</option>
+                                    <option value="hours">horas</option>
+                                </Input>
+                            </span>
+                        </div>
+
+                        <div>
+                            <div class="leading-5 mb-1 mt-1">
+                                <p class="mt-4 inline-block font-bold">
+                                    Máximo de reservas por día
+                                </p>
+                                <small class="inline-block">
+                                    Limitar cuántas citas reservadas se pueden
+                                    aceptar en un día
+                                </small>
+                            </div>
+
+                            <span class={`${!$form.allow_max_appointment_per_day ? "opacity-80" : ""} flex items-center gap-3`}
+                            >
+                                <input
+                                    type="checkbox"
+                                    class="w-6 h-6"
+                                    bind:checked={$form.allow_max_appointment_per_day}
+                                    
+                                    />
+                                    <Input
+                                    type="number"
+                                    disabled={!$form.allow_max_appointment_per_day}
+                                    classes={"w-16 mt-0"}
+                                    inputClasses={"p-3ray-50 w-16"}
+                                    bind:value={$form.max_appointment_per_day}
+                                    error={$form.errors
+                                        ?.max_appointment_per_day}
+                                />
+                            </span>
+                        </div>
+                    </div>
+                {/if}
+            </section>
+        </fieldset>
+    </form>
 </section>
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
-    textarea {
-        resize: none;
-    }
-    .big_picture_label:hover iconify-icon {
-        display: block;
-    }
-    .payment_options ul a {
-        width: 100%;
-        padding: 5px 10px;
-        display: inline-block;
-        /* background: red; */
-    }
-    .slideIn {
-        animation-duration: 0.2s;
-        animation-fill-mode: forwards;
-        animation-name: slideIn;
-    }
-    @keyframes slideIn {
-        0% {
-            transform: translateY(-20px);
-            opacity: 0;
-        }
-        100% {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
 </style>

@@ -21,7 +21,7 @@
     --grayBlue: #b2bdc4;
     --gray: colors.gray;
     --ligthGreen: #54ffaf;
-    --background: #ececec;
+    --background: rgb(229 231 235);
 }
 
 /* // dashboard  */
@@ -200,7 +200,7 @@ h1 {
 }
 
 option {
-    background: #050713;
+    /* background: #050713; */
     padding: 10px;
 }
 

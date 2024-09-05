@@ -5,22 +5,26 @@
     export let required = "";
     export let placeholder = "";
     export let type = "text";
-    export let classes = ''
+    export let classes = false
     export let theme = "ligtht"
     export let min = ""
     export let max = ""
-
+    export let inputClasses= false
+    export let labelClasses= false
+    export let disabled=false
     export let error = false;
 </script>
 
-<div class={`text-left w-full mt-5 ${theme == "dark" ? "bg-color1 text-gray-100" : ''}`}>
-    <label for={label} class={`form__label w-full text-gray-300 ${theme == "dark" ? "bg-color1 text-gray-100" : ''}`} {placeholder}>{label} {required? "*" : "" }</label>
+                
+<div class={`text-left   ${theme == "dark" ? "bg-color1 text-gray-100" : ''}${classes ? classes : "mt-5 w-full"}` } >
+    <label for={label} class={` w-full text-gray-900 ${theme == "dark" ? "bg-color1 text-gray-100" : ''} ${labelClasses}`} {placeholder}>{label} {required? "*" : "" }</label>
     <div class="relative w-full parent_div">
         {#if type === "textarea"}
             <textarea bind:value id={label} rows="1"></textarea>
         {:else if type === "select"}
                 
-            <select id={label} bind:value  required={required}>
+                
+                <select on:change class={`w-full ${inputClasses ? inputClasses : "p-2 bg-gray "}`} id={label} bind:value  required={required}> 
                 <slot></slot>
             </select>
         {:else}
@@ -28,8 +32,9 @@
                 bind:value
                 {...{ type }}
                 id={label}
-                class="form__field"
+                class={`w-full ${inputClasses ? inputClasses : "p-2 bg-gray "}`}
                 required={required}
+                disabled={disabled}
                 max={max}
                 min={min}
                 on:input
@@ -50,19 +55,13 @@
     input,
     textarea,
     select {
-        width: 100%;
-        padding: 10px;
         padding-block: 8px;
         border: 0;
         border-radius: 5px;
-        background: hwb(217 91% 0% / 0.144);
-        border-bottom: 1px solid gray;
     }
-    select {
-        padding: 11px;
-    }
+    
     option {
-        background: #000;
+        background: #ffffff;
     }
     input:focus,
     textarea:focus,

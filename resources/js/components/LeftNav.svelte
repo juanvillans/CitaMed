@@ -32,8 +32,8 @@
     console.log($page);
 </script>
 
-<nav class="left_nav flex md:block items-center bg-color1  text-gray-200 h-full relative rounded-3xl overflow-hidden">
-    <button on:click={() => toggleMenu()} class="hidden md:block burger_icon  items-center pt-1  text-center text-2xl text-gray-300 hover:text-color4 bg-gray-700 bg-opacity-50 ">
+<nav class="left_nav flex md:block items-center bg-color1  text-white h-full relative rounded-3xl overflow-hidden">
+    <button on:click={() => toggleMenu()} class="hidden md:block burger_icon  items-center pt-1  text-center text-2xl text-gray-300 hover:text-color4 bg-color2 bg-opacity-20 ">
     
         <iconify-icon class="mb-0 pb-0" icon="majesticons:menu-expand-left-line"></iconify-icon>
     </button>
@@ -66,11 +66,11 @@
 
 <style>
     .active {
-        /* background: linear-gradient(80deg, #acd7f2 9%, transparent 99%); */
+        background: #6595BF;
         position: relative;
         border-radius: 6px;
         /* box-shadow: 0 0 10px 0px #9BF2EA; */
-        color: #21e6c1 !important;
+        /* color: #21e6c1 !important; */
         font-weight: bold;
     }
     a:before {

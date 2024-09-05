@@ -187,9 +187,9 @@
 <Alert />
 
 <Modal bind:showModal>
-    <h2 slot="header" class="text-sm text-center">
+    <p slot="header" class="text-sm text-center">
         INSCRIBIR NUEVO ESTUDIANTE
-    </h2>
+    </p>
 
     <form id="a-form" on:submit={handleSubmit} action="" class="w-[600px]">
         <fieldset
