@@ -258,9 +258,7 @@
                                                     class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
                                                     title="No disponible"
                                                 >
-                                                    <iconify-icon
-                                                        icon="mdi:remove"
-                                                    ></iconify-icon>
+                                                <iconify-icon icon="ic:baseline-block"></iconify-icon>
                                                 </button>
                                                 {#if indx == 0}
                                                     <button
@@ -515,8 +513,7 @@
                                         class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
                                         title="No disponible"
                                     >
-                                        <iconify-icon icon="mdi:remove"
-                                        ></iconify-icon>
+                                    <iconify-icon icon="ic:baseline-block"></iconify-icon>
                                     </button>
                                     <button
                                         on:click={(e) => {
