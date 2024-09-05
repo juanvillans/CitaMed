@@ -10,7 +10,6 @@
     import { displayAlert } from "../../stores/alertStore";
     export let data;
     let acordion = { franja: false, ajustesCitasReservadas: false };
-    console.log({ data });
     let showModal = false;
 
     let form = useForm({
@@ -60,7 +59,6 @@
     };
     let showPaymentOptions = false;
     function handleCloseCustomTime() {
-        console.log($form.prev_value_duration_per_appointment);
         $form.duration_per_appointment =
             $form.prev_value_duration_per_appointment;
     }
@@ -107,7 +105,6 @@
         </div>
         <button
             on:click={() => {
-                console.log(customTimePerAppointment.type);
                 let valueFixed =
                     customTimePerAppointment.type == "horas"
                         ? customTimePerAppointment.time * 60
@@ -125,7 +122,6 @@
 
                 ($form.prev_value_duration_per_appointment = valueFixed),
                     ($form.duration_per_appointment = valueFixed),
-                    console.log(durationOptions, $form);
                 showModal = false;
             }}
             slot="btn_footer"
@@ -345,7 +341,6 @@
                                                     end: "8:00am",
                                                 },
                                             ];
-                                            console.log($form.availability);
                                         }}
                                         type="button"
                                         class="relative -left-1.5 cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
