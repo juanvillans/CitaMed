@@ -16,8 +16,8 @@ class ModuleSeeder extends Seeder
         DB::table('modules')->insert
         (
             [
-                ['name' => 'Configuración de institución'],
-                ['name' => 'Inscripciones'],
+                ['name' => 'Usuarios'],
+                ['name' => 'Agenda'],
             ]
 
         );
