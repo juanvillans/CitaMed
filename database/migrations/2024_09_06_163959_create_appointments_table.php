@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('max_reservation_time_before_appointment')->default(0);
             $table->integer('min_reservation_time_before_appointment')->default(0);
             $table->json('adjust_avability_json');
-            $table->integer('duration_between_appointmen');
+            $table->integer('duration_between_appointment');
             $table->integer('max_reservations_per_day');
             $table->timestamps();
         });

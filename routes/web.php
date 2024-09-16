@@ -1,14 +1,16 @@
 <?php
 
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\BitacoraController;
+use App\Http\Controllers\MainConfigController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\StudentController;
-use App\Http\Controllers\BitacoraController;
-use App\Http\Controllers\MainConfigController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -48,7 +50,7 @@ Route::middleware(['auth'])->group(function ()
     Route::get('/dashboard/configuracion', [MainConfigController::class, 'index']);
     Route::get('/dashboard/configuracion/editar-cuenta/{id}', [MainConfigController::class, 'showEditAccount']);
     Route::get('/dashboard/configuracion/crear-cuenta/{methodID}', [MainConfigController::class, 'showCreateAccount']);
-    Route::post('/dashboard/configuracion/crear-cuenta', [MainConfigController::class, 'createAccount']);
+    Route::post('/dashboard/agenda', [AppointmentController::class, 'store']);
     Route::put('/dashboard/configuracion/editar-cuenta/{id}', [MainConfigController::class, 'editAccount']);
     Route::delete('/dashboard/configuracion/eliminar-cuenta/{id}', [MainConfigController::class, 'deleteAccount']);
 
