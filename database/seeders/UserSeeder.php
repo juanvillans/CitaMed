@@ -27,10 +27,6 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('12345678'),
                 'phone_number' => '04125800610',
                 'address' => 'JUANCRI',
-                'date_birth' => '2022-07-09',
-                'state' => 'Falcon',
-                'city' => 'Coro',
-                'photo' => '',
 
             ]);
     }
