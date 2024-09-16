@@ -17,7 +17,7 @@
     const onDateChange = (d, indx) => {
         $form.adjusted_availability[indx].date = d.detail.toISOString();
     };
-
+    let defaulTtime_between_appointment = 30;
     export let data = {};
     let acordion = { franja: false, ajustesCitasReservadas: false };
     let showModal = false;
@@ -34,8 +34,7 @@
         allow_min_reservation_time_before_appointment: true,
         max_reservation_time_before_appointment: 60,
         min_reservation_time_before_appointment: 40,
-        time_between_appointment_type: "minutes",
-        time_between_appointment: 30,
+        time_between_appointment: 25,
         max_appointment_per_day: 4,
         availability: {
             mon: [
@@ -1641,22 +1640,33 @@
                                 </div>
 
                                 <span
-                                    class={`${!$form.allow_time_between_appointment ? "opacity-80" : ""} flex items-center gap-3`}
+                                    class={`${!$form.time_between_appointment ? "opacity-80" : ""} flex items-center gap-3`}
                                 >
                                     <input
                                         type="checkbox"
                                         class="w-6 h-6"
                                         name=""
                                         id=""
-                                        bind:checked={$form.allow_time_between_appointment}
+                                        bind:checked={$form.time_between_appointment}
+                                        on:change={(e) => {
+                                            if (e.target.checked) {
+                                                $form.time_between_appointment = defaulTtime_between_appointment
+                                            } else {
+                                                $form.time_between_appointment = 0
+                                            }
+                                        }}
                                     />
                                     <Input
                                         type="number"
                                         classes={"w-16 mt-0"}
-                                        disabled={!$form.allow_time_between_appointment}
+                                        disabled={!$form.time_between_appointment}
                                         inputClasses={"p-3 ray-50 w-16"}
                                         min={0}
-                                        bind:value={$form.time_between_appointment}
+                                        value={$form.time_between_appointment || defaulTtime_between_appointment}
+                                        on:change={(e)=>{
+                                            $form.time_between_appointment = e.target.value
+                                            defaulTtime_between_appointment =  $form.time_between_appointment 
+                                        }}
                                         error={$form.errors
                                             ?.time_between_appointment}
                                         on:change={updateAllStartAppointmets}

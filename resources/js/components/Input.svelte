@@ -89,6 +89,7 @@
                 class={`w-full ${inputClasses ? inputClasses : "p-2 bg-gray "} ${error ? ' border-b border-red bg-red bg-opacity-10' : ""}`}
                 required={required}
                 disabled={disabled}
+                defaultValue={'xxx'}
                 max={max}
                 min={min}
                 on:input
