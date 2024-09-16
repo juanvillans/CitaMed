@@ -1,7 +1,7 @@
 <script>
     export let showModal; // boolean
     export let onClose; // callback function
-
+    export let modalClasses;
     let dialog; // HTMLDialogElement
 
     $: if (dialog && showModal) dialog.showModal();
@@ -16,7 +16,7 @@
         if (onClose) onClose(); // Call the onClose callback
     }}
     on:click|self={() => dialog.close()}
-    class="bg-gray-50 p-5 pb-2 rounded-xl min-w-[300px]"
+    class={`bg-gray-50 p-5 pb-2 rounded-xl min-w-[300px] ${modalClasses}`}
 >
     <div on:click|stopPropagation>
         <slot name="header"  />
