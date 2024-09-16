@@ -1412,6 +1412,15 @@
 #65 C:\\xampp\\htdocs\\VillaDonqV2\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(16): require_once('C:\\\\xampp\\\\htdocs...')
 #66 {main}
 "} 
+<<<<<<< HEAD
+[2024-09-05 15:08:04] local.ERROR: Command "sever" is not defined. {"exception":"[object] (Symfony\\Component\\Console\\Exception\\CommandNotFoundException(code: 0): Command \"sever\" is not defined. at C:\\xampp\\htdocs\\CitaMed\\vendor\\symfony\\console\\Application.php:702)
+[stacktrace]
+#0 C:\\xampp\\htdocs\\CitaMed\\vendor\\symfony\\console\\Application.php(256): Symfony\\Component\\Console\\Application->find('sever')
+#1 C:\\xampp\\htdocs\\CitaMed\\vendor\\symfony\\console\\Application.php(168): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#2 C:\\xampp\\htdocs\\CitaMed\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(200): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#3 C:\\xampp\\htdocs\\CitaMed\\artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#4 {main}
+=======
 [2024-09-05 16:08:33] local.ERROR: SQLSTATE[HY000] [1698] Access denied for user 'root'@'localhost' (Connection: mysql, SQL: select * from `users` where `ci` = 12345678 limit 1) {"exception":"[object] (Illuminate\\Database\\QueryException(code: 1698): SQLSTATE[HY000] [1698] Access denied for user 'root'@'localhost' (Connection: mysql, SQL: select * from `users` where `ci` = 12345678 limit 1) at /var/www/html/CitaMed/vendor/laravel/framework/src/Illuminate/Database/Connection.php:793)
 [stacktrace]
 #0 /var/www/html/CitaMed/vendor/laravel/framework/src/Illuminate/Database/Connection.php(753): Illuminate\\Database\\Connection->runQueryCallback()
@@ -1661,4 +1670,5 @@
 #49 /var/www/html/CitaMed/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(200): Symfony\\Component\\Console\\Application->run()
 #50 /var/www/html/CitaMed/artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle()
 #51 {main}
+>>>>>>> e0cf541a59bd0c9f434be951117483d5c7db1f15
 "} 

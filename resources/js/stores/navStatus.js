@@ -1,8 +1,8 @@
 import { writable } from "svelte/store";
 
 export const navStatus = writable({
-    isContracted: false,
-    navWidth: 240,
+    isContracted: true,
+    navWidth: 60,
     
 });
 
@@ -12,7 +12,7 @@ export function toggleMenu(objParams) {
         if (newStatus == true) {
              return { ...current, isContracted: newStatus, navWidth: 60 };
         } else {
-            return { ...current, isContracted: newStatus, navWidth: 240 };
+            return { ...current, isContracted: newStatus, navWidth: 210 };
 
         }
         console.log({current})
