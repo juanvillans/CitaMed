@@ -14,15 +14,16 @@ class AppController
         return inertia('Index');
     }
 
-    public function dashboard(): Response
+    public function loginForm(): Response
+    {
+        return inertia('Login');
+    }
+
+    public function admin(): Response
     {
         return inertia('Dashboard/Index');
     }
 
-    public function maquinas(): Response
-    {
-        return inertia('Dashboard/Maquinas');
-    }
 
    
 }

@@ -9,23 +9,23 @@
     const navPages = [
         {
             icon: "uil:setting",
-            href: "/dashboard/configuracion",
-            name: "Configuración",
+            href: "/admin/usuarios",
+            name: "Usuarios",
         },
         {
             icon: "mdi:google-classroom",
-            href: "/dashboard/matricula",
-            name: "Matricula",
+            href: "/admin/citas",
+            name: "Citas",
         },
 
         {
             icon: "streamline:payment-10",
-            href: "/dashboard/pagos",
+            href: "/admin/pagos",
             name: "Pagos",
         },
         {
             icon: "streamline:payment-10",
-            href: "/dashboard/registrar-pago",
+            href: "/admin/registrar-pago",
             name: "Registrar pago",
         },
     ];
