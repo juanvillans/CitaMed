@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
-use Illuminate\Http\Request;
-use App\Services\UserService;
-use App\Services\LoginService;
 use App\Http\Requests\LoginRequest;
+use App\Services\LoginService;
+use App\Services\UserService;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class UserController extends Controller
 {
@@ -21,21 +22,21 @@ class UserController extends Controller
 
     }
 
-    
+    public function index()
+    {
+        return inertia('Dashboard/Usuarios');
+    }
 
     public function login(LoginRequest $request)
     {
 
             $dataUser = ['ci' => $request->ci, 'password' => $request->password];
+
             if(!$this->loginService->tryLoginOrFail($dataUser))
     			return redirect('/')->withErrors(['data' => 'Datos incorrectos, intente nuevamente']);
 
-            $token = $this->loginService->generateToken($dataUser);
-            $user = auth()->user();
-            $permissionsArray = $this->userService->getPermissions($user->id);
-            $permissionsWithFormat = $this->userService->formatToPermissions($permissionsArray);
 
-            return Inertia::location('/dashboard');
+            return Inertia::location('/admin');
 
 
     }
@@ -44,7 +45,7 @@ class UserController extends Controller
     {
         Auth::logout();
 
-        return redirect()->route('login');
+        return redirect()->route('landpage');
     }
 
     public function changePassword(UpdatePasswordRequest $request)

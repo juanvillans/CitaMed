@@ -91,7 +91,7 @@
                     class="absolute rounded-md flex items-center flex-col bg-color1 w-full z-50 px-3 top-10 -left-10 rounded-tr-none text-gray-100"
                 >
                     <a
-                        href="/logout"
+                        href="/admin/logout"
                         class="p-2 cursor-pointer hover:underline hover:text-gray-50 inline-block"
                         >Cerrar sesión</a
                     >

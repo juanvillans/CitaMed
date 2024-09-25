@@ -24,32 +24,21 @@ class LoginService
 		return true;
 	}
 
-	public function generateToken($dataUser)
-	{
-		$user = $this->userModel->findForCi($dataUser['ci']);
 
-		$permissions = $this->userModel->getPermissions($user);
+	// public function tryChangePassword($data)
+	// {	
+	// 	$user = Auth::user();
 
-		$token = $user->createToken("permissionsToken",$permissions)->plainTextToken;
+	// 	if (!Hash::check($data['oldPassword'], $user->password)) 
+	// 		throw new CustomException('Contraseña actual incorrecta',422);   
 
-		return $token;
+	// 	if(!$data['newPassword'] == $data['confirmPassword'])
+	// 		throw new CustomException('La nueva contraseña no coincide con la confirmación',422);   
 
-	}
+	// 	$user->password = Hash::make($data['newPassword']);
+    // 	$user->save();
 
-	public function tryChangePassword($data)
-	{	
-		$user = Auth::user();
-
-		if (!Hash::check($data['oldPassword'], $user->password)) 
-			throw new CustomException('Contraseña actual incorrecta',422);   
-
-		if(!$data['newPassword'] == $data['confirmPassword'])
-			throw new CustomException('La nueva contraseña no coincide con la confirmación',422);   
-
-		$user->password = Hash::make($data['newPassword']);
-    	$user->save();
-
-	}
+	// }
 
 
 }

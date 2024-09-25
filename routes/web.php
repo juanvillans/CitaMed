@@ -1,12 +1,7 @@
 <?php
 
 use App\Http\Controllers\AppController;
-use App\Http\Controllers\AppointmentController;
-use App\Http\Controllers\BitacoraController;
-use App\Http\Controllers\MainConfigController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\SectionController;
-use App\Http\Controllers\StudentController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -22,39 +17,18 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', [AppController::class, 'index'])->name('login');
-Route::post('/login', [UserController::class, 'login']);
-Route::get('/logout', [UserController::class, 'logout'])->middleware('auth')->name('logout');         
+Route::get('/', [AppController::class, 'index'])->name('landpage');
+Route::get('/admin/login', [AppController::class, 'loginForm'])->name('login');
+Route::post('/admin/login', [UserController::class, 'login']);
 
-Route::middleware(['auth'])->group(function () 
+Route::get('/admin/logout', [UserController::class, 'logout'])->middleware('auth')->name('logout');         
+
+Route::middleware(['auth'])->prefix('admin')->group(function () 
 {
-    Route::get('/dashboard', [AppController::class, 'dashboard'])->name('dashboard');
-    
-    Route::get('/dashboard/matricula', [StudentController::class, 'index']);    
-    Route::post('/dashboard/matricula', [StudentController::class, 'store']);    
-    Route::put('/dashboard/matricula/{id}', [StudentController::class, 'update']);    
-    Route::delete('/dashboard/matricula/{studentId}', [StudentController::class, 'destroy']);    
+    Route::get('/', [AppController::class, 'admin'])->name('admin');
+    Route::resource('/usuarios', UserController::class);
+    Route::resource('/citas', ServiceController::class);
 
-    Route::get('/dashboard/matricula/search-representative/{ci}', [StudentController::class, 'searchRepresentativeByCI']);
-    Route::get('/dashboard/matricula/search-second_representative/{ci}', [StudentController::class, 'searchSecondRepresentativeByCI']);
-    
-    Route::post('/dashboard/secciones', [SectionController::class, 'store']);    
-    Route::delete('/dashboard/secciones/{course_id}/{section_id}', [SectionController::class, 'destroy']);    
-    
-    Route::get('/dashboard/pagos', [PaymentController::class, 'index']);
-    Route::get('/dashboard/pagos/search-representative/{search}', [StudentController::class, 'searchRepresentative']);
-    Route::get('/dashboard/registrar-pago', [PaymentController::class, 'showCreatePayment']);
-
-
-
-    Route::get('/dashboard/configuracion', [MainConfigController::class, 'index']);
-    Route::get('/dashboard/configuracion/editar-cuenta/{id}', [MainConfigController::class, 'showEditAccount']);
-    Route::get('/dashboard/configuracion/crear-cuenta/{methodID}', [MainConfigController::class, 'showCreateAccount']);
-    Route::post('/dashboard/agenda', [AppointmentController::class, 'store']);
-    Route::put('/dashboard/configuracion/editar-cuenta/{id}', [MainConfigController::class, 'editAccount']);
-    Route::delete('/dashboard/configuracion/eliminar-cuenta/{id}', [MainConfigController::class, 'deleteAccount']);
-
-    Route::put('/dashboard/configuracion/pagos', [MainConfigController::class, 'updatePaymentConfig']);
 
     
 });
