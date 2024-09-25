@@ -34,7 +34,7 @@
         allow_min_reservation_time_before_appointment: true,
         max_reservation_time_before_appointment: 60,
         min_reservation_time_before_appointment: 40,
-        time_between_appointment: 25,
+        time_between_appointment: null,
         max_appointment_per_day: 4,
         availability: {
             mon: [
@@ -46,16 +46,25 @@
                             start_appo: "08:00",
                         },
                         {
-                            start_appo: "09:30",
+                            start_appo: "09:00",
+                        },
+                        {
+                            start_appo: "10:00",
                         },
                         {
                             start_appo: "11:00",
                         },
                         {
-                            start_appo: "12:30",
+                            start_appo: "12:00",
+                        },
+                        {
+                            start_appo: "13:00",
                         },
                         {
                             start_appo: "14:00",
+                        },
+                        {
+                            start_appo: "15:00",
                         },
                     ],
                 },
@@ -69,16 +78,25 @@
                             start_appo: "08:00",
                         },
                         {
-                            start_appo: "09:30",
+                            start_appo: "09:00",
+                        },
+                        {
+                            start_appo: "10:00",
                         },
                         {
                             start_appo: "11:00",
                         },
                         {
-                            start_appo: "12:30",
+                            start_appo: "12:00",
+                        },
+                        {
+                            start_appo: "13:00",
                         },
                         {
                             start_appo: "14:00",
+                        },
+                        {
+                            start_appo: "15:00",
                         },
                     ],
                 },
@@ -92,16 +110,25 @@
                             start_appo: "08:00",
                         },
                         {
-                            start_appo: "09:30",
+                            start_appo: "09:00",
+                        },
+                        {
+                            start_appo: "10:00",
                         },
                         {
                             start_appo: "11:00",
                         },
                         {
-                            start_appo: "12:30",
+                            start_appo: "12:00",
+                        },
+                        {
+                            start_appo: "13:00",
                         },
                         {
                             start_appo: "14:00",
+                        },
+                        {
+                            start_appo: "15:00",
                         },
                     ],
                 },
@@ -115,16 +142,25 @@
                             start_appo: "08:00",
                         },
                         {
-                            start_appo: "09:30",
+                            start_appo: "09:00",
+                        },
+                        {
+                            start_appo: "10:00",
                         },
                         {
                             start_appo: "11:00",
                         },
                         {
-                            start_appo: "12:30",
+                            start_appo: "12:00",
+                        },
+                        {
+                            start_appo: "13:00",
                         },
                         {
                             start_appo: "14:00",
+                        },
+                        {
+                            start_appo: "15:00",
                         },
                     ],
                 },
@@ -138,16 +174,25 @@
                             start_appo: "08:00",
                         },
                         {
-                            start_appo: "09:30",
+                            start_appo: "09:00",
+                        },
+                        {
+                            start_appo: "10:00",
                         },
                         {
                             start_appo: "11:00",
                         },
                         {
-                            start_appo: "12:30",
+                            start_appo: "12:00",
+                        },
+                        {
+                            start_appo: "13:00",
                         },
                         {
                             start_appo: "14:00",
+                        },
+                        {
+                            start_appo: "15:00",
                         },
                     ],
                 },
@@ -432,6 +477,7 @@
         .toLowerCase();
     console.log({ currentDatabaseDay });
     let shiftsForCalendar = {};
+
     function updateShiftsForCalendar() {
         Object.entries(database.calendar).forEach(([key, value], indx) => {
             let isItAjustedShift = $form.adjusted_availability.findIndex(
@@ -484,6 +530,7 @@
         return `${newHours}:${newMinutes}`;
     }
     const GetStartAppointmets = (shift) => {
+        console.log($form.time_between_appointment);
         let forAppointments = [];
         let amountOfAppointments = calculateAppointments(
             GetHeight(shift.start, shift.end),
@@ -782,7 +829,7 @@
           
         </div> -->
         <form
-            class=" bg-gray-100 p-3 pl-0 rounded pt-5 sticky top-1 h-screen overflow-y-scroll overflow-x-hidden pr-2 "
+            class=" bg-gray-100 p-3 pl-0 rounded pt-5 sticky top-1 h-screen overflow-y-scroll overflow-x-hidden pr-2"
             action=""
             on:submit={(e) => {
                 e.preventDefault();
@@ -1650,10 +1697,12 @@
                                         bind:checked={$form.time_between_appointment}
                                         on:change={(e) => {
                                             if (e.target.checked) {
-                                                $form.time_between_appointment = defaulTtime_between_appointment
+                                                $form.time_between_appointment =
+                                                    defaulTtime_between_appointment;
                                             } else {
-                                                $form.time_between_appointment = 0
+                                                $form.time_between_appointment = 0;
                                             }
+                                            updateAllStartAppointmets();
                                         }}
                                     />
                                     <Input
@@ -1662,14 +1711,17 @@
                                         disabled={!$form.time_between_appointment}
                                         inputClasses={"p-3 ray-50 w-16"}
                                         min={0}
-                                        value={$form.time_between_appointment || defaulTtime_between_appointment}
-                                        on:change={(e)=>{
-                                            $form.time_between_appointment = e.target.value
-                                            defaulTtime_between_appointment =  $form.time_between_appointment 
+                                        value={$form.time_between_appointment ||
+                                            defaulTtime_between_appointment}
+                                        on:change={(e) => {
+                                            $form.time_between_appointment =
+                                                e.target.value;
+                                            defaulTtime_between_appointment =
+                                                $form.time_between_appointment;
+                                            updateAllStartAppointmets();
                                         }}
                                         error={$form.errors
                                             ?.time_between_appointment}
-                                        on:change={updateAllStartAppointmets}
                                     />
                                     <p>minutos</p>
                                 </span>
