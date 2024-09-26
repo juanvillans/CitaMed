@@ -24,6 +24,7 @@ class UserSeeder extends Seeder
             "email" => "juandonquis07@gmail.com",
             "password" => Hash::make('admin'),
             "phone_number" => "04125800610",
+            "search" => "Juan Donquis juandonquis07@gmail.com 30847627 04125800610"
         ]);
 
         $user2 = User::create([
@@ -34,6 +35,7 @@ class UserSeeder extends Seeder
             "email" => "juanvillans16@gmail.com",
             "password" => Hash::make('admin'),
             "phone_number" => "04124393123",
+            "search" => "Juan Villasmil juanvillans16@gmail.com 27253194 04124393123"
         ]);
 
         $user1->assignRole('admin');
