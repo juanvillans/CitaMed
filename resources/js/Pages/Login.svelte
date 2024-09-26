@@ -28,19 +28,10 @@
 </script>
 
 <Alert />
-<section class="bg-background min-h-screen">
-    <header class="flex justify-between px-1 mx-4 md:mx-12 py-3 lg:mx-20">
-        <img src="file:///C:/Users/Juan/Downloads/logo_colegio_negro%20(1).png" alt="">
-        <button
-            class="btn_create inline-block"
-            on:click={(e) => {
-                e.preventDefault();
-                showModal = true;
-            }}>Login</button
-        >
-    </header>
-    <Modal bind:showModal>
-        <legend slot="header" class="text-center opacity-70"
+<section class="bg-background min-h-screen flex justify-center items-center">
+
+   <div class="w-11/12 max-w-sm">
+        <legend class="text-center opacity-70"
             >INICIAR SESIÓN</legend
         >
         <form on:submit={handleSubmit} class="min-w-[250px]">
@@ -74,15 +65,12 @@
                 type="submit"
                 disabled={$form.processing}
                 value={$form.processing ? "Cargando..." : "ENTRAR"}
-                class="hover:bg-color3 hover:text-white duration-200 mt-5 w-full bg-color4 text-black font-bold py-3 rounded-md cursor-pointer"
+                class="bg-color3 text-white duration-200 mt-5 w-full hover:bg-color4 hover:text-black font-bold py-3 rounded-md cursor-pointer"
             />
         </form>
-    </Modal>
+    </div>
 
-    <main
-        class="bg-background px-1 mx-4 md:py-9 md:mx-12 lg:mx-20 justify-between md:grid grid-flow-col md:gap-x-10 lg:gap-x-24 xl:gap-32 items-center"
-    >
-    </main>
+  
 </section>
 
 <style>

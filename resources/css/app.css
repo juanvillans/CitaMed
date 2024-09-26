@@ -23,7 +23,17 @@
     --ligthGreen: #54ffaf;
     --background: rgb(245, 245, 245);
 }
-
+.text-editor ul  {
+    list-style-type: disc !important;
+    padding: inherit !important;
+    margin-left: 25px !important;
+}
+.text-editor ol {
+    list-style-type: decimal !important;
+    padding: inherit !important;
+    margin-left: 25px !important;
+    
+}
 /* // dashboard  */
 .dashboard_container {
     height: 100vh;
@@ -36,7 +46,9 @@
     background: var(--background);
     color: #1d1d1d;
 }
-
+.cl-content {
+    resize: both;
+  }
 .main_and_footer_container {
     display: grid;
     grid-template-rows: 1fr auto;
