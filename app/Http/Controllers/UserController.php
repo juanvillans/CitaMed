@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\UserRequest;
+use App\Models\Specialty;
 use App\Services\LoginService;
+use App\Services\SpecialtyService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -28,14 +30,16 @@ class UserController extends Controller
         $this->params = [
             'search' => $request->input('search'),
         ];     
-        
+        $specialtyService = new SpecialtyService();
+
         $users = $this->userService->getUsers($this->params);
-        
+        $specialties = $specialtyService->getSpecialties(['status' => 1]);
 
         return inertia('Dashboard/Usuarios',[
 
             'data' => [
                 'users' => $users,
+                'specialties' => $specialties,
             ]
         ]);
     }

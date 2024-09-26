@@ -21,10 +21,15 @@ class SpecialtyService
             
             $query->where('name','like','%' . $search . '%');
         })
+        ->when($params['status'],function($query, $status){
+            
+            $query->where('status', $status);
+        })
         ->get();
 
         return $users;
     }
+
 
     public function setSpecialtyStatus($specialty)
     {
