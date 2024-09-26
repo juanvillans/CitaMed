@@ -30,7 +30,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function ()
     Route::resource('/citas', ServiceController::class);
     
     Route::get('/especialidades', [SpecialtyController::class,'index']);
-    Route::update('/especialidades/{id}', [SpecialtyController::class,'setSpecialty']);
+    Route::put('/especialidades/{id}', [SpecialtyController::class,'setSpecialty']);
 
 
 

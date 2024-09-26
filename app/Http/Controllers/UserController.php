@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\UserRequest;
 use App\Services\LoginService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -28,6 +30,7 @@ class UserController extends Controller
         ];     
         
         $users = $this->userService->getUsers($this->params);
+        
 
         return inertia('Dashboard/Usuarios',[
 
@@ -35,6 +38,32 @@ class UserController extends Controller
                 'users' => $users,
             ]
         ]);
+    }
+
+    public function store(UserRequest $request)
+    {   
+        DB::beginTransaction();
+
+        try 
+        {
+            $data = $request->all();
+
+            $this->userService->createUser($data);
+
+            DB::commit();
+
+            return redirect('/admin/usuarios');
+
+        }
+        catch (\Throwable $e)
+        {   
+            
+            DB::rollback();
+            
+            return redirect('/admin/usuarios')->withErrors(['message' => $e->getMessage()]);
+        }
+
+
     }
 
     public function login(LoginRequest $request)
