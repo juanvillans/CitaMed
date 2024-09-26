@@ -25,6 +25,13 @@ class SpecialtyService
 
         return $users;
     }
+
+    public function setSpecialtyStatus($specialty)
+    {
+        $specialty->update(['status' => 1]);
+
+        return 0;
+    }
     
 
 }
