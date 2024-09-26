@@ -18,7 +18,11 @@
         $form.adjusted_availability[indx].date = d.detail.toISOString();
     };
 
-    export let data = {};
+    export let data;
+
+    console.log(data);
+
+    // export let data = {};
     let acordion = { franja: false, ajustesCitasReservadas: false };
     let showModal = false;
     let showModalFranja = false;

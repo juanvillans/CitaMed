@@ -14,17 +14,27 @@ class UserController extends Controller
 {
     private LoginService $loginService;
     private UserService $userService;
-
+    private $params = [];
     public function __construct()
     {
         $this->loginService = new LoginService;
         $this->userService = new UserService;
-
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return inertia('Dashboard/Usuarios');
+        $this->params = [
+            'search' => $request->input('search'),
+        ];     
+        
+        $users = $this->userService->getUsers($this->params);
+
+        return inertia('Dashboard/Usuarios',[
+
+            'data' => [
+                'users' => $users,
+            ]
+        ]);
     }
 
     public function login(LoginRequest $request)

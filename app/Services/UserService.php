@@ -2,10 +2,8 @@
 
 namespace App\Services;
 
-use DB;
+use App\Http\Resources\UserCollection;
 use App\Models\User;
-use App\Http\Resources\UserResource;
-use Illuminate\Support\Facades\Auth;
 
 class UserService
 {	
@@ -15,6 +13,19 @@ class UserService
     public function __construct()
     {
         $this->userModel = new User;
+    }
+
+    public function getUsers($params)
+    {
+        $users = User::query()
+        ->when($params['search'],function($query, $search){
+            
+            $query->where('search','like','%' . $search . '%');
+        })
+        ->with('specialties')
+        ->get();
+
+        return new UserCollection($users);
     }
     
 
