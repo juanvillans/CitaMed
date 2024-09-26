@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -28,6 +29,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function ()
     Route::get('/', [AppController::class, 'admin'])->name('admin');
     Route::resource('/usuarios', UserController::class);
     Route::resource('/citas', ServiceController::class);
+    
+    Route::get('/especialidades', [SpecialtyController::class,'index']);
+
 
 
     

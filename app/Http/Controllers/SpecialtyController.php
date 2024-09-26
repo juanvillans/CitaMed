@@ -6,14 +6,14 @@ use App\Models\Specialties;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
-class SpecialtiesController extends Controller
+class SpecialtyController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return inertia('Dashboard/Especialidades');
     }
 
     /**
