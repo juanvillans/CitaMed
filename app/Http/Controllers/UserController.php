@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\UserRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Models\Specialty;
+use App\Models\User;
 use App\Services\LoginService;
 use App\Services\SpecialtyService;
 use App\Services\UserService;
@@ -68,6 +70,30 @@ class UserController extends Controller
         }
 
 
+    }
+
+    public function update(UserUpdateRequest $request, User $user)
+    {
+        DB::beginTransaction();
+
+        try 
+        {
+            $data = $request->all();
+
+            $this->userService->updateUser($data, $user);
+
+            DB::commit();
+
+            return redirect('/admin/usuarios');
+
+        }
+        catch (\Throwable $e)
+        {   
+            
+            DB::rollback();
+            
+            return redirect('/admin/usuarios')->withErrors(['message' => $e->getMessage()]);
+        }
     }
 
     public function login(LoginRequest $request)

@@ -10,14 +10,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UserService
 {	
-	private User $userModel;
-
-
-    public function __construct()
-    {
-        $this->userModel = new User;
-    }
-
     public function getUsers($params)
     {
         $users = User::query()
@@ -48,6 +40,28 @@ class UserService
 
         if($newUser->hasRole('doctor'))
             $this->assignSpecialties($newUser,$data);
+
+        return 0;
+
+    }
+
+    public function updateUser($data, $user)
+    {
+
+        $user->update([
+            
+            "ci" => $data['ci'],
+            "name" => $data['name'],
+            "last_name" => $data['last_name'],
+            "email" => $data['email'],
+            "search" => $this->generateSearch($data),
+        ]);
+
+        $user->revokeRoles();
+        $user->assignRole($data['role']);
+
+        if($user->hasRole('doctor'))
+            $this->assignSpecialties($user,$data);
 
         return 0;
 
