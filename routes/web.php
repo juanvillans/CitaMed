@@ -5,7 +5,6 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +30,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function ()
     Route::resource('/citas', ServiceController::class);
     
     Route::get('/especialidades', [SpecialtyController::class,'index']);
+    Route::put('/especialidades/{id}', [SpecialtyController::class,'setSpecialty']);
+
 
 
 

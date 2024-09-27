@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Specialty;
 use App\Services\SpecialtyService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -30,6 +31,23 @@ class SpecialtyController extends Controller
                 'specialties' => $specialties,
             ]
         ]);
+    }
+
+    public function setSpecialty(Specialty $specialty)
+    {
+        try{
+
+            $this->specialtyService->setSpecialtyStatus($specialty);
+            return 0;
+        }
+        catch (\Throwable $th) {
+
+            return redirect('/admin/especialidades')->withErrors(['message' => $th->getMessage()]);
+
+        }
+
+
+
     }
 
    

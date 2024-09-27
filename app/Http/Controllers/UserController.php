@@ -3,11 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\UserRequest;
+use App\Http\Requests\UserUpdateRequest;
+use App\Models\Specialty;
+use App\Models\User;
 use App\Services\LoginService;
+use App\Services\SpecialtyService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -26,15 +32,68 @@ class UserController extends Controller
         $this->params = [
             'search' => $request->input('search'),
         ];     
-        
+        $specialtyService = new SpecialtyService();
+
         $users = $this->userService->getUsers($this->params);
+        $specialties = $specialtyService->getSpecialties(['status' => 1]);
 
         return inertia('Dashboard/Usuarios',[
 
             'data' => [
                 'users' => $users,
+                'specialties' => $specialties,
             ]
         ]);
+    }
+
+    public function store(UserRequest $request)
+    {   
+        DB::beginTransaction();
+
+        try 
+        {
+            $data = $request->all();
+
+            $this->userService->createUser($data);
+
+            DB::commit();
+
+            return redirect('/admin/usuarios');
+
+        }
+        catch (\Throwable $e)
+        {   
+            
+            DB::rollback();
+            
+            return redirect('/admin/usuarios')->withErrors(['message' => $e->getMessage()]);
+        }
+
+
+    }
+
+    public function update(UserUpdateRequest $request, User $user)
+    {
+        DB::beginTransaction();
+
+        try 
+        {
+            $data = $request->all();
+
+            $this->userService->updateUser($data, $user);
+
+            DB::commit();
+
+            return redirect('/admin/usuarios');
+
+        }
+        catch (\Throwable $e)
+        {   
+            
+            DB::rollback();
+            
+            return redirect('/admin/usuarios')->withErrors(['message' => $e->getMessage()]);
+        }
     }
 
     public function login(LoginRequest $request)
