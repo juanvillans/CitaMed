@@ -14,7 +14,6 @@
         scrollableElement.addEventListener("scroll", (event) => {
             // Simulate a small delay to avoid rapid changes
             const currentScrollTop = scrollableElement.scrollTop;
-            console.log(previousScrollTop - currentScrollTop);
             if (moving) {
                top = top - (previousScrollTop - currentScrollTop)
             }

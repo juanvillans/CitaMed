@@ -1,6 +1,16 @@
 <script>
     import { onMount } from "svelte";
+    import { router } from "@inertiajs/svelte";
+    let selectedId;
+    function handleSubmit(id) {
+        const userConfirmed = window.confirm(
+            "¿Está seguro de añadir esta especialidad?",
+        );
 
+        if (userConfirmed) {
+            router.put(`/admin/especialidades/${id}`);
+        }
+    }
     export let data;
     let searchTerm = "";
     let instituteSpecialities = [];
@@ -9,20 +19,16 @@
     $: data, UpdateData();
     function UpdateData() {
         for (let i = 0; i < data.specialties.length; i++) {
-                const speciality = data.specialties[i];
-                console.log(speciality);
-                if (speciality.status == 1) {
-                    instituteSpecialities = [
-                        ...instituteSpecialities,
-                        speciality,
-                    ];
-                } else {
-                    specialities = [...specialities, speciality];
-                }
+            const speciality = data.specialties[i];
+            console.log(speciality);
+            if (speciality.status == 1) {
+                instituteSpecialities = [...instituteSpecialities, speciality];
+            } else {
+                specialities = [...specialities, speciality];
             }
+        }
     }
 
-    
     $: filteredItems = specialities.filter((item) =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
@@ -58,7 +64,7 @@
             {#each filteredItems as item}
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <li
-                    on:click={() => console.log(item)}
+                    on:click={() => handleSubmit(item.id)}
                     class="flex items-center cursor-pointer hover:text-color2"
                 >
                     <span
