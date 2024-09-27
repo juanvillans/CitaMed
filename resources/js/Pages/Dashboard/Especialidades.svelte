@@ -1,32 +1,90 @@
 <script>
+    import { onMount } from "svelte";
+
     export let data;
-    console.log(data);
+    let searchTerm = "";
+    let instituteSpecialities = [];
+    let specialities = [];
+    console.log(data.specialties);
+    $: data, UpdateData();
+    function UpdateData() {
+        for (let i = 0; i < data.specialties.length; i++) {
+                const speciality = data.specialties[i];
+                console.log(speciality);
+                if (speciality.status == 1) {
+                    instituteSpecialities = [
+                        ...instituteSpecialities,
+                        speciality,
+                    ];
+                } else {
+                    specialities = [...specialities, speciality];
+                }
+            }
+    }
+
+    
+    $: filteredItems = specialities.filter((item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
 </script>
 
 <main class="flex justify-between gap-8 md:gap-10">
     <div class="offered sticky top-2">
         <h1 class="mb-2">Especialidades y servicios de la institución</h1>
         <ul class="text-lg p-2">
-            <li>Endocrinología</li>
-            <li>Oncología</li>
-            <li>Neurología</li>
-            <li>Medicina Interna</li>
+            {#each instituteSpecialities as speci}
+                <li>{speci.name}</li>
+            {/each}
         </ul>
     </div>
     <div>
-        <h2 class="font-bold text-lg">Selecciona otras Especialidades y/o servicios</h2>
-        <ul class="text-lg p-2">
-            <li><iconify-icon class="text-3xl relative t-4" icon="weui:sending-outlined"></iconify-icon> Endocrinología</li>
-            <li><iconify-icon class="text-3xl relative t-4" icon="weui:sending-outlined"></iconify-icon> Endocrinología</li>
-            <li><iconify-icon class="text-3xl relative t-4" icon="weui:sending-outlined"></iconify-icon> Endocrinología</li>
-            <li><iconify-icon class="text-3xl relative t-4" icon="weui:sending-outlined"></iconify-icon> Endocrinología</li>
+        <h2 class="font-bold text-lg">
+            Selecciona otras Especialidades y/o servicios
+        </h2>
+        <div
+            class="flex ml-7 bg-gray-200 md:min-w-72 rounded-full my-2 pl-3 items-center sticky top-1 z-50 shadow-md"
+        >
+            <iconify-icon icon="cil:search" class="mx-2" />
+            <input
+                type="search"
+                placeholder="Buscar"
+                name=""
+                id=""
+                class="bg-gray-200 px-3 py-2 rounded-full outline-none w-full"
+                bind:value={searchTerm}
+            />
+        </div>
+        <ul class="text-lg p-2 for_select">
+            {#each filteredItems as item}
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <li
+                    on:click={() => console.log(item)}
+                    class="flex items-center cursor-pointer hover:text-color2"
+                >
+                    <span
+                        class="text-3xl mr-3 h-8 aspect-square rounded-full inline-block icon"
+                    >
+                        <iconify-icon
+                            class="relative"
+                            icon="weui:sending-outlined"
+                        ></iconify-icon>
+                    </span>
+                    {item.name}
+                </li>
+            {/each}
         </ul>
     </div>
 </main>
 
 <style>
-.offered ul li:before {
-  content: '✓';
-  margin-right: 6px;
-}
+    .offered ul li:before {
+        content: "✓";
+        margin-right: 6px;
+    }
+    ul.for_select li:hover .icon {
+        background-color: #397373;
+        color: white;
+        transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.2s;
+        font-size: 35px !important;
+    }
 </style>
