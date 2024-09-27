@@ -17,11 +17,11 @@ class SpecialtyService
     public function getSpecialties($params)
     {
         $users = Specialty::query()
-        ->when($params['search'],function($query, $search){
+        ->when($params['search']??null,function($query, $search){
             
             $query->where('name','like','%' . $search . '%');
         })
-        ->when($params['status'],function($query, $status){
+        ->when($params['status']??null,function($query, $status){
             
             $query->where('status', $status);
         })
