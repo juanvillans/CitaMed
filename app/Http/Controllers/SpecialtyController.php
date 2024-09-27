@@ -35,7 +35,9 @@ class SpecialtyController extends Controller
 
     public function setSpecialty(Specialty $specialty)
     {
+
         try{
+
 
             $this->specialtyService->setSpecialtyStatus($specialty);
             return 0;

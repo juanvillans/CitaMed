@@ -11,7 +11,10 @@ class Specialty extends Model
 
     protected $fillable = [
         'name',
+        'status',
     ];
+
+    public $timestamps = false;
 
     public function users()
     {
