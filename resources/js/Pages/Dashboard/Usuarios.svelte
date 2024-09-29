@@ -12,12 +12,12 @@
     $: console.log(data);
 
     const emptyDataForm = {
-        ci: "30847627",
-        name: "Juan",
-        last_name: "Donquis",
-        email: "juandonquis07@gmail.com",
-        phone_number: "04125800610",
-        role: "doctor",
+        ci: "",
+        name: "",
+        last_name: "",
+        email: "",
+        phone_number: "",
+        role_name: "",
         specialties: [],
         specialties_ids: [],
     };
@@ -42,6 +42,12 @@
 
     function handleSubmit(event) {
         event.preventDefault();
+        if (submitStatus == "Crear") {
+
+        } else if (submitStatus == "Editar") {
+
+        }
+        
         $formCreate.clearErrors();
         $formCreate.post("/admin/usuarios", {
             onError: (errors) => {
@@ -62,6 +68,7 @@
 
     function handleEdit(event) {
         event.preventDefault();
+        console.log("editando");
         $formEdit.clearErrors();
         $formEdit.put(`/admin/usuarios/${$formEdit.id}`, {
             onError: (errors) => {
@@ -136,6 +143,7 @@
         {/each}
     </ul>
 </Modal>
+
 <Modal bind:showModal modalClasses={"max-w-[560px]"}>
     <h2 slot="header" class="text-sm text-center">CREAR NUEVO USUARIO</h2>
 
@@ -172,7 +180,7 @@
                                         $formCreate.specialties.filter(
                                             (v, i) => v.id != speciality.id,
                                         );
-                                        $formCreate.specialties_ids =
+                                    $formCreate.specialties_ids =
                                         $formCreate.specialties_ids.filter(
                                             (v, i) => v != speciality.id,
                                         );
@@ -228,8 +236,8 @@
             type="select"
             required={true}
             label={"Tipo de Usuario"}
-            bind:value={$formCreate.role}
-            error={$formCreate.errors?.role}
+            bind:value={$formCreate.role_name}
+            error={$formCreate.errors?.role_name}
         >
             <option value="doctor">Doctor</option>
             <option value="admin">Admin</option>
@@ -245,7 +253,7 @@
 </Modal>
 
 <Modal bind:showModal={showModalFormEdit}>
-    <h2 slot="header" class="text-sm text-center">EDITAR ACTIVIDAD</h2>
+    <h2 slot="header" class="text-sm text-center">EDITAR NUEVO USUARIO</h2>
 
     <form
         id="a-form"
@@ -318,9 +326,14 @@
                     id: 0,
                     title: "",
                 };
-                $formCreate.defaults();
-                $formCreate.reset();
-                console.log("ss");
+                // console.log(emptyDataForm)
+
+                $formCreate.defaults({
+                    ...emptyDataForm,
+                });
+                setTimeout(() => {
+                    $formCreate.reset()
+                }, 100);
             }
             e.preventDefault();
 
