@@ -58,7 +58,7 @@ class UserController extends Controller
 
             DB::commit();
 
-            return redirect('/admin/usuarios');
+            return redirect('/admin/usuarios')->with(['message' => 'Usuario creado con éxito']);
 
         }
         catch (\Throwable $e)
@@ -66,7 +66,7 @@ class UserController extends Controller
             
             DB::rollback();
             
-            return redirect('/admin/usuarios')->withErrors(['message' => $e->getMessage()]);
+            return redirect('/admin/usuarios')->withErrors(['data' => $e->getMessage()]);
         }
 
 
@@ -94,6 +94,30 @@ class UserController extends Controller
             
             return redirect('/admin/usuarios')->withErrors(['message' => $e->getMessage()]);
         }
+    }
+
+    public function destroy(User $usuario)
+    {
+
+        DB::beginTransaction();
+
+        try 
+        {
+            $this->userService->deleteUser($usuario);
+
+            DB::commit();
+
+            return redirect('/admin/usuarios')->with(['message' => 'Usuario eliminado con éxito']);
+
+        }
+        catch (\Throwable $e)
+        {   
+            
+            DB::rollback();
+            
+            return redirect('/admin/usuarios')->withErrors(['data' => $e->getMessage()]);
+        }       
+
     }
 
     public function login(LoginRequest $request)

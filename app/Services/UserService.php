@@ -36,7 +36,7 @@ class UserService
             "search" => $this->generateSearch($data),
         ]);
 
-        $newUser->assignRole($data['role']);
+        $newUser->assignRole($data['role_name']);
 
         if($newUser->hasRole('doctor'))
             $this->assignSpecialties($newUser,$data);
@@ -58,7 +58,7 @@ class UserService
         ]);
 
         $user->revokeRoles();
-        $user->assignRole($data['role']);
+        $user->assignRole($data['role_name']);
 
         if($user->hasRole('doctor'))
             $this->assignSpecialties($user,$data);
@@ -67,10 +67,20 @@ class UserService
 
     }
 
+    public function deleteUser($usuario)
+    {
+        $usuario->specialties()->detach();
+        $usuario->roles()->detach();
+
+        $usuario->delete();
+
+        return 0;
+    }
+
     private function assignSpecialties($user, $data)
     {
 
-        if(!isset($data['specialties_ids']))
+        if(!isset($data['specialties_ids']) || count($data['specialties_ids']) == 0 )
             throw new Exception("El doctor debe tener alguna especialidad seleccionada", 401);
         
         $user->specialties()->sync($data['specialties_ids']);
