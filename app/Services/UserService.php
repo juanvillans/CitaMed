@@ -73,7 +73,7 @@ class UserService
         if(!isset($data['specialties_ids']))
             throw new Exception("El doctor debe tener alguna especialidad seleccionada", 401);
         
-        $user->specialties()->sync([$data['specialties_ids']]);
+        $user->specialties()->sync($data['specialties_ids']);
 
         return 0;
             
