@@ -35,7 +35,7 @@ class UserController extends Controller
         $specialtyService = new SpecialtyService();
 
         $users = $this->userService->getUsers($this->params);
-        $specialties = $specialtyService->getSpecialties(['status' => 1]);
+        $specialties = $specialtyService->getSpecialties([]);
 
         return inertia('Dashboard/Usuarios',[
 
