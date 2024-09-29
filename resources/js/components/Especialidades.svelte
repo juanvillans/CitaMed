@@ -3,9 +3,9 @@
     import { router } from "@inertiajs/svelte";
 
     export let data;
-    let searchTerm = "";
-    let instituteSpecialities = [];
-    let specialities = [];
+    export let searchTerm = "";
+    export let instituteSpecialities = [];
+    export let specialities = [];
 
     // Function to handle form submission
     function handleSubmit(id) {

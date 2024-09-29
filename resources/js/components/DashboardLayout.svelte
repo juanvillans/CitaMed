@@ -5,14 +5,17 @@
     import Footer from "./Footer.svelte";
 	import 'iconify-icon';
 	import { navStatus } from '../stores/navStatus';
-    import { element } from "svelte/internal";
+    import {  page } from "@inertiajs/svelte";
+
     let screenWidth=  window.innerWidth 
     // $: mainWidth = main.offsetWidth;
     let mainWidth = `width:${screenWidth}%`
     $: if (screenWidth > 768) {
         mainWidth =`width:${screenWidth - $navStatus.navWidth-20}px`
     }
-    
+    // if ($page.props.flash.message) {
+    //   <div class="alert">{$page.props.flash.message}</div>
+    // }
 </script>
 
 <svelte:head>

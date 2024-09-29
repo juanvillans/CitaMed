@@ -6,6 +6,7 @@
     import debounce from "lodash/debounce";
 
     import Alert from "../../components/Alert.svelte";
+    import Especialidades from "../../components/Especialidades.svelte";
     import { displayAlert } from "../../stores/alertStore";
     import { useForm, inertia } from "@inertiajs/svelte";
     export let data = [];
@@ -31,7 +32,7 @@
     });
 
     let showModal = false;
-    $: showModalFormEdit = false;
+    $: showModalCreateSpecialties = false;
     let selectedRow = { status: false, id: 0 };
 
     document.addEventListener("keydown", ({ key }) => {
@@ -42,14 +43,26 @@
 
     function handleSubmit(event) {
         event.preventDefault();
+        $formCreate.clearErrors();
         if (submitStatus == "Crear") {
+            $formCreate.post("/admin/usuarios", {
+                onError: (errors) => {
+                    if (errors.data) {
+                        displayAlert({ type: "error", message: errors.data });
+                    }
+                },
+                onSuccess: (mensaje) => {
+                    $formCreate.reset();
+                    displayAlert({
+                        type: "success",
+                        message: "Ok todo salió bien",
+                    });
+                    showModal = false;
+                },
+            });
 
         } else if (submitStatus == "Editar") {
-
-        }
-        
-        $formCreate.clearErrors();
-        $formCreate.post("/admin/usuarios", {
+            $formCreate.put(`/admin/usuarios/${$formCreate.id}`, {
             onError: (errors) => {
                 if (errors.data) {
                     displayAlert({ type: "error", message: errors.data });
@@ -61,9 +74,12 @@
                     type: "success",
                     message: "Ok todo salió bien",
                 });
-                showModal = false;
+
+                selectedRow = { status: false, id: 0, row: {} };
             },
         });
+        }
+        
     }
 
     function handleEdit(event) {
@@ -82,7 +98,7 @@
                     type: "success",
                     message: "Ok todo salió bien",
                 });
-                showModalFormEdit = false;
+                showModalCreateSpecialties = false;
                 selectedRow = { status: false, id: 0, row: {} };
             },
         });
@@ -252,67 +268,8 @@
     />
 </Modal>
 
-<Modal bind:showModal={showModalFormEdit}>
-    <h2 slot="header" class="text-sm text-center">EDITAR NUEVO USUARIO</h2>
-
-    <form
-        id="a-form"
-        on:submit={handleEdit}
-        action=""
-        class="w-[600px] px-5 bg-gray-100 mt-4 grid grid-cols-2 gap-x-5 w-full border p-6 pt-2 rounded-md"
-    >
-        <Input
-            type="text"
-            required={true}
-            label={"Nombres"}
-            bind:value={$formEdit.name}
-            error={$formEdit.errors?.name}
-        />
-        <Input
-            type="text"
-            required={true}
-            label={"Apellidos"}
-            bind:value={$formEdit.last_name}
-            error={$formEdit.errors?.last_name}
-        />
-        <Input
-            type="email"
-            label="correo"
-            bind:value={$formEdit.email}
-            error={$formEdit.errors?.email}
-        />
-        <Input
-            type="number"
-            required={true}
-            label={"Cédula"}
-            bind:value={$formEdit.ci}
-            error={$formEdit.errors?.ci}
-        />
-        <Input
-            type="tel"
-            label={"Teléfono"}
-            bind:value={$formEdit.phone_number}
-            error={$formEdit.errors?.phone_number}
-        />
-        <Input
-            type="select"
-            required={true}
-            label={"Especialidad"}
-            bind:value={$formEdit.speciality_id}
-            error={$formEdit.errors?.speciality_id}
-        >
-            {#each data.specialties as speciality}
-                <option value={speciality.id}>{speciality.name}</option>
-            {/each}
-        </Input>
-    </form>
-    <input
-        form="a-form"
-        slot="btn_footer"
-        type="submit"
-        value={$formEdit.processing ? "Cargando..." : "Editar"}
-        class="hover:bg-color3 hover:text-white duration-200 mt-auto w-full bg-color2 text-black font-bold py-3 rounded-md cursor-pointer"
-    />
+<Modal bind:showModal={showModalCreateSpecialties}>
+    <Especialidades />
 </Modal>
 
 <div class="flex justify-between items-center">
@@ -342,7 +299,8 @@
         }}>Crear nuevo usuario</button
     >
     <!-- svelte-ignore missing-declaration -->
-    <a use:inertia href="/admin/especialidades">Añadir especialidades</a>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <a on:click={() => showModalCreateSpecialties= true}>Especialidades de la institución</a>
 </div>
 <Table
     {selectedRow}

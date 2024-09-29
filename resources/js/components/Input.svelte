@@ -14,7 +14,7 @@
     export let disabled=false
     export let error = false;
 
-
+console.log({error})
 </script>
 
 <style>
