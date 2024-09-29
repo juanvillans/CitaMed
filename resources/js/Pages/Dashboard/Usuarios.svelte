@@ -19,6 +19,7 @@
         phone_number: "04125800610",
         role: "doctor",
         specialties: [],
+        specialties_ids: [],
     };
 
     let formCreate = useForm({
@@ -123,6 +124,10 @@
                     on:click={() => {
                         $formCreate.specialties = [
                             ...$formCreate.specialties,
+                            speciality,
+                        ];
+                        $formCreate.specialties_ids = [
+                            ...$formCreate.specialties_ids,
                             speciality.id,
                         ];
                     }}>{speciality.name}</button
@@ -166,6 +171,10 @@
                                     $formCreate.specialties =
                                         $formCreate.specialties.filter(
                                             (v, i) => v.id != speciality.id,
+                                        );
+                                        $formCreate.specialties_ids =
+                                        $formCreate.specialties_ids.filter(
+                                            (v, i) => v != speciality.id,
                                         );
                                 }}
                                 type="button"
