@@ -326,7 +326,7 @@
 
             showModal = true;
             submitStatus = "Crear";
-        }}>Crear nuevo usario</button
+        }}>Crear nuevo usuario</button
     >
     <!-- svelte-ignore missing-declaration -->
     <a use:inertia href="/admin/especialidades">Añadir especialidades</a>
