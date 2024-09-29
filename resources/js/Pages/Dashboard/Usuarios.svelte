@@ -151,7 +151,7 @@
                     for="date1"
                     class="ml-2 inline-block cursor-pointer text-color2 font-bold py-2 px-3 rounded bg-color2 bg-opacity-10 hover:bg-opacity-20 mt-3"
                     ><iconify-icon class="mr-1 relative top-0.5" icon="gala:add"
-                    ></iconify-icon>Especialidades de la institución</button
+                    ></iconify-icon>Añadir Especialidad</button
                 >
             </div>
             <ul class="flex flex-wrap gap-x-2">
