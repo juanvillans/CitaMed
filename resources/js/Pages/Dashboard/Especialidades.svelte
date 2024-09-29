@@ -1,7 +1,13 @@
 <script>
     import { onMount } from "svelte";
     import { router } from "@inertiajs/svelte";
-    let selectedId;
+
+    export let data;
+    let searchTerm = "";
+    let instituteSpecialities = [];
+    let specialities = [];
+
+    // Function to handle form submission
     function handleSubmit(id) {
         const userConfirmed = window.confirm(
             "¿Está seguro de añadir esta especialidad?",
@@ -11,20 +17,23 @@
             router.put(`/admin/especialidades/${id}`);
         }
     }
-    export let data;
-    let searchTerm = "";
-    let instituteSpecialities = [];
-    let specialities = [];
-    console.log(data.specialties);
-    $: data, UpdateData();
+
+    // Reactive update function
+    $: if (data) {
+        UpdateData();
+    }
+
+    // Update data based on the current state of `data.specialties`
     function UpdateData() {
+        instituteSpecialities = [];
+        specialities = [];
+
         for (let i = 0; i < data.specialties.length; i++) {
             const speciality = data.specialties[i];
-            console.log(speciality);
             if (speciality.status == 1) {
-                instituteSpecialities = [...instituteSpecialities, speciality];
+                instituteSpecialities.push(speciality);
             } else {
-                specialities = [...specialities, speciality];
+                specialities.push(speciality);
             }
         }
     }
@@ -32,13 +41,14 @@
     $: filteredItems = specialities.filter((item) =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
+    $: console.log(instituteSpecialities);
 </script>
 
 <main class="flex justify-between gap-8 md:gap-10">
     <div class="offered sticky top-2">
         <h1 class="mb-2">Especialidades y servicios de la institución</h1>
         <ul class="text-lg p-2">
-            {#each instituteSpecialities as speci}
+            {#each instituteSpecialities as speci (speci.id)}
                 <li>{speci.name}</li>
             {/each}
         </ul>
@@ -61,7 +71,7 @@
             />
         </div>
         <ul class="text-lg p-2 for_select">
-            {#each filteredItems as item}
+            {#each filteredItems as item (item.id)}
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <li
                     on:click={() => handleSubmit(item.id)}

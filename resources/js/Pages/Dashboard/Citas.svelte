@@ -20,16 +20,21 @@
     let editor;
     $: editor && ro.observe(document.getElementById("notes-content"));
     let currentDate = new Date().toISOString();
-    console.log(currentDate);
     const onDateChange = (d, indx) => {
         $form.adjusted_availability[indx].date = d.detail.toISOString();
     };
     let defaulTtime_between_appointment = 30;
     export let data = {};
-    let acordion = { franja: false, ajustesCitasReservadas: false };
+    let acordion = {
+        franja: false,
+        ajustesCitasReservadas: false,
+        form: false,
+    };
     let showModal = false;
     let showModalFranja = false;
     let showModalappointments = false;
+    let showModalForm = false;
+    let newItem = { name: "", required: false };
     let form = useForm({
         title: "",
         allow_max_appointment_per_day: false,
@@ -207,7 +212,7 @@
             sat: [],
             sun: [],
         },
-
+        description: "",
         adjusted_availability: [
             {
                 date: "2024-09-09T04:00:00.000Z",
@@ -267,6 +272,13 @@
                     },
                 ],
             },
+        ],
+        fields: [
+            { name: "Nombre", required: true },
+            { name: "Apellido", required: true },
+            { name: "Correo", required: true },
+            { name: "Cédula", required: true },
+            { name: "Teléfono", required: true },
         ],
         time_available_type: 1,
     });
@@ -502,8 +514,8 @@
 
     $: {
         // updateShiftsForCalendar();
-        console.log($form.adjusted_availability);
-        console.log($form.availability);
+        // console.log($form.adjusted_availability);
+        // console.log($form);
     }
     $: $form, updateShiftsForCalendar();
 
@@ -650,6 +662,8 @@
             ($form.prev_value_duration_per_appointment = valueFixed),
                 ($form.duration_per_appointment = valueFixed),
                 (showModal = false);
+                updateAllStartAppointmets();
+
         }}
         slot="btn_footer"
         type="button"
@@ -817,6 +831,35 @@
     </div>
 </Modal>
 
+<Modal
+    bind:showModal={showModalForm}
+    onClose={() => {
+        // handleCloseCustomTime();
+    }}
+>
+    <p slot="header" class="font-bold text-lg text-gray-500">
+        Añade un campo para el formulario
+    </p>
+    <Input bind:value={newItem.name} />
+    <input
+        type="checkbox"
+        name=""
+        id="required"
+        bind:checked={newItem.required}
+    />
+    <label for="required">Requerido</label>
+
+    <button
+        on:click={() => {
+            $form.fields = [...$form.fields, newItem];
+            showModalForm = false
+        }}
+        slot="btn_footer"
+        type="button"
+        class="text-color2 font-bold hover:bg-color2 p-2 hover:font-extrabold px-4 rounded-xl hover:bg-opacity-10"
+        >Hecho</button
+    >
+</Modal>
 <section class="flex gap-4 justify-between">
     <div class="min-w-[450px] w-[470px]">
         <!-- <div class="sticky top-1">
@@ -836,13 +879,15 @@
           
         </div> -->
         <form
-            class=" bg-gray-100 p-3 pl-0 rounded pt-5 sticky top-1 h-screen overflow-y-scroll overflow-x-hidden pr-2"
+            class=" bg-gray-100  p-3 pl-0 rounded pt-5 sticky top-1 h-scr  overflow-x-hidden pr-2"
             action=""
             on:submit={(e) => {
                 e.preventDefault();
             }}
         >
-            <div>
+        <div class="overflow-y-scroll h-full">
+
+            <div class="relative" >
                 <fieldset class="border-b border-gray-300 items-center pb-4">
                     <h2>CONFIGURAR CITAS DISPONIBLES</h2>
 
@@ -866,16 +911,18 @@
                         labelClasses={"font-bold"}
                         label={"Duración de cada cita"}
                         classes={"mt-3 w-auto"}
-                        bind:value={$form.duration_per_appointment}
+                        value={$form.duration_per_appointment} 
                         on:change={(e) => {
                             if (e.target.value == "999999") {
                                 $form.prev_value_duration_per_appointment =
                                     $form.duration_per_appointment;
                                 showModal = true;
                                 $form.duration_per_appointment = "";
+                            } else {
+                                $form.duration_per_appointment = e.target.value
+                                updateAllStartAppointmets();
                             }
                             // console.log('se ejecutó esto?')
-                            updateAllStartAppointmets();
                         }}
                         error={$form.errors?.duration_per_appointment}
                         inputClasses={"bg-gray-200 px-2"}
@@ -1667,7 +1714,8 @@
                             {/each}
                         </ul>
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <label
+                        <button
+                            type="button"
                             on:click={() => {
                                 $form.adjusted_availability = [
                                     ...$form.adjusted_availability,
@@ -1681,7 +1729,7 @@
                             }}
                             for="date1"
                             class="cursor-pointer text-color2 font-bold p-1 px-3 rounded hover:bg-color2 hover:bg-opacity-10 mt-3 inline-block"
-                            >Cambiar la diponibilidad en una fecha</label
+                            >Cambiar la diponibilidad en una fecha</button
                         >
                     </section>
                 </fieldset>
@@ -1811,8 +1859,10 @@
                         {/if}
                     </section>
                 </fieldset>
+
+                
             </div>
-            <div>
+            <div class="hidden">
                 <fieldset class="border-b border-gray-300 items-center pb-4">
                     <h2>CONFIGURAR CITAS DISPONIBLES</h2>
 
@@ -1830,7 +1880,7 @@
                     class="mt-2 border-b border-gray-300 pb-4 flex gap-1 text-editor"
                 >
                     <span class="pt-2">
-                        <iconify-icon icon="ant-design:reload-time-outline"
+                        <iconify-icon icon="pajamas:text-description"
                         ></iconify-icon>
                     </span>
                     <section class="p-2">
@@ -1852,13 +1902,76 @@
                                 "justify",
                                 "forecolor",
                             ]}
-                            {html}
-                            on:change={(evt) => (html = evt.detail)}
+                            html={$form.description}
+                            on:change={(evt) =>
+                                ($form.description = evt.detail)}
                             contentId="notes-content"
                             bind:this={editor}
                         />
                     </section>
                 </fieldset>
+
+                <fieldset class="mt-2 pb-4 flex gap-4">
+                    <span>
+                        <iconify-icon
+                            class="pt-3 text-xl opacity-80"
+                            icon="mdi:form"
+                        ></iconify-icon>
+                    </span>
+                    <section>
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <div
+                            class="p-2 flex justify-between hover:bg-gray-200 cursor-pointer w-full"
+                            on:click={(e) => {
+                                acordion.form = !acordion.form;
+                            }}
+                        >
+                            <div>
+                                <legend class="font-bold">Formulario</legend>
+                                <small class="leading-4 inline-block">
+                                    Personaliza el formulario que las personas
+                                    usan para reservar una cita.</small
+                                >
+                            </div>
+                            {#if acordion.form}
+                                <iconify-icon
+                                    icon="iconamoon:arrow-up-2-duotone"
+                                ></iconify-icon>
+                            {:else}
+                                <iconify-icon
+                                    icon="iconamoon:arrow-down-2-duotone"
+                                ></iconify-icon>
+                            {/if}
+                        </div>
+                        {#if acordion.form}
+                            <div class="flex w-full flex-wrap gap-3 mt-1">
+                                {#each $form.fields as field (field)}
+                                    <span
+                                        class="bg-gray-200 bg-opacity-40 border border-gray-300 rounded-full px-3 py-1"
+                                        >{field.name}*</span
+                                    >
+                                {/each}
+                            </div>
+
+                            <button
+                                type="button"
+                                on:click={() => (showModalForm = true)}
+                                for="date1"
+                                class="block cursor-pointer text-color2 font-bold p-1 px-3 rounded hover:bg-color2 hover:bg-opacity-10 mt-3"
+                                ><iconify-icon class="mr-1" icon="gala:add"
+                                ></iconify-icon> Añadir campo</button
+                            >
+                        {/if}
+                    </section>
+                </fieldset>
+            </div>
+        </div>
+
+            <div class="absolute bg-white left-0 bottom-0 w-full flex justify-between items-center">
+                <button type="button" class="px-4 py-2 cursor-pointer hover:font-bold">Volver</button>
+
+                <button type="button" class="bg-color3 text-white rounded px-4 py-2 cursor-pointer hover:font-bold">Siguiente</button>
+
             </div>
         </form>
     </div>
@@ -1976,38 +2089,34 @@
 
             {#each Object.entries(database.calendar) as [day, values], indxDay (day)}
                 {#each values.appointments as appointment, indx (day + "_" + indx)}
-                <Draggable>
-                        
-                    <div
-                        class="flex gap-3 w-28 h-12 absolute duration-300 z-50 px-0.5"
-                        style={`top: ${GetTop(appointment.start)}px; left: ${40 + (112 * indxDay + 1)}px; 
+                    <Draggable>
+                        <div
+                            class="flex gap-3 w-28 h-12 absolute duration-300 z-50 px-0.5"
+                            style={`top: ${GetTop(appointment.start)}px; left: ${40 + (112 * indxDay + 1)}px; 
                             height: ${GetHeight(appointment.start, appointment.end) * 48}px
                            `}
-                    >
-                    
-                        <div class=" z-50 px-1 w-full">
-                            <!-- svelte-ignore a11y-click-events-have-key-events -->
-                            <div
-                                class={`cursor-pointer hover:bg-color1 text-center bg-color3 ${database.calendar[day].current_date < database.headerInfo.today ? "opacity-40" : ""}  w-[98%] h-full mx-auto p-1 rounded-lg ${$form.time_between_appointment < 5 ? "border-b-4 border-color4" : ""}`}
-                            
-                            >
-                                <h4 class="text-white text-sm">
-                                    {appointment.name.split(" ")[0]}
-                                    {appointment.last_name.split(" ")[0]}
-                                </h4>
-                                <span class="invisible"></span>
+                        >
+                            <div class=" z-50 px-1 w-full">
+                                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                <div
+                                    class={`cursor-pointer hover:bg-color1 text-center bg-color3 ${database.calendar[day].current_date < database.headerInfo.today ? "opacity-40" : ""}  w-[98%] h-full mx-auto p-1 rounded-lg ${$form.time_between_appointment < 5 ? "border-b-4 border-color4" : ""}`}
+                                >
+                                    <h4 class="text-white text-sm">
+                                        {appointment.name.split(" ")[0]}
+                                        {appointment.last_name.split(" ")[0]}
+                                    </h4>
+                                    <span class="invisible"></span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </Draggable>
+                    </Draggable>
 
-                <div
+                    <div
                         class="flex gap-3 w-28 h-12 absolute duration-300 z-40 px-0.5"
                         style={`top: ${GetTop(appointment.start)}px; left: ${40 + (112 * indxDay + 1)}px; 
                             height: ${GetHeight(appointment.start, appointment.end) * 48}px
                            `}
                     >
-                    
                         <div class=" z-40 px-1 w-full">
                             <!-- svelte-ignore a11y-click-events-have-key-events -->
                             <div

@@ -1,25 +1,25 @@
 <script>
-    export let showModal; // boolean
+    export let showModal = false; // Ensure default value is set
     export let onClose; // callback function
-    export let modalClasses;
+    export let modalClasses = "";
     let dialog; // HTMLDialogElement
 
+    // Show modal when showModal is true
     $: if (dialog && showModal) dialog.showModal();
 </script>
 
 {#if showModal}
-<!-- svelte-ignore a11y-click-events-have-key-events -->
 <dialog
     bind:this={dialog}
     on:close={() => {
-        showModal = false;
+        showModal = false; // Close modal
         if (onClose) onClose(); // Call the onClose callback
     }}
     on:click|self={() => dialog.close()}
-    class={`bg-gray-50 p-5 pb-2 rounded-xl min-w-[300px] ${modalClasses}`}
+    class={`p-5 pb-2 rounded-xl min-w-[300px] ${modalClasses}`}
 >
     <div on:click|stopPropagation>
-        <slot name="header"  />
+        <slot name="header" />
         <hr class="mt-3" />
         <slot />
         <hr class="my-4" />
@@ -33,7 +33,7 @@
 
 <style>
     dialog {
-        max-width: 98vw;
+        width: fit-content;
         border: none;
     }
     dialog::backdrop {

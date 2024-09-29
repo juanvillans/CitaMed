@@ -11,10 +11,10 @@
 :root {
     --black: #000000;
     --dark: #161616;
-    --color1: #081f3d;
-    --color2: #1f4287;
-    --color3: #278ea5;
-    --color4: #21e6c1;
+    --color1: #2477BF;
+    --color2: #397373;
+    --color3: #6595BF;
+    --color4: #C9EBF2;
     --white: #ffffff;
     --red: #bf0404;
     --green: #02731e;
@@ -48,6 +48,9 @@
 }
 .cl-content {
     resize: both;
+    box-shadow: none !important;
+    background-color: rgb(231, 231, 231) !important;
+    /* height: 200px; */
   }
 .main_and_footer_container {
     display: grid;

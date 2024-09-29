@@ -56,7 +56,7 @@
         left: 2.5px;
         border-radius: 4px;
         height: 2px;
-        background: linear-gradient(80deg, #54ffaf 9%, #1f4287 93%);
+        background: linear-gradient(80deg, #C9EBF2 9%, #2477BF 93%);
         background-color: aqua;
         width: 0%;
     }
@@ -78,7 +78,7 @@
         {:else if type === "select"}
                 
                 
-                <select on:focus class={`w-full ${inputClasses ? inputClasses : "p-2 bg-gray "} ${error ? ' border-b border-red bg-red bg-opacity-10' : ""}`} id={label} bind:value  required={required} on:change > 
+                <select on:focus class={`w-full ${inputClasses ? inputClasses : " p-2 bg-gray-200 "} ${error ? ' border-b border-red bg-red bg-opacity-10' : ""}`} id={label} bind:value  required={required} on:change > 
                 <slot></slot>
             </select>
         {:else}
@@ -86,7 +86,7 @@
                 bind:value
                 {...{ type }}
                 id={label}
-                class={`w-full ${inputClasses ? inputClasses : "p-2 bg-gray "} ${error ? ' border-b border-red bg-red bg-opacity-10' : ""}`}
+                class={`w-full ${inputClasses ? inputClasses : "p-2 bg-gray-200 "} ${error ? ' border-b border-red bg-red bg-opacity-10' : ""}`}
                 required={required}
                 disabled={disabled}
                 defaultValue={'xxx'}
