@@ -51,6 +51,9 @@
             {#each instituteSpecialities as speci (speci.id)}
                 <li>{speci.name}</li>
             {/each}
+            {#if instituteSpecialities.length == 0}
+                <li>No hay ningúna</li>
+            {/if}
         </ul>
     </div>
     <div>
