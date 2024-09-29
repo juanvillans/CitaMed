@@ -7,7 +7,7 @@
 
     import Alert from "../../components/Alert.svelte";
     import { displayAlert } from "../../stores/alertStore";
-    import { useForm, router, page } from "@inertiajs/svelte";
+    import { useForm, inertia } from "@inertiajs/svelte";
     export let data = [];
     $: console.log(data);
 
@@ -62,7 +62,7 @@
     function handleEdit(event) {
         event.preventDefault();
         $formEdit.clearErrors();
-        $formEdit.put(`/admin/usuarios/${$formEdit.student_id}`, {
+        $formEdit.put(`/admin/usuarios/${$formEdit.id}`, {
             onError: (errors) => {
                 if (errors.data) {
                     displayAlert({ type: "error", message: errors.data });
@@ -123,7 +123,7 @@
                     on:click={() => {
                         $formCreate.specialties = [
                             ...$formCreate.specialties,
-                            speciality,
+                            speciality.id,
                         ];
                     }}>{speciality.name}</button
                 >
@@ -131,8 +131,8 @@
         {/each}
     </ul>
 </Modal>
-<Modal bind:showModal modalClasses={"max-w-[500px]"}>
-    <h2 slot="header" class="text-sm text-center">INSCRIBIR NUEVO USUARIO</h2>
+<Modal bind:showModal modalClasses={"max-w-[560px]"}>
+    <h2 slot="header" class="text-sm text-center">CREAR NUEVO USUARIO</h2>
 
     <form
         id="a-form"
@@ -140,6 +140,48 @@
         action=""
         class="w-full px-5 mt-4 grid md:grid-cols-2 gap-x-5 p-6 pt-2 rounded-md"
     >
+        <div class="mt-4 col-span-2">
+            <div class="flex justify-between items-center">
+                <span>Especialidades:</span>
+                <button
+                    type="button"
+                    on:click={() => {
+                        selectSpecialityModal = true;
+                    }}
+                    for="date1"
+                    class="ml-2 inline-block cursor-pointer text-color2 font-bold py-2 px-3 rounded bg-color2 bg-opacity-10 hover:bg-opacity-20 mt-3"
+                    ><iconify-icon class="mr-1 relative top-0.5" icon="gala:add"
+                    ></iconify-icon>Añadir Especialidad</button
+                >
+            </div>
+            <ul class="flex flex-wrap gap-x-2">
+                {#each $formCreate.specialties as speciality (speciality.id)}
+                    <li>
+                        <span
+                            class="rounded-full text-black inline-block px-3 py-2 mt-2 bg-color4"
+                        >
+                            {speciality.name}
+                            <button
+                                on:click={(e) => {
+                                    $formCreate.specialties =
+                                        $formCreate.specialties.filter(
+                                            (v, i) => v.id != speciality.id,
+                                        );
+                                }}
+                                type="button"
+                                class="cursor-pointer hover:font-bold ml-1 hover:text-white aspect-square w-5 hover:bg-color1 rounded-full"
+                                title="Quitar especialidad"
+                            >
+                                <iconify-icon
+                                    class="relative top-1"
+                                    icon="ic:outline-close"
+                                ></iconify-icon>
+                            </button>
+                        </span>
+                    </li>
+                {/each}
+            </ul>
+        </div>
         <Input
             type="text"
             required={true}
@@ -183,48 +225,6 @@
             <option value="doctor">Doctor</option>
             <option value="admin">Admin</option>
         </Input>
-        <div class="mt-4 col-span-2">
-            <div class="flex justify-between items-center">
-                <span>Especialidades:</span>
-                <button
-                    type="button"
-                    on:click={() => {
-                        selectSpecialityModal = true;
-                    }}
-                    for="date1"
-                    class="ml-2 inline-block cursor-pointer text-color2 font-bold py-2 px-3 rounded bg-color2 bg-opacity-10 hover:bg-opacity-20 mt-3"
-                    ><iconify-icon class="mr-1 relative top-0.5" icon="gala:add"
-                    ></iconify-icon> Añadir Especialidad</button
-                >
-            </div>
-            <ul class="flex flex-wrap gap-x-2">
-                {#each $formCreate.specialties as speciality (speciality.id)}
-                    <li>
-                        <span
-                            class="rounded-full text-black inline-block px-3 py-2 mt-2 bg-color4"
-                        >
-                            {speciality.name}
-                            <button
-                                on:click={(e) => {
-                                    $formCreate.specialties =
-                                        $formCreate.specialties.filter(
-                                            (v, i) => v.id != speciality.id,
-                                        );
-                                }}
-                                type="button"
-                                class="cursor-pointer hover:font-bold ml-1 hover:text-white aspect-square w-5 hover:bg-color1 rounded-full"
-                                title="Quitar especialidad"
-                            >
-                                <iconify-icon
-                                    class="relative top-1"
-                                    icon="ic:outline-close"
-                                ></iconify-icon>
-                            </button>
-                        </span>
-                    </li>
-                {/each}
-            </ul>
-        </div>
     </form>
     <input
         form="a-form"
@@ -319,6 +319,8 @@
             submitStatus = "Crear";
         }}>Crear nuevo usario</button
     >
+    <!-- svelte-ignore missing-declaration -->
+    <a use:inertia href="/admin/especialidades">Añadir especialidades</a>
 </div>
 <Table
     {selectedRow}
@@ -376,7 +378,15 @@
                 <!-- <td>{row.sex}</td> -->
                 <td>{row.phone_number}</td>
                 <!-- <td>{row.rep_name} {row.rep_last_name}</td> -->
-                <td>{row.specialties}</td>
+                <td
+                    >{#if row.specialties.length != 0}
+                        {#each row.specialties as specialty (specialty.id)}
+                            {specialty.name}
+                        {/each}
+                    {:else}
+                        <span class="opacity-60">No tiene</span>
+                    {/if}
+                </td>
             </tr>
         {/each}
     </tbody>
