@@ -17,7 +17,7 @@ class UserService
             
             $query->where('search','like','%' . $search . '%');
         })
-        ->with('specialties')
+        ->with('specialties', 'roles')
         ->get();
 
         return new UserCollection($users);
@@ -73,7 +73,7 @@ class UserService
         if(!isset($data['specialties']))
             throw new Exception("El doctor debe tener alguna especialidad seleccionada", 401);
         
-        $user->specialties->sync($data['specialties']);
+        $user->specialties()->sync([$data['specialties']]);
 
         return 0;
             

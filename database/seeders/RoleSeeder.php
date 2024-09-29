@@ -14,6 +14,7 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         $adminRole = Role::create(['name' => 'admin']);
+        $doctorRole = Role::create(['name' => 'doctor']);
         $receptionist = Role::create(['name' => 'receptionist']);
 
 
@@ -43,9 +44,14 @@ class RoleSeeder extends Seeder
             $readServicePermission, $createServicePermission, $updateServicePermission, $deleteServicePermission,
         ];
 
+        $doctorPermissions = [
+            $readSpecialtyPermission, $createSpecialtyPermission, $updateSpecialtyPermission, $deleteSpecialtyPermission,
+            $readServicePermission, $createServicePermission, $updateServicePermission, $deleteServicePermission,
+        ];
+
         $adminRole->syncPermissions($adminPermissions);
         $receptionist->syncPermissions($receptionistPermissions);
-
+        $doctorRole->syncPermissions($doctorPermissions);
         
 
 
