@@ -30,6 +30,8 @@ class UserRequest extends FormRequest
             "phone_number" => ['required','max:14','string'],
             "role" => ['required'],
             "specialties" => ['sometimes'],
+            "specialties_ids" => ['sometimes'],
+
 
 
         ];

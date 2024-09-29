@@ -72,7 +72,7 @@ class UserController extends Controller
 
     }
 
-    public function update(UserUpdateRequest $request, User $user)
+    public function update(UserUpdateRequest $request, User $usuario)
     {
         DB::beginTransaction();
 
@@ -80,7 +80,7 @@ class UserController extends Controller
         {
             $data = $request->all();
 
-            $this->userService->updateUser($data, $user);
+            $this->userService->updateUser($data, $usuario);
 
             DB::commit();
 

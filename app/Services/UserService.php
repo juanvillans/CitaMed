@@ -70,10 +70,10 @@ class UserService
     private function assignSpecialties($user, $data)
     {
 
-        if(!isset($data['specialties']))
+        if(!isset($data['specialties_ids']))
             throw new Exception("El doctor debe tener alguna especialidad seleccionada", 401);
         
-        $user->specialties()->sync([$data['specialties']]);
+        $user->specialties()->sync([$data['specialties_ids']]);
 
         return 0;
             
