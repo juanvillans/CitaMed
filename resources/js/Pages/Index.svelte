@@ -46,15 +46,15 @@
         const result = [];
         const start = new Date(startDate);
 
-        for (let i = 1; i <= n; i++) {
+        for (let i = 0; i <= n-1; i++) {
             const nextDate = new Date(start);
             nextDate.setDate(start.getDate() + i);
             result.push({
                 date: nextDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
-                dayOfWeek: nextDate.toLocaleDateString("es-VE", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "short",
+                weekday: nextDate.toLocaleDateString("es-VE", {
+                    weekday: "short",
+                }),
+                day: nextDate.toLocaleDateString("es-VE", {
                     day: "numeric",
                 }),
             });
@@ -126,7 +126,7 @@
                 >
                     <div class="w-10 max-w-[40px]"></div>
                     <ul class="flex listCalendarHeader">
-                        {#each Object.entries(data.calendar) as [day, values], indxDay (day)}
+                        {#each frontCalendar as obj (day)}
                             <li
                                 class="flex flex-col justify-center text-center w-28"
                             >
