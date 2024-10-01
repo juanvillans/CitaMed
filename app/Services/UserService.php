@@ -57,7 +57,8 @@ class UserService
             "search" => $this->generateSearch($data),
         ]);
 
-        $user->revokeRoles();
+        method_exists($user, 'revokeRoles') ? $user->revokeRoles(): null;
+        
         $user->assignRole($data['role_name']);
 
         if($user->hasRole('doctor'))

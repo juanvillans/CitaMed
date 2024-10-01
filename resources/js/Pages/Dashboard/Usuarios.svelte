@@ -356,7 +356,7 @@
                         };
                         $formCreate.defaults({
                             ...row,
-                            specialities_ids : row.specialities.map(obj = obj.id)
+                            specialties_ids : row.specialties.map(obj => obj.id)
                         });
                     } else {
                         selectedRow = {
