@@ -20,7 +20,7 @@
     const handleFilters = () => {
         router.get(`${$page.url}`, filterClientData);
     }
-
+    
     const handleSearch = debounce((event) => {
         router.get(`${$page.url}`, filterClientData);
     }, 300);

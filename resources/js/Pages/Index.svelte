@@ -1,182 +1,152 @@
 <script>
     import { useForm } from "@inertiajs/svelte";
-
+    import { onMount, onDestroy } from "svelte";
     // import secretariaLogo from '$lib/images/logo_secretaria-circle-main.png';
     import Input from "../components/Input.svelte";
     import Modal from "../components/Modal.svelte";
-
+    import DatePicker from "../components/DatePicker.svelte";
     import Alert from "../components/Alert.svelte";
     import { displayAlert } from "../stores/alertStore";
     let showModal = false;
+    let sourceDiv;
+    let width = 0;
+
+    function updateWidth() {
+        if (sourceDiv) {
+            width = sourceDiv.getBoundingClientRect().width;
+        }
+    }
+    const translateDays = {
+        mon: "Lun",
+        tue: "Mar",
+        wed: "Mié",
+        thu: "Jue",
+        fri: "Vie",
+        sat: "Sáb",
+        sun: "Dom",
+    };
+    onMount(() => {
+        updateWidth(); // Set the initial width
+        window.addEventListener("resize", updateWidth);
+    });
+
+    onDestroy(() => {
+        window.removeEventListener("resize", updateWidth);
+    });
 
     let form = useForm({
         ci: null,
         password: null,
     });
+    export let data = {
+        today: "2024-09-10T04:00:00.000Z",
+    };
+    let frontCalendar = []
+    function getNextNDays(startDate, n) {
+        const result = [];
+        const start = new Date(startDate);
 
-    function handleSubmit(event) {
-        event.preventDefault();
-        $form.clearErrors();
-        $form.post("/login", {
-            onError: (errors) => {
-                if (errors.data) {
-                    displayAlert({ type: "error", message: errors.data });
-                }
-            },
-        });
+        for (let i = 1; i <= n; i++) {
+            const nextDate = new Date(start);
+            nextDate.setDate(start.getDate() + i);
+            result.push({
+                date: nextDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
+                dayOfWeek: nextDate.toLocaleDateString("es-VE", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                }),
+            });
+        }
+
+        frontCalendar = result
+        return result;
     }
+    getNextNDays("2024-09-10T04:00:00.000Z", 7)
+    $: console.log({frontCalendar})
+
 </script>
 
 <Alert />
 <section class="bg-background min-h-screen">
-    <header class="flex justify-between px-1 mx-4 md:mx-12 py-3 lg:mx-20">
-        <img src="file:///C:/Users/Juan/Downloads/logo_colegio_negro%20(1).png" alt="">
-        <button
-            class="btn_create inline-block"
-            on:click={(e) => {
-                e.preventDefault();
-                showModal = true;
-            }}>Login</button
-        >
+    <header>
+        <iconify-icon icon="fa6-solid:user-doctor"></iconify-icon>
     </header>
-    <Modal bind:showModal>
-        <legend slot="header" class="text-center opacity-70"
-            >INICIAR SESIÓN</legend
-        >
-        <form on:submit={handleSubmit} class="min-w-[250px]">
-            <div>
-                <Input
-                    type="text"
-                    name="ci"
-                    required={true}
-                    label={"Cédula"}
-                    bind:value={$form.ci}
-                    error={$form.errors?.ci}
-                />
-                <!-- {#if $form.errors.ci}
-            <div class="text-white bg-opacity-30 bg-red pt-1">
-                
-                <span >{$form.errors.ci}</span>
-            </div>
-            {/if} -->
 
-                <Input
-                    type="password"
-                    required={true}
-                    name="password"
-                    label={"Contraseña"}
-                    bind:value={$form.password}
-                />
-            </div>
-            <!-- <button type="submit">Iniciar sesión</button> -->
-
-            <input
-                type="submit"
-                disabled={$form.processing}
-                value={$form.processing ? "Cargando..." : "ENTRAR"}
-                class="hover:bg-color3 hover:text-white duration-200 mt-5 w-full bg-color4 text-black font-bold py-3 rounded-md cursor-pointer"
-            />
-        </form>
-    </Modal>
-
-    <main
-        class="bg-background px-1 mx-4 md:py-9 md:mx-12 lg:mx-20 justify-between md:grid grid-flow-col md:gap-x-10 lg:gap-x-24 xl:gap-32 items-center"
-    >
-        <div class="md:min-w-[600px]">
-            <h1 class="md:text-5xl text-color1">
-                Colegio
-                <br />
-                Maestro José Marti
-            </h1>
-            <h2 class="text-xl">
-                Formando mentes brillantes para un mañana prometedor
-            </h2>
-
-            <div class="flex justify-between mt-4 md:mt-14 text-color1">
-                <div>
-                    <span class="flex items-center gap-2 mb-2 lg:mb-3">
-                        <div class="bg-color1 w-6 md:w-8 aspect-square rounded-full overflow-hidden flex items-center justify-center"><iconify-icon class="text-color4 text-4xl" icon="pajamas:check-xs"></iconify-icon></div>
-                        <b>Prescolar</b>
-                    </span>
-                    <ul class="grid grid-cols-2 gap-x-3">
-                        <li>1er nivel</li>
-                        <li>2do nivel</li>
-                        <li>3er nivel</li>
-                    </ul>
-                </div>
-                <div>
-                    <span class="flex items-center gap-2 mb-2 lg:mb-3">
-                        <div class="bg-color1 w-6 md:w-8 aspect-square rounded-full overflow-hidden flex items-center justify-center"><iconify-icon class="text-color4 text-4xl" icon="pajamas:check-xs"></iconify-icon></div>
-                        <b>Primaria</b>
-                    </span>
-                    <ul class="grid grid-cols-2 gap-x-3">
-                        <li>1er grado</li>
-                        <li>2do grado</li>
-                        <li>3er grado</li>
-                        <li>4to grado</li>
-                        <li>5to grado</li>
-                        <li>6to grado</li>
-                    </ul>
-                </div>
-                <div>
-                    <span class="flex items-center gap-2 mb-2 lg:mb-3">
-                        <div class="bg-color1 w-6 md:w-8 aspect-square rounded-full overflow-hidden flex items-center justify-center"><iconify-icon class="text-color4 text-4xl" icon="pajamas:check-xs"></iconify-icon></div>
-                        <b>Secundaria</b>
-                    </span>
-                    <ul class="grid grid-cols-2 gap-x-3">
-                        <li>1er año</li>
-                        <li>2do año</li>
-                        <li>3er año</li>
-                        <li>4to año</li>
-                        <li>5to año</li>
-                    </ul>
-                </div>
-            </div>
-
-
-            <div class="flex justify-between  mt-4 md:mt-16 md:gap-10  text-color1">
-
-                <div class="flex divide-x divide-dark ">
-                    <span class="pr-3 text-4xl">33</span>
-                    <p class="pl-3 col-span-2 leading-5 font-semibold">
-                        AÑOS DE
-                        <br>
-                        FORMACIÓN
-                    </p>
-                </div>
-
-                <div class="flex divide-x divide-dark ">
-                    <span class="pr-3 text-4xl">32</span>
-                    <p class="pl-3 col-span-2 leading-5 font-semibold">
-                        PROMOCIONES 
-                        <br>
-                        GRADUADAS
-                    </p>
-                </div>
-
-                <div class="flex divide-x divide-dark ">
-                    <span class="pr-3 text-4xl">400</span>
-                    <p class="pl-3 col-span-2 leading-5 font-semibold">
-                        ESTUDIANTES
-                        <br>
-                        ACTIVOS
-                    </p>
-                </div>
-            </div>
-
-
-
-        </div>
-
-        <div class="pl-5 relative pr-2 max-w-[500px]">
-            <img class="absolute w-full" src="https://cdn.discordapp.com/attachments/1238903237218930802/1244452251028688906/Iconos.png?ex=6655d2b9&is=66548139&hm=13ffaaa80051f10b14f4ac464ba1edc1a2b82a9546f069c85de0dfde2da6309a&" alt="" >
-            <img    
-                class="rounded-full aspect-square border-4 object-cover border-color1   "
-                src="https://notifalcon.com/wp-content/uploads/2023/11/WhatsApp-Image-2023-11-08-at-10.21.36-AM.jpeg"
-                alt=""
+    <body class="flex">
+        <div class="sticky top-1">
+            <DatePicker
+                on:datechange={(e) => console.log(e)}
+                selected={"2024-09-10T04:00:00.000Z"}
+                showDatePickerAlways={true}
+                whitInput={false}
+                isAllowed={(date) => {
+                    const millisecs = date.getTime();
+                    if (millisecs + 25 * 3600 * 1000 < Date.now()) return false;
+                    if (millisecs > Date.now() + 3600 * 24 * 45 * 10000)
+                        return false;
+                    return true;
+                }}
             />
         </div>
-    </main>
+
+        <div>
+            <header class=" sticky top-0 pt-1 bg-gray-100 z-30 calendarHeader">
+                <div class="flex gap-4 items-center">
+                    <button
+                        class="text-md font-bold border border-gray-300 rounded-md p-2 px-6 hover:bg-gray-200"
+                        >Hoy</button
+                    >
+                    <div class="mx-5 flex gap-2">
+                        <button
+                            class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
+                        >
+                            <iconify-icon
+                                icon="iconamoon:arrow-left-2-bold"
+                                class="relative left-2"
+                            ></iconify-icon></button
+                        >
+                        <button
+                            class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
+                        >
+                            <iconify-icon
+                                icon="iconamoon:arrow-right-2-bold"
+                                class="relative left-2"
+                            ></iconify-icon></button
+                        >
+                    </div>
+                    <!-- <h2 class="text-2xl">{data.headerInfo.month_year}</h2> -->
+                </div>
+
+                <div
+                    class="py-5 w-max pt-10 flex"
+                    bind:this={sourceDiv}
+                    on:resize={updateWidth}
+                >
+                    <div class="w-10 max-w-[40px]"></div>
+                    <ul class="flex listCalendarHeader">
+                        {#each Object.entries(data.calendar) as [day, values], indxDay (day)}
+                            <li
+                                class="flex flex-col justify-center text-center w-28"
+                            >
+                                <p
+                                    class={` ${values.current_date == data.headerInfo.today ? "text-color1 " : ""}`}
+                                >
+                                    {translateDays[day].toUpperCase()}
+                                </p>
+                                <p
+                                    class={`text-2xl mx-auto w-12 aspect-square rounded-full flex items-center justify-center ${values.current_date == data.headerInfo.today ? "bg-color1 text-gray-50 " : ""}`}
+                                >
+                                    {new Date(values.current_date).getUTCDate()}
+                                </p>
+                            </li>
+                        {/each}
+                    </ul>
+                </div>
+            </header>
+        </div>
+    </body>
 </section>
 
 <style>
