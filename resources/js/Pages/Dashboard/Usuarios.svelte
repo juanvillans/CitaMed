@@ -95,7 +95,7 @@
                     type: "success",
                     message: "Ok todo salió bien",
                 });
-
+                showModal = false;
                 selectedRow = { status: false, id: 0, row: {} };
             },
         });
