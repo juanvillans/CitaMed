@@ -356,6 +356,7 @@
                         };
                         $formCreate.defaults({
                             ...row,
+                            specialities_ids : row.specialities.map(obj = obj.id)
                         });
                     } else {
                         selectedRow = {
@@ -381,7 +382,7 @@
                 <td
                     >{#if row.specialties.length != 0}
                         {#each row.specialties as specialty (specialty.id)}
-                            {specialty.name}
+                            {specialty.name + " "}
                         {/each}
                     {:else}
                         <span class="opacity-60">No tiene</span>
