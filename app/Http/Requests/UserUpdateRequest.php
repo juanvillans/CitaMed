@@ -13,7 +13,7 @@ class UserUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,7 @@ class UserUpdateRequest extends FormRequest
      */
     public function rules(): array
     {   
-        $userId = $this->route('user'); 
+        $userId = $this->route('usuario'); 
 
         return [
             
@@ -32,7 +32,7 @@ class UserUpdateRequest extends FormRequest
             "last_name" => ['required','max:40','string'],
             'email'=> ['required','email',Rule::unique(User::class)->ignore($userId)],
             "phone_number" => ['required','max:14','string'],
-            "role" => ['required'],
+            "role_name" => ['required'],
             "specialties" => ['sometimes'],
         ];
     }

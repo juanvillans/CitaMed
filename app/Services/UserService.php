@@ -57,7 +57,8 @@ class UserService
             "search" => $this->generateSearch($data),
         ]);
 
-        $user->revokeRoles();
+        method_exists($user, 'revokeRoles') ? $user->revokeRoles(): null;
+        
         $user->assignRole($data['role_name']);
 
         if($user->hasRole('doctor'))
@@ -68,7 +69,10 @@ class UserService
     }
 
     public function deleteUser($usuario)
-    {
+    {   
+        $authUserId = auth()->id();
+        $usuario->id == $authUserId ? throw new Exception("No puedes eliminar tu propio usuario", 401) : null;
+
         $usuario->specialties()->detach();
         $usuario->roles()->detach();
 

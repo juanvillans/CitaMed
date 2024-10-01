@@ -23,10 +23,10 @@ class UserRequest extends FormRequest
     {
         return [
 
-            "ci" => ['required','max:15','string'],
+            "ci" => ['required','max:15','string','unique:users,ci'],
             "name" => ['required','max:40','string'],
             "last_name" => ['required','max:40','string'],
-            "email" => ['required','email'],
+            "email" => ['required','email','unique:users,email'],
             "phone_number" => ['required','max:14','string'],
             "role_name" => ['required'],
             "specialties" => ['sometimes'],
