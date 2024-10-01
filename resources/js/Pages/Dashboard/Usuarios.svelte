@@ -95,7 +95,7 @@
                     type: "success",
                     message: "Ok todo salió bien",
                 });
-
+                showModal = false;
                 selectedRow = { status: false, id: 0, row: {} };
             },
         });
@@ -356,7 +356,7 @@
                         };
                         $formCreate.defaults({
                             ...row,
-                            specialities_ids : row.specialities.map(obj = obj.id)
+                            specialties_ids : row.specialties.map(obj => obj.id)
                         });
                     } else {
                         selectedRow = {
