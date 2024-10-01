@@ -10,8 +10,29 @@
     import { displayAlert } from "../../stores/alertStore";
     import { useForm, inertia } from "@inertiajs/svelte";
     export let data = [];
+
+    let instituteSpecialities = [];
+    let specialities = [];
     $: console.log(data);
 
+    $: if (data) {
+        UpdateData();
+    }
+
+    // Update data based on the current state of `data.specialties`
+    function UpdateData() {
+        instituteSpecialities = [];
+        specialities = [];
+
+        for (let i = 0; i < data.specialties.length; i++) {
+            const speciality = data.specialties[i];
+            if (speciality.status == 1) {
+                instituteSpecialities.push(speciality);
+            } else {
+                specialities.push(speciality);
+            }
+        }
+    }
     const emptyDataForm = {
         ci: "",
         name: "",
@@ -121,7 +142,7 @@
     let filteredSpecialities = [];
 
     $: if ($formCreate.specialties) {
-        filteredSpecialities = data.specialties.filter(
+        filteredSpecialities = instituteSpecialities.filter(
             (obj) =>
                 !$formCreate.specialties.some((speci) => speci.id == obj.id),
         );
@@ -161,7 +182,6 @@
 </Modal>
 
 <Modal bind:showModal modalClasses={"max-w-[560px]"}>
-    <h2 slot="header" class="text-sm text-center">CREAR NUEVO USUARIO</h2>
 
     <form
         id="a-form"
@@ -269,7 +289,7 @@
 </Modal>
 
 <Modal bind:showModal={showModalCreateSpecialties}>
-    <Especialidades />
+    <Especialidades {instituteSpecialities} {specialities} {data} />
 </Modal>
 
 <div class="flex justify-between items-center">
@@ -300,7 +320,7 @@
     >
     <!-- svelte-ignore missing-declaration -->
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <a on:click={() => showModalCreateSpecialties= true}>Especialidades de la institución</a>
+    <a class="cursor-pointer border-b py-2 px-3 hover:bg-color4" on:click={() => showModalCreateSpecialties= true}>Especialidades de la institución</a>
 </div>
 <Table
     {selectedRow}

@@ -2,10 +2,10 @@
     import { onMount } from "svelte";
     import { router } from "@inertiajs/svelte";
 
-    export let data;
-    export let searchTerm = "";
+  
     export let instituteSpecialities = [];
     export let specialities = [];
+    let searchTerm = "";
 
     // Function to handle form submission
     function handleSubmit(id) {
@@ -19,24 +19,7 @@
     }
 
     // Reactive update function
-    $: if (data) {
-        UpdateData();
-    }
-
-    // Update data based on the current state of `data.specialties`
-    function UpdateData() {
-        instituteSpecialities = [];
-        specialities = [];
-
-        for (let i = 0; i < data.specialties.length; i++) {
-            const speciality = data.specialties[i];
-            if (speciality.status == 1) {
-                instituteSpecialities.push(speciality);
-            } else {
-                specialities.push(speciality);
-            }
-        }
-    }
+   
 
     $: filteredItems = specialities.filter((item) =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase()),
