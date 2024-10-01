@@ -41,12 +41,12 @@
     export let data = {
         today: "2024-09-10T04:00:00.000Z",
     };
-    let frontCalendar = []
+    let frontCalendar = [];
     function getNextNDays(startDate, n) {
         const result = [];
         const start = new Date(startDate);
 
-        for (let i = 0; i <= n-1; i++) {
+        for (let i = 0; i <= n - 1; i++) {
             const nextDate = new Date(start);
             nextDate.setDate(start.getDate() + i);
             result.push({
@@ -60,12 +60,11 @@
             });
         }
 
-        frontCalendar = result
+        frontCalendar = result;
         return result;
     }
-    getNextNDays("2024-09-10T04:00:00.000Z", 7)
-    $: console.log({frontCalendar})
-
+    getNextNDays("2024-09-10T04:00:00.000Z", 7);
+    $: console.log({ frontCalendar });
 </script>
 
 <Alert />
@@ -74,7 +73,7 @@
         <iconify-icon icon="fa6-solid:user-doctor"></iconify-icon>
     </header>
 
-    <body class="flex">
+    <body class="flex justify-between">
         <div class="sticky top-1">
             <DatePicker
                 on:datechange={(e) => console.log(e)}
@@ -94,28 +93,7 @@
         <div>
             <header class=" sticky top-0 pt-1 bg-gray-100 z-30 calendarHeader">
                 <div class="flex gap-4 items-center">
-                    <button
-                        class="text-md font-bold border border-gray-300 rounded-md p-2 px-6 hover:bg-gray-200"
-                        >Hoy</button
-                    >
-                    <div class="mx-5 flex gap-2">
-                        <button
-                            class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
-                        >
-                            <iconify-icon
-                                icon="iconamoon:arrow-left-2-bold"
-                                class="relative left-2"
-                            ></iconify-icon></button
-                        >
-                        <button
-                            class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
-                        >
-                            <iconify-icon
-                                icon="iconamoon:arrow-right-2-bold"
-                                class="relative left-2"
-                            ></iconify-icon></button
-                        >
-                    </div>
+             
                     <!-- <h2 class="text-2xl">{data.headerInfo.month_year}</h2> -->
                 </div>
 
@@ -124,25 +102,41 @@
                     bind:this={sourceDiv}
                     on:resize={updateWidth}
                 >
-                    <div class="w-10 max-w-[40px]"></div>
+    
+                    <button
+                        class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
+                    >
+                        <iconify-icon
+                            icon="iconamoon:arrow-left-2-bold"
+                            class="relative left-2"
+                        ></iconify-icon></button
+                    >
                     <ul class="flex listCalendarHeader">
-                        {#each frontCalendar as obj (day)}
+                        {#each frontCalendar as objDate (objDate.day)}
                             <li
                                 class="flex flex-col justify-center text-center w-28"
                             >
                                 <p
-                                    class={` ${values.current_date == data.headerInfo.today ? "text-color1 " : ""}`}
+                                    class={` ${objDate.date == data.today ? "text-color1 " : ""}`}
                                 >
-                                    {translateDays[day].toUpperCase()}
+                                    {objDate.weekday.toUpperCase()}
                                 </p>
                                 <p
-                                    class={`text-2xl mx-auto w-12 aspect-square rounded-full flex items-center justify-center ${values.current_date == data.headerInfo.today ? "bg-color1 text-gray-50 " : ""}`}
+                                    class={`text-2xl mx-auto w-12 aspect-square rounded-full flex items-center justify-center ${objDate.date == data.today ? "bg-color1 text-gray-50 " : ""}`}
                                 >
-                                    {new Date(values.current_date).getUTCDate()}
+                                    {objDate.day}
                                 </p>
                             </li>
                         {/each}
                     </ul>
+                    <button
+                        class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
+                    >
+                        <iconify-icon
+                            icon="iconamoon:arrow-right-2-bold"
+                            class="relative left-2"
+                        ></iconify-icon></button
+                    >
                 </div>
             </header>
         </div>
