@@ -25,8 +25,8 @@
         },
         {
             icon: "streamline:payment-10",
-            href: "/admin/registrar-pago",
-            name: "Registrar pago",
+            href: "/admin/agenda",
+            name: "Agenda",
         },
     ];
 </script>
