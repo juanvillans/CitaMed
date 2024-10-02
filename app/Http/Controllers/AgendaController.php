@@ -2,17 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Service;
+use App\Services\AgendaService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Inertia\Inertia;
 
-class ServiceController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
+class AgendaController extends Controller
+{   
+    private AgendaService $agendaService;
+
+
+    public function __construct()
+    {
+        $this->agendaService = new AgendaService;
+    }
+
     public function index()
+    {
+        // $specialties = $this->agendaService->getSpecialties();
+        $specialties = null;
+        
+        return inertia('Dashboard/Agenda',[
+            'data' => [
+                'specialties' => $specialties,
+            ]
+        ]);
+    }
+
+    public function appointment()
     {
         return inertia('Dashboard/Citas');
 
@@ -37,7 +53,7 @@ class ServiceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Service $service)
+    public function show(string $id)
     {
         //
     }
@@ -45,7 +61,7 @@ class ServiceController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Service $service)
+    public function edit(string $id)
     {
         //
     }
@@ -53,7 +69,7 @@ class ServiceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Service $service)
+    public function update(Request $request, string $id)
     {
         //
     }
@@ -61,7 +77,7 @@ class ServiceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Service $service)
+    public function destroy(string $id)
     {
         //
     }

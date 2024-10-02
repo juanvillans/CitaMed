@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SpecialtyController;
@@ -26,8 +27,10 @@ Route::get('/admin/logout', [UserController::class, 'logout'])->middleware('auth
 Route::middleware(['auth'])->prefix('admin')->group(function () 
 {
     Route::get('/', [AppController::class, 'admin'])->name('admin');
-    Route::resource('/usuarios', UserController::class);
-    Route::resource('/citas', ServiceController::class);
+    Route::resource('/usuarios', UserController::class)->middleware('role:admin');
+    
+    Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda');
+    Route::get('/agenda/cita',[AgendaController::class,'appointment'])->name('appointment');
     
     Route::get('/especialidades', [SpecialtyController::class,'index']);
     Route::put('/especialidades/{specialty}', [SpecialtyController::class,'setSpecialty']);

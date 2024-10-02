@@ -14,8 +14,8 @@
         },
         {
             icon: "mdi:google-classroom",
-            href: "/admin/citas",
-            name: "Citas",
+            href: "/admin/agenda",
+            name: "Agenda",
         },
 
         {

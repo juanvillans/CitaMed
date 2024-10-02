@@ -141,37 +141,37 @@ class UserController extends Controller
         return redirect()->route('landpage');
     }
 
-    public function changePassword(UpdatePasswordRequest $request)
-    {   
-        $data = [
-            'oldPassword' => $request->oldPassword,
-            'newPassword' => $request->newPassword,
-            'confirmPassword' => $request->confirmPassword
-        ];
+    // public function changePassword(UpdatePasswordRequest $request)
+    // {   
+    //     $data = [
+    //         'oldPassword' => $request->oldPassword,
+    //         'newPassword' => $request->newPassword,
+    //         'confirmPassword' => $request->confirmPassword
+    //     ];
 
-        try {
-            $this->loginService->tryChangePassword($data);
+    //     try {
+    //         $this->loginService->tryChangePassword($data);
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Contraseña cambiada',
-            ], 200);
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => 'Contraseña cambiada',
+    //         ], 200);
             
-        } catch (GeneralExceptions $e) {
+    //     } catch (GeneralExceptions $e) {
             
-            if ($e->getCustomCode() == 401) {
-                return response()->json([
-                    'status' => false,
-                    'message' => $e->getMessage()
-                ], 401);
-            }
+    //         if ($e->getCustomCode() == 401) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => $e->getMessage()
+    //             ], 401);
+    //         }
             
-            return response()->json([
-                'status' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
     public function username()
     {
