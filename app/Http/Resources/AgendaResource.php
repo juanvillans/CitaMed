@@ -29,6 +29,7 @@ class AgendaResource extends JsonResource
         $result = $doctorsAndServices->map(function ($register){
 
             return [
+                'id' => $register->pivot->id,
                 'doctor_name' => $register->name,
                 'doctor_last_name' => $register->last_name,
                 'title' => $register->pivot->title,

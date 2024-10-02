@@ -30,6 +30,7 @@ class Specialty extends Model
     {
         return $this->belongsToMany(User::class,'services','specialty_id','user_id')
         ->withPivot(
+            'id',
             'user_id',
             'specialty_id',
             'title',
