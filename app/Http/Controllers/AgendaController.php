@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\AgendaService;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class AgendaController extends Controller
 {   
@@ -17,8 +18,9 @@ class AgendaController extends Controller
 
     public function index()
     {
-        $specialties = $this->agendaService->getSpecialties();
-
+        // $specialties = $this->agendaService->getSpecialties();
+        $specialties = null;
+        
         return inertia('Dashboard/Agenda',[
             'data' => [
                 'specialties' => $specialties,

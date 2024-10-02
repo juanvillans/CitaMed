@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
+use App\Models\Specialty;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Hash;
@@ -14,19 +15,26 @@ class AgendaService
     {   
         $userID = auth()->id();
         $user = User::find($userID);
-
-        $roles = $user->getRoleNames()->first();
-        return $roles;
+        $role = $user->getRoleNames()->first();
         
-        // $users = User::query()
-        // ->when($params['search'],function($query, $search){
-            
-        //     $query->where('search','like','%' . $search . '%');
-        // })
-        // ->with('specialties', 'roles')
-        // ->get();
+        // Specialty::with('services')
+        // ->when($role == 'doctor', function($query){
 
-        // return new UserCollection($users);
+        // })
+        // $response = null;
+
+        // if($role == 'admin')
+        //     $response = $this->getAllSpecialtiesWithAppointments();
+        
+        // else
+        //     $response = $this->getSpecialtiesWithAppointments($user);
+
+        // return $response;
+        
+    }
+
+    private function getAllSpecialtiesWithAppointments(){
+
     }
 
     public function createUser($data)
