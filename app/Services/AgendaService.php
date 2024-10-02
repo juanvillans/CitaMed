@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\AgendaCollection;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Models\Specialty;
@@ -17,25 +18,20 @@ class AgendaService
         $user = User::find($userID);
         $role = $user->getRoleNames()->first();
         
-        // Specialty::with('services')
-        // ->when($role == 'doctor', function($query){
+        $specialties = Specialty::with('doctors')
+        ->when($role == 'doctor', function($query) use ($userID){
 
-        // })
-        // $response = null;
+            $query->whereHas('services',function($query) use ($userID) {
+                $query->where('doctor_id',$userID);
+            });
+        })
+        ->where('status',1)
+        ->get();
 
-        // if($role == 'admin')
-        //     $response = $this->getAllSpecialtiesWithAppointments();
-        
-        // else
-        //     $response = $this->getSpecialtiesWithAppointments($user);
-
-        // return $response;
+        return new AgendaCollection($specialties);
         
     }
 
-    private function getAllSpecialtiesWithAppointments(){
-
-    }
 
     public function createUser($data)
     {
