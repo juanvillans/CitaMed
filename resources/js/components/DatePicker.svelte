@@ -55,21 +55,39 @@
     };
 
     const next = () => {
+
         if (month === 11) {
             month = 0;
             year = year + 1;
-            return;
+        } else {
+
+            month = month + 1;
         }
-        month = month + 1;
+        if (whitInput == false) {
+            selected = new Date(selected).setMonth(month); // month is 1-indexed, so subtract 1
+            selected = new Date(selected).setDate(1); // month is 1-indexed, so subtract 1
+            selected = new Date(selected).setYear(year);
+            dispatch("datechange", new Date(selected));
+        }
     };
 
     const prev = () => {
+        
         if (month === 0) {
             month = 11;
             year -= 1;
-            return;
+           
+        } else {
+            month -= 1;
+
         }
-        month -= 1;
+
+        if (whitInput == false) {
+            selected = new Date(selected).setMonth(month); // month is 1-indexed, so subtract 1
+            selected = new Date(selected).setDate(1); // month is 1-indexed, so subtract 1
+            selected = new Date(selected).setYear(year);
+            dispatch("datechange", new Date(selected));
+        }
     };
 
     const onDateChange = (d) => {

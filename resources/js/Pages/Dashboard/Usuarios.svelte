@@ -128,7 +128,20 @@
     function handleDelete(id) {
         $formCreate.delete(`/admin/usuarios/${id}`, {
             onBefore: () => confirm(`¿Está seguro de eliminar a este usuario?`),
+            onError: (errors) => {
+                if (errors.data) {
+                    displayAlert({ type: "error", message: errors.data });
+                }
+            },
+            onSuccess: (mensaje) => {
+                displayAlert({
+                    type: "success",
+                    message: "Usuario Eliminado",
+                });
+                selectedRow = { status: false, id: 0, row: {} };
+            },
         });
+        
     }
 
     function fillFormToEdit() {
@@ -358,6 +371,8 @@
                             ...row,
                             specialties_ids : row.specialties.map(obj => obj.id)
                         });
+                        $formCreate.clearErrors();
+
                     } else {
                         selectedRow = {
                             status: false,
