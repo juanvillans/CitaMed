@@ -18,8 +18,7 @@ class AgendaController extends Controller
 
     public function index()
     {
-        // $specialties = $this->agendaService->getSpecialties();
-        $specialties = null;
+        $specialties = $this->agendaService->getSpecialties();
         
         return inertia('Dashboard/Agenda',[
             'data' => [

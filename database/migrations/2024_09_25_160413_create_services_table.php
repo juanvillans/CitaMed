@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->foreignId('specialty_id');
             $table->string('title',50);
+            $table->string('description',255);
             $table->integer('duration_per_appointment');
             $table->json('schedule_json');
             $table->date('start_date_agenda');
