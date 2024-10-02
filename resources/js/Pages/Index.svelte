@@ -121,11 +121,11 @@
 
                 <div
                     class="py-5 w-max pt-10 flex"
-                    bind:this={sourceDiv}
-                    on:resize={updateWidth}
+                  
+
                 >
                     <button
-                        class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
+                        class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-12 h-12"
                         on:click={() => {
                             const start = new Date(
                                 frontCalendar[0].date,
@@ -167,7 +167,7 @@
                             nextDate.setDate(start.getDate() + 1);
                             getNextNDays(nextDate, numberOfDays);
                         }}
-                        class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
+                        class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-12 h-12"
                     >
                         <iconify-icon
                             icon="iconamoon:arrow-right-2-bold"
