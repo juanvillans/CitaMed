@@ -30,7 +30,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function ()
     Route::resource('/usuarios', UserController::class)->middleware('role:admin');
     
     Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda');
-    Route::get('/agenda/cita',[AgendaController::class,'appointment'])->name('appointment');
+    Route::get('/agenda/cita/{service}',[AgendaController::class,'service'])->name('service');
     
     Route::get('/especialidades', [SpecialtyController::class,'index']);
     Route::put('/especialidades/{specialty}', [SpecialtyController::class,'setSpecialty']);

@@ -24,5 +24,15 @@ class Service extends Model
         'duration_between_appointment',
         'max_reservations_per_day',
     ];
+
+    public function user(){
+
+        return $this->belongsTo(User::class);
+    }
+
+    public function specialty(){
+
+        return $this->belongsTo(Specialty::class);
+    }
     
 }

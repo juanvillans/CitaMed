@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Service;
 use App\Services\AgendaService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -27,9 +28,16 @@ class AgendaController extends Controller
         ]);
     }
 
-    public function appointment()
+    public function service(Service $service)
     {
-        return inertia('Dashboard/Citas');
+        $serviceDetails = $this->agendaService->getServiceDetails($service);   
+        
+        return inertia('Dashboard/Citas',[
+            
+            'data' => [
+                'serviceDetails' => $serviceDetails,
+            ]
+        ]);
 
     }
 
