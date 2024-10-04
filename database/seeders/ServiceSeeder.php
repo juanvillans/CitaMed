@@ -14,7 +14,7 @@ class ServiceSeeder extends Seeder
     public function run(): void
     {
         Service::create([
-            'user_id' => 1, 
+            'user_id' => 3, 
             'specialty_id' => 1, 
             'title' => 'Consulta General',
             'description' => 'Esto es una jodida descripcion',
@@ -30,7 +30,7 @@ class ServiceSeeder extends Seeder
         ]);
 
         Service::create([
-            'user_id' => 1, 
+            'user_id' => 3, 
             'specialty_id' => 1, 
             'title' => 'Consulta Operacion',
             'description' => 'Esto es una jodida descripcion',

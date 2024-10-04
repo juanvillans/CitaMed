@@ -38,8 +38,21 @@ class UserSeeder extends Seeder
             "search" => "Juan Villasmil juanvillans16@gmail.com 27253194 04124393123"
         ]);
 
+        $user3 = User::create([
+
+            "ci" => "14027371",
+            "name" => "Jose",
+            "last_name" => "Rodriguez",
+            "email" => "joserodriguez@gmail.com",
+            "password" => Hash::make('doctor'),
+            "phone_number" => "04143672200",
+            "search" => "Juan Rodriguez joserodriguez@gmail.com 27253194 04143672200"
+        ]);
+
         $user1->assignRole('admin');
         $user2->assignRole('admin');
+        $user3->assignRole('doctor');
+
 
 
 

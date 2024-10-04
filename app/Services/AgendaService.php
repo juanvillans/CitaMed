@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Resources\AgendaCollection;
+use App\Http\Resources\ServiceResource;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Models\Specialty;
@@ -33,25 +34,11 @@ class AgendaService
     }
 
 
-    public function createUser($data)
+    public function getServiceDetails($service)
     {
-        $newUser = User::create([
-            
-            "ci" => $data['ci'],
-            "name" => $data['name'],
-            "last_name" => $data['last_name'],
-            "email" => $data['email'],
-            "password" => Hash::make($data['ci']),
-            "phone_number" => $data['phone_number'],
-            "search" => $this->generateSearch($data),
-        ]);
+        $service->load('user','specialty');
 
-        $newUser->assignRole($data['role_name']);
-
-        if($newUser->hasRole('doctor'))
-            $this->assignSpecialties($newUser,$data);
-
-        return 0;
+        return new ServiceResource($service);
 
     }
 
