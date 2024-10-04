@@ -26,6 +26,7 @@ return new class extends Migration
             $table->json('adjust_avability_json');
             $table->integer('duration_between_appointment');
             $table->integer('max_reservations_per_day');
+            $table->json('fields');
             $table->timestamps();
         });
     }

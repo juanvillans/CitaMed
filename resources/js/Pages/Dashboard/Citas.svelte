@@ -20,7 +20,11 @@
         $form.adjusted_availability[indx].date = d.detail.toISOString();
     };
     let defaulTtime_between_appointment = 30;
+    
     export let data = {};
+
+    console.log(data);
+
     let acordion = {
         franja: false,
         ajustesCitasReservadas: false,
