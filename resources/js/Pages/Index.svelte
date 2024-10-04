@@ -59,6 +59,7 @@
         password: null,
     });
     export let data = {
+        availableDays: {7: true, 8:true, 9:true, 10: true, 14:true, 15:true},
         today: "2024-10-01T04:00:00.000Z",
     };
     let frontCalendar = [];
@@ -103,7 +104,15 @@
                 selected={focusedDate}
                 showDatePickerAlways={true}
                 whitInput={false}
+                thereIsAvailable={(date) => {
+                    if(data.availableDays[date]) {
+                        return true
+                    } else {
+                        false
+                    }
+                }}
                 isAllowed={(date) => {
+                    console.log(date)
                     const millisecs = date.getTime();
                     if (millisecs + 25 * 3600 * 1000 < Date.now()) return false;
                     if (millisecs > Date.now() + 3600 * 24 * 45 * 10000)
@@ -180,8 +189,3 @@
     </body>
 </section>
 
-<style>
-    * {
-        box-sizing: border-box;
-    }
-</style>

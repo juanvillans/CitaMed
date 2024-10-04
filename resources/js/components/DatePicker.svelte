@@ -26,6 +26,7 @@
         document.removeEventListener("mousedown", handleClickOutside);
     });
     // props
+    export let thereIsAvailable = ()  => false;
     export let isAllowed = () => true;
     export let selected = new Date();
     export let whitInput = true
@@ -156,6 +157,7 @@
                 {year}
                 date={new Date(selected)}
                 {isAllowed}
+                {thereIsAvailable}
                 on:datechange={onDateChange}
             />
         </div>

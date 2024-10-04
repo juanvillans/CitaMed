@@ -47,10 +47,11 @@
     color: #1d1d1d;
 }
 .cl-content {
-    resize: both;
+    /* resize: both; */
     box-shadow: none !important;
     background-color: rgb(231, 231, 231) !important;
-    /* height: 200px; */
+    height: 200px !important;
+    width: 382px !important;
   }
 .main_and_footer_container {
     display: grid;

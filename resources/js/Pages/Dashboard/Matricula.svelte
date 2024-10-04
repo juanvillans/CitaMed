@@ -153,19 +153,16 @@
     }
 
     const search_rep1 = debounce(async (ci) => {
-        if (ci.length>=6) {
-
+        if (ci.length >= 6) {
             try {
                 const response = await axios.get(
-                    `/dashboard/matricula/search-representative/${ci}`
+                    `/dashboard/matricula/search-representative/${ci}`,
                 );
                 if (response.data.rep_id) {
-                  
-                    let dataForm = $formCreate
-                    let updatedData = {...dataForm, ...response.data}
+                    let dataForm = $formCreate;
+                    let updatedData = { ...dataForm, ...response.data };
                     $formCreate.defaults(response.data);
                     $formCreate.reset();
-
                 }
             } catch (error) {}
         }
@@ -754,12 +751,23 @@
         {#if sectionsOfThisYear.length !== 1 && lastSectionId == data.filters.section_id}
             <button
                 on:click={() => deleteSection(data.filters.section_id)}
-                class="ml-3 p-2 px-3 bg-gray-100"
+                class="ml-3 p-2  px-3 bg-gray-100"
                 title="Elimar Sección"
             >
                 <iconify-icon class="text-xl relative top-1" icon="ph:trash"
                 ></iconify-icon>
             </button>
+
+            <div
+                class="ml-2 mt-1.5 flex gap-2 items-center bg-gray-100 rounded-full max-w-fit pr-3"
+            >
+                <span
+                    class="rounded-full overflow-hidden bg-color4 w-7 h-7 justify-center items-center flex"
+                >
+                    <iconify-icon icon="fa6-solid:user-doctor"></iconify-icon>
+                </span>
+                <p>Doctor Kilo Perez</p>
+            </div>
         {/if}
     </div>
     <thead slot="thead" class="sticky top-0 z-50">
