@@ -2285,7 +2285,7 @@
 
             {#each Object.entries(database.calendar) as [day, values], indxDay (day)}
                 {#each values.appointments as appointment, indx (day + "_" + indx)}
-                    <Draggable>
+                    <!-- <Draggable>
                         <div
                             class="flex gap-3 w-28 h-12 absolute duration-300 z-50 px-0.5"
                             style={`top: ${GetTop(appointment.start)}px; left: ${40 + (112 * indxDay + 1)}px; 
@@ -2293,7 +2293,6 @@
                            `}
                         >
                             <div class=" z-50 px-1 w-full">
-                                <!-- svelte-ignore a11y-click-events-have-key-events -->
                                 <div
                                     class={`cursor-pointer hover:bg-color1 text-center bg-color3 ${database.calendar[day].current_date < database.headerInfo.today ? "opacity-40" : ""}  w-[98%] h-full mx-auto p-1 rounded-lg ${$form.time_between_appointment < 5 ? "border-b-4 border-color4" : ""}`}
                                 >
@@ -2305,7 +2304,7 @@
                                 </div>
                             </div>
                         </div>
-                    </Draggable>
+                    </Draggable> -->
 
                     <div
                         class="flex gap-3 w-28 h-12 absolute duration-300 z-40 px-0.5"
