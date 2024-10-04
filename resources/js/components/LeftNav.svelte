@@ -23,11 +23,7 @@
             href: "/admin/pagos",
             name: "Pagos",
         },
-        {
-            icon: "streamline:payment-10",
-            href: "/admin/agenda",
-            name: "Agenda",
-        },
+        
     ];
 </script>
 

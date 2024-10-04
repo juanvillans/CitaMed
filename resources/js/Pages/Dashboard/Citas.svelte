@@ -13,12 +13,8 @@
     import DatePicker from "../../components/DatePicker.svelte";
     import { text } from "svelte/internal";
     let html = "";
-    const ro = new ResizeObserver((entries) => {
-        const contentWd = entries[0].contentRect.width;
-        // respond to contentWd ...
-    });
     let editor;
-    $: editor && ro.observe(document.getElementById("notes-content"));
+    let descriptionLength = 0;
     let currentDate = new Date().toISOString();
     const onDateChange = (d, indx) => {
         $form.adjusted_availability[indx].date = d.detail.toISOString();
@@ -863,9 +859,8 @@
 </Modal>
 <section class="flex gap-4 justify-between">
     <div class="min-w-[450px] w-[470px]">
-        
         <form
-            class=" bg-gray-100  pl-0 rounded pt-5 sticky top-1 h overflow-x-hidden pr-2"
+            class=" bg-gray-100 pl-0 rounded pt-5 sticky top-1 h overflow-x-hidden pr-2"
             action=""
             on:submit={(e) => {
                 e.preventDefault();
@@ -884,11 +879,50 @@
                                 type="text"
                                 required={true}
                                 label={"Titulo"}
-                                labelClasses={"font-bold w-11/12"}
+                                labelClasses={"font-bold w-11/12 mb-3"}
                                 inputClasses={"text-2xl  p-1 px-3 bg-gray-200 w-11/12 "}
                                 bind:value={$form.title}
                                 error={$form.errors?.title}
                             />
+                            <div class="flex justify-between">
+                                <button type="button">
+                                    <div class="mt-3 text-left">
+                                        <span class="text-left font-bold"
+                                            >Doctor</span
+                                        >
+                                    </div>
+                                    <div
+                                        class="ml-2 mt-1.5 flex gap-2 items-center bg-gray-100 rounded-full hover:bg-gray-200 max-w-fit pr-3"
+                                    >
+                                        <span
+                                            class="rounded-full overflow-hidden bg-color4 w-7 h-7 justify-center items-center flex"
+                                        >
+                                            <iconify-icon
+                                                icon="fa6-solid:user-doctor"
+                                            ></iconify-icon>
+                                        </span>
+                                        <p>Doctor Kilo Perez</p>
+                                        <iconify-icon
+                                            icon="iconamoon:arrow-down-2-duotone"
+                                        ></iconify-icon>
+                                    </div>
+                                </button>
+
+                                <Input
+                                    type="select"
+                                    required={true}
+                                    labelClasses={"font-bold"}
+                                    label={"Especialidad"}
+                                    classes={"mt-3 w-auto"}
+                                    value={$form.specialty}
+                                    error={$form.errors?.specialty}
+                                    inputClasses={"bg-gray-200 px-2"}
+                                >
+                                    <option>Ginecologia</option>
+                                    <option>Ginecologia</option>
+                                    <option>Ginecologia</option>
+                                </Input>
+                            </div>
                         </fieldset>
 
                         <fieldset
@@ -1320,10 +1354,15 @@
                                         <legend class="font-bold"
                                             >Franja de programación</legend
                                         >
-                                        <small class="inline-block"
-                                            >Desde 60 días de antelación hasta 4
-                                            horas antes</small
-                                        >
+                                        <small class="inline-block">
+                                            {#if acordion.franja}
+                                                Limita el rango de tiempo en que
+                                                se puede agendar una cita
+                                            {:else}
+                                                Desde 60 días de antelación
+                                                hasta 4 horas antes
+                                            {/if}
+                                        </small>
                                     </div>
                                     <iconify-icon
                                         icon="iconamoon:arrow-down-2-duotone"
@@ -1374,8 +1413,8 @@
                                         </label>
 
                                         <small class="mt-4 mb-2 inline-block"
-                                            >Tiempo máximo antes de la cita con
-                                            el que se puede reservar
+                                            >Tiempo máximo de antelación con el
+                                            que se puede reservar una cita
                                         </small>
                                         <span class={`flex items-center gap-3`}>
                                             <input
@@ -1398,8 +1437,8 @@
                                             </span>
                                         </span>
                                         <small class="mt-4 mb-2 inline-block"
-                                            >Tiempo máximo antes de la cita con
-                                            el que se puede reservar
+                                            >Tiempo mínimo antes del inicio de
+                                            la cita para poder reservarla
                                         </small>
                                         <span
                                             class={` flex items-center gap-3`}
@@ -1938,7 +1977,7 @@
                         </fieldset>
                     </div>
                 {:else}
-                    <div>
+                    <div class="mb-5">
                         <fieldset
                             class="border-b border-gray-300 items-center pb-4"
                         >
@@ -1961,7 +2000,7 @@
                                 <iconify-icon icon="pajamas:text-description"
                                 ></iconify-icon>
                             </span>
-                            <section class="p-2">
+                            <section class="p-2 relative">
                                 <legend class="font-bold">Descripción</legend>
                                 <small class="mb-5 inline-block"
                                     >Agrega una nota que explique tu servicio.
@@ -1978,15 +2017,28 @@
                                         "left",
                                         "center",
                                         "justify",
-                                        "forecolor",
                                     ]}
                                     html={$form.description}
-                                    on:change={(evt) =>
-                                        ($form.description = evt.detail)}
+                                    on:change={(evt) => {
+                                        descriptionLength = evt.detail.length
+                                       if (descriptionLength >= 300) {
+                                        $form.setError('description', 'No puede tener más de 300 caracteres');
+                                       } else {
+                                        $form.clearErrors('description')
+                                       }
+                                        $form.description = evt.detail;
+                                    }}
                                     contentId="notes-content"
                                     bind:this={editor}
                                 />
+                            <div class={`absolute bottom-0 text-sm opacity-80 right-0 ${$form.errors?.description ? "text-red font-bold" : ""}`}>
+                                {descriptionLength} / 300
+                                {#if $form.errors?.description}
+                                    {$form.errors.description}
+                                {/if}
+                            </div>
                             </section>
+                            
                         </fieldset>
 
                         <fieldset class="mt-2 pb-4 flex gap-4">
