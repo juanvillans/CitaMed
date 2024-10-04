@@ -31,6 +31,7 @@
     let showModalFranja = false;
     let showModalappointments = false;
     let showModalForm = false;
+    let showModalDoctor = false;
     let newItem = { name: "", required: false };
     let form = useForm({
         title: "",
@@ -508,11 +509,15 @@
             };
         });
     }
+    let searchDoctor = "";
 
     $: {
+        // if(searchDoctor) {
+
+        // }
         // updateShiftsForCalendar();
         // console.log($form.adjusted_availability);
-        // console.log($form);
+        console.log($form);
     }
     $: $form, updateShiftsForCalendar();
 
@@ -545,8 +550,10 @@
         const newMinutes = String(date.getMinutes()).padStart(2, "0");
         return `${newHours}:${newMinutes}`;
     }
+
     const GetStartAppointmets = (shift) => {
-        console.log($form.time_between_appointment);
+        console.log({ shift });
+        // console.log($form.time_between_appointment);
         let forAppointments = [];
         let amountOfAppointments = calculateAppointments(
             GetHeight(shift.start, shift.end),
@@ -564,6 +571,7 @@
                     +$form.time_between_appointment,
             );
         }
+        console.log({ forAppointments });
         return forAppointments;
         // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.time_between_appointment / 60) }, (_, index) => index)
     };
@@ -857,6 +865,23 @@
         >Hecho</button
     >
 </Modal>
+
+<Modal bind:showModal={showModalDoctor}>
+    <p slot="header">Selecciona un Doctor</p>
+    <div
+        class="flex ml-7 bg-gray-200 md:min-w-72 rounded-full my-2 pl-3 items-center sticky top-1 z-50 shadow-md"
+    >
+        <iconify-icon icon="cil:search" class="mx-2" />
+        <input
+            type="search"
+            placeholder="Buscar"
+            name=""
+            id=""
+            class="bg-gray-200 px-3 py-2 rounded-full outline-none w-full"
+            bind:value={searchDoctor}
+        />
+    </div>
+</Modal>
 <section class="flex gap-4 justify-between">
     <div class="min-w-[450px] w-[470px]">
         <form
@@ -885,14 +910,19 @@
                                 error={$form.errors?.title}
                             />
                             <div class="flex justify-between">
-                                <button type="button">
+                                <button
+                                    type="button"
+                                    on:click={() => {
+                                        showModalDoctor = true;
+                                    }}
+                                >
                                     <div class="mt-3 text-left">
                                         <span class="text-left font-bold"
                                             >Doctor</span
                                         >
                                     </div>
                                     <div
-                                        class="ml-2 mt-1.5 flex gap-2 items-center bg-gray-100 rounded-full hover:bg-gray-200 max-w-fit pr-3"
+                                        class=" mt-1.5 flex gap-2 items-center bg-gray-100 rounded-full hover:bg-gray-200 max-w-fit pr-3"
                                     >
                                         <span
                                             class="rounded-full overflow-hidden bg-color4 w-7 h-7 justify-center items-center flex"
@@ -1313,6 +1343,13 @@
                                                                 {
                                                                     start: "08:00",
                                                                     end: "16:00",
+                                                                    appointments:
+                                                                        GetStartAppointmets(
+                                                                            {
+                                                                                start: "08:00",
+                                                                                end: "16:00",
+                                                                            },
+                                                                        ),
                                                                 },
                                                             ];
                                                         }}
@@ -2020,25 +2057,29 @@
                                     ]}
                                     html={$form.description}
                                     on:change={(evt) => {
-                                        descriptionLength = evt.detail.length
-                                       if (descriptionLength >= 300) {
-                                        $form.setError('description', 'No puede tener más de 300 caracteres');
-                                       } else {
-                                        $form.clearErrors('description')
-                                       }
+                                        descriptionLength = evt.detail.length;
+                                        if (descriptionLength >= 300) {
+                                            $form.setError(
+                                                "description",
+                                                "No puede tener más de 300 caracteres",
+                                            );
+                                        } else {
+                                            $form.clearErrors("description");
+                                        }
                                         $form.description = evt.detail;
                                     }}
                                     contentId="notes-content"
                                     bind:this={editor}
                                 />
-                            <div class={`absolute bottom-0 text-sm opacity-80 right-0 ${$form.errors?.description ? "text-red font-bold" : ""}`}>
-                                {descriptionLength} / 300
-                                {#if $form.errors?.description}
-                                    {$form.errors.description}
-                                {/if}
-                            </div>
+                                <div
+                                    class={`absolute bottom-0 text-sm opacity-80 right-0 ${$form.errors?.description ? "text-red font-bold" : ""}`}
+                                >
+                                    {descriptionLength} / 300
+                                    {#if $form.errors?.description}
+                                        {$form.errors.description}
+                                    {/if}
+                                </div>
                             </section>
-                            
                         </fieldset>
 
                         <fieldset class="mt-2 pb-4 flex gap-4">
@@ -2229,7 +2270,7 @@
                                 <div
                                     class="bg-color4 bg-opacity-60 border z-30 border-color1 border-opacity-25 px-1 rounded-md text-color1 w-full"
                                 >
-                                    {#each shift.appointments as xxx}
+                                    {#each shift?.appointments as xxx}
                                         <div
                                             class={`bg-color1 bg-opacity-30 w-[98%] mx-auto h-full rounded-lg ${$form.time_between_appointment < 5 ? "border-b-4 border-color4" : ""}`}
                                             style={`margin-bottom: ${(+$form.time_between_appointment / 60) * 48}px ;height: ${(GetHeight(shift.start, shift.end) * 48) / ((GetHeight(shift.start, shift.end) * 60) / $form.duration_per_appointment)}px`}
