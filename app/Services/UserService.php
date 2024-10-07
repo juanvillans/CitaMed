@@ -13,9 +13,20 @@ class UserService
     public function getUsers($params)
     {
         $users = User::query()
-        ->when($params['search'],function($query, $search){
+        ->when($params['search'] ?? null, function($query, $search){
             
             $query->where('search','like','%' . $search . '%');
+        })
+        ->when($params['role'] ?? null, function($query, $role) {
+            $query->whereHas('roles',function($query) use ($role){
+                
+                $query->where('name',$role);
+            
+            });
+        })
+        ->when($params['userID'] ?? null, function($query, $userID){
+            
+            $query->where('id',$userID);
         })
         ->with('specialties', 'roles')
         ->get();
