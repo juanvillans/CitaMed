@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateServiceRequest;
 use App\Models\Service;
 use App\Services\AgendaService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 
 class AgendaController extends Controller
 {   
@@ -41,14 +43,35 @@ class AgendaController extends Controller
 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function createService(){
+
+
+        return inertia('Dashboard/Citas');
     }
 
+    public function updateService(UpdateServiceRequest $request, Service $service){
+        
+        DB::beginTransaction();
+
+        try 
+        {
+            $data = $request->all();
+
+            $this->agendaService->updateService($data, $service);
+
+            DB::commit();
+
+            return redirect()->back()->with(['message' => 'Cita actualizada con éxito']);
+
+        }
+        catch (\Throwable $e)
+        {   
+            
+            DB::rollback();
+            
+            return redirect()->back()->withErrors(['data' => $e->getMessage()]);
+        }
+    }
     /**
      * Store a newly created resource in storage.
      */

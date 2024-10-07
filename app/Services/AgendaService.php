@@ -42,6 +42,12 @@ class AgendaService
 
     }
 
+    public function updateService($data, $service){
+
+        // Update service
+        return 0;
+    }
+
     public function updateUser($data, $user)
     {
 

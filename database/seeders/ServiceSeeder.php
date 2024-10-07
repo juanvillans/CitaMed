@@ -27,6 +27,7 @@ class ServiceSeeder extends Seeder
             'adjust_avability_json' => json_encode(['adjustments' => []]),
             'duration_between_appointment' => 15,
             'max_reservations_per_day' => 10,
+            'fields' => json_encode(['Nombre y Apellido']),
         ]);
 
         Service::create([
@@ -43,6 +44,7 @@ class ServiceSeeder extends Seeder
             'adjust_avability_json' => json_encode(['adjustments' => []]),
             'duration_between_appointment' => 15,
             'max_reservations_per_day' => 10,
+            'fields' => json_encode(['Nombre y Apellido']),
         ]);
     }
 }

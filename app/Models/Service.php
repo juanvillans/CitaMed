@@ -23,6 +23,7 @@ class Service extends Model
         'adjust_avability_json',
         'duration_between_appointment',
         'max_reservations_per_day',
+        'fields',
     ];
 
     public function user(){
