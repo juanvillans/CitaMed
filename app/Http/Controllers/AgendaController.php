@@ -43,6 +43,12 @@ class AgendaController extends Controller
 
     }
 
+    public function createService(){
+
+
+        return inertia('Dashboard/Citas');
+    }
+
     public function updateService(UpdateServiceRequest $request, Service $service){
         
         DB::beginTransaction();
