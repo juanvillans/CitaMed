@@ -8,6 +8,7 @@ use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Models\Specialty;
 use App\Models\User;
+use App\Services\UserService;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 
@@ -40,6 +41,44 @@ class AgendaService
 
         return new ServiceResource($service);
 
+    }
+
+    public function getDataToCreateService(){
+        
+        $userService = new UserService;
+        $params = $this->generateParamsAccordingToRoleUser();
+        
+        
+        $doctors = $userService->getUsers($params);
+
+        $response = [
+
+            'doctors' => new UserCollection($doctors),
+        ];
+
+        return $response;
+    }
+
+    private function generateParamsAccordingToRoleUser(){
+
+        $user = auth()->user();
+        $role = $user->getRoleNames()->first();
+        $params = null;
+
+        if($role == 'admin'){
+            $params = [
+                'role' => 'doctor',
+            ];
+        }
+        else{
+
+            $params = [
+                'role' => 'doctor',
+                'userID' => $user->id,
+            ];
+        }
+
+        return $params;
     }
 
     public function updateService($data, $service){

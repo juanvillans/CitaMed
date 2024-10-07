@@ -31,10 +31,13 @@ class UserController extends Controller
     {
         $this->params = [
             'search' => $request->input('search'),
+            'role' => $request->input('role'),
+
         ];     
         $specialtyService = new SpecialtyService();
 
         $users = $this->userService->getUsers($this->params);
+
         $specialties = $specialtyService->getSpecialties([]);
 
         return inertia('Dashboard/Usuarios',[
