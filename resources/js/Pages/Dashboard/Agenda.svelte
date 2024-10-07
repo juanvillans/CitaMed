@@ -3,7 +3,7 @@
     import Modal from "../../components/Modal.svelte";
     export let data = {};
     let contentForModal;
-    console.log(data);
+    $: console.log(contentForModal);
     let showModal = false;
     // $: console.log(showModal);
 </script>
@@ -12,14 +12,17 @@
     <h2 slot="header" class="text-center">
         Citas de {contentForModal.specialty_name}
         <span class="text-gray-300 block">|</span>
-    </h2>
-    <div class="md:grid md:grid-cols-2 md:gap-4">
+    </h2> 
+    <div class="lg:grid lg:grid-cols-2 lg:gap-4">
         {#each contentForModal.calendar as calendar}
-            <div class="border p-3 rounded-md mb-3 min-w-[290px] md:w-[420px] cursor-pointer hover:bg-gray-50 hover:border-dark">
+            <a use:inertia href={`/admin/agenda/cita/${calendar.id}`} class="border p-3 rounded-md mb-3 min-w-[290px] md:w-[420px] cursor-pointer hover:bg-gray-50 hover:border-dark">
                 <div class="flex justify-between">
                     <h3 class="font-bold">{calendar.title}</h3>
                     <button
-                        class="ml-3  px-3"
+                        on:click|preventDefault={() => {
+                            console.log('eliminal')
+                        }}
+                        class="ml-3  px-3 hover:bg-gray-200 rounded-full"
                     >
                         <iconify-icon
                             class="text-xl relative top-1"
@@ -49,7 +52,7 @@
                     quisquam natus voluptatibus, quos quaerat quia minus? Minima,
                     id repellendus soluta eaque voluptas at.
                 </div>
-            </div>
+            </a>
         {/each}
     </div>
 </Modal>
