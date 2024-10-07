@@ -519,6 +519,7 @@
         // console.log($form.adjusted_availability);
         console.log($form);
     }
+    
     $: $form, updateShiftsForCalendar();
 
     function calculateAppointments(availableHours, duration, rest) {

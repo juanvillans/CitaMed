@@ -149,7 +149,7 @@
                             class="relative left-2"
                         ></iconify-icon></button
                     >
-                    <ul class="flex listCalendarHeader">
+                    <ul class="flex listCalendarHeader gap-2">
                         {#each frontCalendar as objDate (objDate.day)}
                             <li
                                 class="flex flex-col justify-center text-center w-28"
@@ -164,6 +164,10 @@
                                 >
                                     {objDate.day}
                                 </p>
+                                <div class="grid gap-2 mt-7 bg-gray-200">
+                                    <button class="py-2 border-color1 border rounded hover:bg-color3 duration-75 hover:text-white bg-color4 ">8:00AM</button>
+                                    <button class="py-2 border-color1 border rounded hover:bg-color3 duration-75 hover:text-white bg-color4 ">9:00AM</button>
+                                </div>
                             </li>
                         {/each}
                     </ul>
