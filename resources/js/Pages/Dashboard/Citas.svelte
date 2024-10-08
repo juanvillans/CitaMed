@@ -204,21 +204,6 @@
             sat: [],
             sun: [],
         },
-<<<<<<< HEAD
-        programming_slot:{
-            
-            available_now_check: true,
-            interval_date:{
-                
-                start_now_check: false,
-                custom_start_date: "2024-09-09T04:00:00.000Z",
-
-                end_never_check: false,
-                custom_end_date: "2024-09-09T04:00:00.000Z",
-
-            },
-
-=======
         programming_slot: {
             available_now_check: 1,
             interval_date: {
@@ -228,19 +213,12 @@
                 end_never_check: false,
                 custom_end_date: "2024-09-09T04:00:00.000Z",
             },
->>>>>>> 5738b7234cd17a866c0a623b6e8e80015e03399e
             allow_max_reservation_time_before_appointment: true,
             allow_min_reservation_time_before_appointment: true,
 
             max_reservation_time_before_appointment: 60,
             min_reservation_time_before_appointment: 40,
-<<<<<<< HEAD
-
         },
-        
-=======
-        },
->>>>>>> 5738b7234cd17a866c0a623b6e8e80015e03399e
         adjusted_availability: [
             {
                 date: "2024-09-09T04:00:00.000Z",
