@@ -63,11 +63,11 @@ class AgendaService
     public function storeService($serviceData){
         
         $newService = Service::create([
-            'user_id' => $serviceData['user_id'],
+            'user_id' => $serviceData['doctor_id'],
             'specialty_id' => $serviceData['specialty_id'],
             'title' => $serviceData['title'],
             'availability_json' => json_encode($serviceData['availability']),
-            'adjust_avability_json' => json_encode($serviceData['adjust_avability']),
+            'adjust_avability_json' => json_encode($serviceData['adjusted_availability']),
             'programming_slot_json' => json_encode($serviceData['programming_slot']),
             'booked_appointment_settings_json' => json_encode($serviceData['booked_appointment_settings']),
             'description' => $serviceData['description'],
