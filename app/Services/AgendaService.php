@@ -6,6 +6,7 @@ use App\Http\Resources\AgendaCollection;
 use App\Http\Resources\ServiceResource;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
+use App\Models\Service;
 use App\Models\Specialty;
 use App\Models\User;
 use App\Services\UserService;
@@ -57,6 +58,23 @@ class AgendaService
         ];
 
         return $response;
+    }
+
+    public function storeService($serviceData){
+        
+        $newService = Service::create([
+            'user_id' => $serviceData['user_id'],
+            'specialty_id' => $serviceData['specialty_id'],
+            'title' => $serviceData['title'],
+            'availability_json' => json_encode($serviceData['availability']),
+            'adjust_avability_json' => json_encode($serviceData['adjust_avability']),
+            'programming_slot_json' => json_encode($serviceData['programming_slot']),
+            'booked_appointment_settings_json' => json_encode($serviceData['booked_appointment_settings']),
+            'description' => $serviceData['description'],
+            'fields_json' => json_encode($serviceData['fields']),
+        ]);
+
+        return $newService;
     }
 
     private function generateParamsAccordingToRoleUser(){

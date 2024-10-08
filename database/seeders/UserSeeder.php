@@ -53,6 +53,8 @@ class UserSeeder extends Seeder
         $user2->assignRole('admin');
         $user3->assignRole('doctor');
 
+        $user3->specialties()->sync([ 1, 2 ]);
+
 
 
 

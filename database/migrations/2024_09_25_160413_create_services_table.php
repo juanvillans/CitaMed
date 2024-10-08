@@ -16,17 +16,12 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->foreignId('specialty_id');
             $table->string('title',50);
-            $table->string('description',255);
-            $table->integer('duration_per_appointment');
-            $table->json('schedule_json');
-            $table->date('start_date_agenda');
-            $table->date('end_date_agenda')->nullable();
-            $table->integer('max_reservation_time_before_appointment')->default(0);
-            $table->integer('min_reservation_time_before_appointment')->default(0);
+            $table->json('availability_json');
             $table->json('adjust_avability_json');
-            $table->integer('duration_between_appointment');
-            $table->integer('max_reservations_per_day');
-            $table->json('fields');
+            $table->json('programming_slot_json');
+            $table->json('booked_appointment_settings_json');
+            $table->string('description',255);
+            $table->json('fields_json');
             $table->timestamps();
         });
     }

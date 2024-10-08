@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use App\Models\Service;
 use App\Services\AgendaService;
@@ -53,6 +54,14 @@ class AgendaController extends Controller
                 'serviceDetails' => $serviceDetails,
             ]
         ]);
+    }
+
+    public function storeService(CreateServiceRequest $serviceData){
+
+        $serviceCreated = $this->agendaService->storeService($serviceData->all());
+
+        return redirect('/admin/agenda/cita/'.$serviceCreated->id)->with(['message' => 'Cita creada con éxito']);
+
     }
 
     public function updateService(UpdateServiceRequest $request, Service $service){

@@ -22,9 +22,9 @@
     let defaulTtime_between_appointment = 30;
     
     export let data = {};
-
+    
     console.log(data);
-
+    
     let acordion = {
         franja: false,
         ajustesCitasReservadas: false,
@@ -39,17 +39,7 @@
     let newItem = { name: "", required: false };
     let form = useForm({
         title: "",
-        allow_max_appointment_per_day: false,
-        allow_time_between_appointment: false,
         duration_per_appointment: "60",
-        prev_value_duration_per_appointment: "",
-        duration_per_appointment_type: "",
-        allow_max_reservation_time_before_appointment: true,
-        allow_min_reservation_time_before_appointment: true,
-        max_reservation_time_before_appointment: 60,
-        min_reservation_time_before_appointment: 40,
-        time_between_appointment: null,
-        max_appointment_per_day: 4,
         availability: {
             mon: [
                 {
@@ -214,7 +204,27 @@
             sat: [],
             sun: [],
         },
-        description: "",
+        programming_slot:{
+            
+            available_now_check: true,
+            interval_date:{
+                
+                start_now_check: false,
+                custom_start_date: "2024-09-09T04:00:00.000Z",
+
+                end_never_check: false,
+                custom_end_date: "2024-09-09T04:00:00.000Z",
+
+            },
+
+            allow_max_reservation_time_before_appointment: true,
+            allow_min_reservation_time_before_appointment: true,
+
+            max_reservation_time_before_appointment: 60,
+            min_reservation_time_before_appointment: 40,
+
+        },
+        
         adjusted_availability: [
             {
                 date: "2024-09-09T04:00:00.000Z",
@@ -275,6 +285,15 @@
                 ],
             },
         ],
+        booked_appointment_settings:{
+            time_between_appointment: null,
+
+            allow_max_appointment_per_day: false,
+            max_appointment_per_day: 4,
+        
+        },
+        
+        description: "",
         fields: [
             { name: "Nombre", required: true },
             { name: "Apellido", required: true },
@@ -282,7 +301,14 @@
             { name: "Cédula", required: true },
             { name: "Teléfono", required: true },
         ],
-        time_available_type: 1,
+
+
+        
+        
+        prev_value_duration_per_appointment: "",
+
+        
+
     });
     let optionValue = "";
 
