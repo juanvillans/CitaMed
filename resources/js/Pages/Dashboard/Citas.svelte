@@ -204,17 +204,14 @@
             sat: [],
             sun: [],
         },
-        programming_slot:{
-            
+        programming_slot: {
             available_now_check: 1,
-            interval_date:{
-                
+            interval_date: {
                 start_now_check: false,
                 custom_start_date: "2024-12-30T04:00:00.000Z",
 
                 end_never_check: false,
                 custom_end_date: "2024-09-09T04:00:00.000Z",
-
             },
             allow_max_reservation_time_before_appointment: true,
             allow_min_reservation_time_before_appointment: true,
@@ -282,7 +279,7 @@
                 ],
             },
         ],
-        booked_appointment_settings:{
+        booked_appointment_settings: {
             time_between_appointment: null,
             allow_max_appointment_per_day: false,
             max_appointment_per_day: 4,
@@ -291,9 +288,9 @@
         prev_value_duration_per_appointment: "",
         duration_per_appointment_type: "",
         max_appointment_per_day: 4,
-       
+
         description: "",
-        
+
         fields: [
             { name: "Nombre", required: true },
             { name: "Apellido", required: true },
@@ -541,7 +538,7 @@
         // }
         // updateShiftsForCalendar();
         // console.log($form.adjusted_availability);}
-        console.log($form.programming_slot.interval_date)
+        console.log($form.programming_slot.interval_date);
         // console.log($form);
     }
 
@@ -642,6 +639,26 @@
         // Return the formatted time
         return `${hours12}:${formattedMinutes} ${suffix}`;
     }
+
+    function handleSubmit(event) {
+        console.log('xxx')
+        event.preventDefault();
+        $form.clearErrors();
+        $form.post("/admin/agenda/crear-cita", {
+            onError: (errors) => {
+                if (errors.data) {
+                    displayAlert({ type: "error", message: errors.data });
+                }
+            },
+            onSuccess: (mensaje) => {
+                $form.reset();
+                displayAlert({
+                    type: "success",
+                    message: "Ok todo salió bien",
+                });
+            },
+        });
+    }
 </script>
 
 <Modal
@@ -729,9 +746,9 @@
         />
         <span>
             <DatePicker
-                on:datechange={(d)=> {
-                    $form.programming_slot.interval_date.start_now_check = false
-                    $form.programming_slot.custom_start_date = d.detail
+                on:datechange={(d) => {
+                    $form.programming_slot.interval_date.start_now_check = false;
+                    $form.programming_slot.custom_start_date = d.detail;
                 }}
                 selected={$form.programming_slot.custom_start_date}
                 isAllowed={(date) => {
@@ -767,9 +784,10 @@
         />
         <span>
             <DatePicker
-                 on:datechange={(d)=> {
-                    $form.programming_slot.interval_date.end_never_check = false
-                    $form.programming_slot.custom_end_date = d.detail.toISOString()
+                on:datechange={(d) => {
+                    $form.programming_slot.interval_date.end_never_check = false;
+                    $form.programming_slot.custom_end_date =
+                        d.detail.toISOString();
                 }}
                 selected={$form.programming_slot.custom_end_date}
                 isAllowed={(date) => {
@@ -926,8 +944,7 @@
                         <b> {doctor.name} {doctor.last_name}</b> - {doctor.ci}
                     </p>
                     <p class="mt-2 flex gap-2">
-                        {#each doctor.specialties as specialty }
-                            
+                        {#each doctor.specialties as specialty}
                             <span class="bg-gray-200 rounded-full px-2 py-1"
                                 >{specialty.name}</span
                             >
@@ -943,9 +960,8 @@
         <form
             class=" bg-gray-100 pl-0 rounded pt-5 sticky top-1 h overflow-x-hidden pr-2"
             action=""
-            on:submit={(e) => {
-                e.preventDefault();
-            }}
+            on:submit={handleSubmit}
+
             style="height: calc(100vh - 80px)"
         >
             <div class="overflow-y-scroll h-full pb-10 p-3">
@@ -1015,11 +1031,13 @@
                                     error={$form.errors?.specialty}
                                     inputClasses={"bg-gray-200 px-2"}
                                 >
-                                {#if ($form.doctor_id)} 
-                                    {#each data.serviceDetails.doctors.data.find((obj) => obj.id == $form.doctor_id)?.specialties as specialty}
-                                        <option value={specialty.id} >{specialty.name}</option>
-                                    {/each}
-                                {/if}
+                                    {#if $form.doctor_id}
+                                        {#each data.serviceDetails.doctors.data.find((obj) => obj.id == $form.doctor_id)?.specialties as specialty}
+                                            <option value={specialty.id}
+                                                >{specialty.name}</option
+                                            >
+                                        {/each}
+                                    {/if}
                                 </Input>
                             </div>
                         </fieldset>
@@ -1480,7 +1498,9 @@
                                             class="flex gap-3 items-center mb-3"
                                         >
                                             <input
-                                                bind:group={$form.programming_slot.available_now_check}
+                                                bind:group={$form
+                                                    .programming_slot
+                                                    .available_now_check}
                                                 type="radio"
                                                 class="w-5 h-5"
                                                 name="time_available_type"
@@ -1492,14 +1512,17 @@
                                             class="flex gap-3 items-center mb-3"
                                         >
                                             <input
-                                                bind:group={$form.programming_slot.available_now_check}
+                                                bind:group={$form
+                                                    .programming_slot
+                                                    .available_now_check}
                                                 type="radio"
                                                 class="w-5 h-5"
                                                 name="available_now_check"
                                                 value={0}
                                                 on:change={() => {
                                                     if (
-                                                        $form.programming_slot.available_now_check ==
+                                                        $form.programming_slot
+                                                            .available_now_check ==
                                                         0
                                                     ) {
                                                         showModalFranja = true;
@@ -1526,13 +1549,19 @@
                                             <input
                                                 type="checkbox"
                                                 class="w-6 h-6"
-                                                bind:checked={$form.programming_slot.allow_max_reservation_time_before_appointment}
+                                                bind:checked={$form
+                                                    .programming_slot
+                                                    .allow_max_reservation_time_before_appointment}
                                             />
                                             <Input
                                                 type="number"
-                                                disabled={!$form.programming_slot.allow_max_reservation_time_before_appointment}
+                                                disabled={!$form
+                                                    .programming_slot
+                                                    .allow_max_reservation_time_before_appointment}
                                                 classes={"w-16 mt-0"}
-                                                bind:value={$form.programming_slot.max_reservation_time_before_appointment}
+                                                bind:value={$form
+                                                    .programming_slot
+                                                    .max_reservation_time_before_appointment}
                                                 error={$form.errors
                                                     ?.max_reservation_time_before_appointment}
                                             />
@@ -1552,13 +1581,19 @@
                                             <input
                                                 type="checkbox"
                                                 class="w-6 h-6"
-                                                bind:checked={$form.programming_slot.allow_min_reservation_time_before_appointment}
+                                                bind:checked={$form
+                                                    .programming_slot
+                                                    .allow_min_reservation_time_before_appointment}
                                             />
                                             <Input
                                                 type="number"
-                                                disabled={!$form.programming_slot.allow_min_reservation_time_before_appointment}
+                                                disabled={!$form
+                                                    .programming_slot
+                                                    .allow_min_reservation_time_before_appointment}
                                                 classes={"w-16 mt-0"}
-                                                bind:value={$form.programming_slot.min_reservation_time_before_appointment}
+                                                bind:value={$form
+                                                    .programming_slot
+                                                    .min_reservation_time_before_appointment}
                                                 error={$form.errors
                                                     ?.min_reservation_time_before_appointment}
                                             />
@@ -2006,7 +2041,9 @@
                                                     class="w-6 h-6"
                                                     name=""
                                                     id=""
-                                                    bind:checked={$form.booked_appointment_settings.time_between_appointment}
+                                                    bind:checked={$form
+                                                        .booked_appointment_settings
+                                                        .time_between_appointment}
                                                     on:change={(e) => {
                                                         if (e.target.checked) {
                                                             $form.booked_appointment_settings.time_between_appointment =
@@ -2020,16 +2057,22 @@
                                                 <Input
                                                     type="number"
                                                     classes={"w-16 mt-0"}
-                                                    disabled={!$form.booked_appointment_settings.time_between_appointment}
+                                                    disabled={!$form
+                                                        .booked_appointment_settings
+                                                        .time_between_appointment}
                                                     inputClasses={"p-3 ray-50 w-16"}
                                                     min={0}
-                                                    value={$form.booked_appointment_settings.time_between_appointment ||
+                                                    value={$form
+                                                        .booked_appointment_settings
+                                                        .time_between_appointment ||
                                                         defaulTtime_between_appointment}
                                                     on:change={(e) => {
                                                         $form.booked_appointment_settings.time_between_appointment =
                                                             e.target.value;
                                                         defaulTtime_between_appointment =
-                                                            $form.booked_appointment_settings.time_between_appointment;
+                                                            $form
+                                                                .booked_appointment_settings
+                                                                .time_between_appointment;
                                                         updateAllStartAppointmets();
                                                     }}
                                                     error={$form.errors
