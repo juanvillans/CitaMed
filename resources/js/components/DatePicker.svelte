@@ -29,7 +29,7 @@
     export let thereIsAvailable = ()  => false;
     export let isAllowed = () => true;
     export let selected = new Date();
-    export let whitInput = true
+    export let withInput = true
     export let showDatePickerAlways = false
     let options = {
         weekday: "short",
@@ -45,6 +45,7 @@
         month = new Date(selected).getMonth();
         year = new Date(selected).getFullYear();
         formattedDate = new Date(selected).toLocaleDateString("es-VE", options);
+        console.log(formattedDate)
     }
     let datePickerPosition = "below"; // 'above' or 'below'
     let inputElement; // Reference for the input element
@@ -64,7 +65,7 @@
 
             month = month + 1;
         }
-        if (whitInput == false) {
+        if (withInput == false) {
             selected = new Date(selected).setMonth(month); // month is 1-indexed, so subtract 1
             selected = new Date(selected).setDate(1); // month is 1-indexed, so subtract 1
             selected = new Date(selected).setYear(year);
@@ -83,7 +84,7 @@
 
         }
 
-        if (whitInput == false) {
+        if (withInput == false) {
             selected = new Date(selected).setMonth(month); // month is 1-indexed, so subtract 1
             selected = new Date(selected).setDate(1); // month is 1-indexed, so subtract 1
             selected = new Date(selected).setYear(year);
@@ -116,10 +117,11 @@
         return () =>
             window.removeEventListener("resize", calculateDatePickerPosition);
     });
+    $: console.log({selected})
 </script>
 
 <div class="relative">
-    {#if whitInput }
+    {#if withInput }
         <input
             bind:this={inputElement}
             type="text"
@@ -156,6 +158,7 @@
                 {month}
                 {year}
                 date={new Date(selected)}
+                {withInput}
                 {isAllowed}
                 {thereIsAvailable}
                 on:datechange={onDateChange}

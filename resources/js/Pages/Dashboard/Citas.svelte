@@ -20,7 +20,7 @@
         $form.adjusted_availability[indx].date = d.detail.toISOString();
     };
     let defaulTtime_between_appointment = 30;
-    
+
     export let data = {};
     
     console.log(data);
@@ -204,6 +204,7 @@
             sat: [],
             sun: [],
         },
+<<<<<<< HEAD
         programming_slot:{
             
             available_now_check: true,
@@ -217,14 +218,29 @@
 
             },
 
+=======
+        programming_slot: {
+            available_now_check: 1,
+            interval_date: {
+                start_now_check: false,
+                custom_start_date: "2024-12-30T04:00:00.000Z",
+
+                end_never_check: false,
+                custom_end_date: "2024-09-09T04:00:00.000Z",
+            },
+>>>>>>> 5738b7234cd17a866c0a623b6e8e80015e03399e
             allow_max_reservation_time_before_appointment: true,
             allow_min_reservation_time_before_appointment: true,
 
             max_reservation_time_before_appointment: 60,
             min_reservation_time_before_appointment: 40,
+<<<<<<< HEAD
 
         },
         
+=======
+        },
+>>>>>>> 5738b7234cd17a866c0a623b6e8e80015e03399e
         adjusted_availability: [
             {
                 date: "2024-09-09T04:00:00.000Z",
@@ -285,15 +301,18 @@
                 ],
             },
         ],
-        booked_appointment_settings:{
+        booked_appointment_settings: {
             time_between_appointment: null,
-
             allow_max_appointment_per_day: false,
             max_appointment_per_day: 4,
-        
         },
-        
+
+        prev_value_duration_per_appointment: "",
+        duration_per_appointment_type: "",
+        max_appointment_per_day: 4,
+
         description: "",
+
         fields: [
             { name: "Nombre", required: true },
             { name: "Apellido", required: true },
@@ -474,6 +493,7 @@
 
         return +endHours - +startHours;
     };
+
     let database = {
         headerInfo: {
             month_year: "Septiembre de 2024",
@@ -522,7 +542,7 @@
     const currentDatabaseDay = formatter
         .format(databaseCurrentDate)
         .toLowerCase();
-    console.log({ currentDatabaseDay });
+    // console.log({ currentDatabaseDay });
     let shiftsForCalendar = {};
 
     function updateShiftsForCalendar() {
@@ -539,16 +559,18 @@
             };
         });
     }
-    let searchDoctor = "";
+    // let searchDoctor = "";
 
     $: {
         // if(searchDoctor) {
 
         // }
         // updateShiftsForCalendar();
-        // console.log($form.adjusted_availability);
-        console.log($form);
+        // console.log($form.adjusted_availability);}
+        console.log($form.programming_slot.interval_date);
+        // console.log($form);
     }
+
     $: $form, updateShiftsForCalendar();
 
     function calculateAppointments(availableHours, duration, rest) {
@@ -583,12 +605,12 @@
 
     const GetStartAppointmets = (shift) => {
         console.log({ shift });
-        // console.log($form.time_between_appointment);
+        // console.log($form.booked_appointment_settings.time_between_appointment);
         let forAppointments = [];
         let amountOfAppointments = calculateAppointments(
             GetHeight(shift.start, shift.end),
             $form.duration_per_appointment / 60,
-            $form.time_between_appointment / 60,
+            $form.booked_appointment_settings.time_between_appointment / 60,
         );
         let lastTime = shift.start;
         for (let i = 0; i < amountOfAppointments; i++) {
@@ -598,12 +620,12 @@
             lastTime = addMinutes(
                 lastTime,
                 +$form.duration_per_appointment +
-                    +$form.time_between_appointment,
+                    +$form.booked_appointment_settings.time_between_appointment,
             );
         }
         console.log({ forAppointments });
         return forAppointments;
-        // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.time_between_appointment / 60) }, (_, index) => index)
+        // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.booked_appointment_settings.time_between_appointment / 60) }, (_, index) => index)
     };
 
     function updateAllStartAppointmets() {
@@ -645,6 +667,26 @@
 
         // Return the formatted time
         return `${hours12}:${formattedMinutes} ${suffix}`;
+    }
+
+    function handleSubmit(event) {
+        console.log('xxx')
+        event.preventDefault();
+        $form.clearErrors();
+        $form.post("/admin/agenda/crear-cita", {
+            onError: (errors) => {
+                if (errors.data) {
+                    displayAlert({ type: "error", message: errors.data });
+                }
+            },
+            onSuccess: (mensaje) => {
+                $form.reset();
+                displayAlert({
+                    type: "success",
+                    message: "Ok todo salió bien",
+                });
+            },
+        });
     }
 </script>
 
@@ -714,27 +756,30 @@
     <p class="opacity-80 mb-3">Empieza</p>
     <label class="flex gap-3 items-center mb-3">
         <input
-            bind:group={$form.time_available_type}
+            bind:group={$form.programming_slot.interval_date.start_now_check}
             type="radio"
             class="w-5 h-5"
             name="time_available_type"
-            value={1}
+            value={true}
         />
         <span class="opacity-80">Ahora</span>
     </label>
 
     <label class="flex gap-3 items-center">
         <input
-            bind:group={$form.time_available_type}
+            bind:group={$form.programming_slot.interval_date.start_now_check}
             type="radio"
             class="w-5 h-5"
             name="time_available_type"
-            value={1}
+            value={false}
         />
         <span>
             <DatePicker
-                on:datechange={onDateChange}
-                selected={currentDate}
+                on:datechange={(d) => {
+                    $form.programming_slot.interval_date.start_now_check = false;
+                    $form.programming_slot.custom_start_date = d.detail;
+                }}
+                selected={$form.programming_slot.custom_start_date}
                 isAllowed={(date) => {
                     const millisecs = date.getTime();
                     if (millisecs + 25 * 3600 * 1000 < Date.now()) return false;
@@ -749,27 +794,31 @@
     <p class="opacity-80 mt-5 mb-4">Termina</p>
     <label class="flex gap-3 items-center mb-3">
         <input
-            bind:group={$form.time_available_type}
+            bind:group={$form.programming_slot.interval_date.end_never_check}
             type="radio"
             class="w-5 h-5"
-            name="time_available_type"
-            value={1}
+            name="termina"
+            value={true}
         />
         <span class="opacity-80">Nunca</span>
     </label>
 
     <label class="flex gap-3 items-center h-max">
         <input
-            bind:group={$form.time_available_type}
+            bind:group={$form.programming_slot.interval_date.end_never_check}
             type="radio"
             class="w-5 h-5"
-            name="time_available_type"
-            value={1}
+            name="termina"
+            value={false}
         />
         <span>
             <DatePicker
-                on:datechange={onDateChange}
-                selected={currentDate}
+                on:datechange={(d) => {
+                    $form.programming_slot.interval_date.end_never_check = false;
+                    $form.programming_slot.custom_end_date =
+                        d.detail.toISOString();
+                }}
+                selected={$form.programming_slot.custom_end_date}
                 isAllowed={(date) => {
                     const millisecs = date.getTime();
                     if (millisecs + 25 * 3600 * 1000 < Date.now()) return false;
@@ -898,28 +947,50 @@
 
 <Modal bind:showModal={showModalDoctor}>
     <p slot="header">Selecciona un Doctor</p>
-    <div
-        class="flex ml-7 bg-gray-200 md:min-w-72 rounded-full my-2 pl-3 items-center sticky top-1 z-50 shadow-md"
-    >
-        <iconify-icon icon="cil:search" class="mx-2" />
-        <input
-            type="search"
-            placeholder="Buscar"
-            name=""
-            id=""
-            class="bg-gray-200 px-3 py-2 rounded-full outline-none w-full"
-            bind:value={searchDoctor}
-        />
-    </div>
+    <ul class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        {#each data.serviceDetails.doctors.data as doctor}
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <li
+                class="flex gap-3 border rounded cursor-pointer hover:bg-gray-100 hover:border-dark p-4"
+                on:click={() => {
+                    $form.doctor_id = doctor.id;
+                    $form = {
+                        ...$form,
+                        doctor_name: doctor.name,
+                        doctor_last_name: doctor.last_name,
+                    };
+                    showModalDoctor = false;
+                }}
+            >
+                <span
+                    class="rounded-full overflow-hidden bg-color4 w-9 h-9 justify-center items-center flex"
+                >
+                    <iconify-icon icon="fa6-solid:user-doctor"></iconify-icon>
+                </span>
+
+                <div class="mt-1">
+                    <p>
+                        <b> {doctor.name} {doctor.last_name}</b> - {doctor.ci}
+                    </p>
+                    <p class="mt-2 flex gap-2">
+                        {#each doctor.specialties as specialty}
+                            <span class="bg-gray-200 rounded-full px-2 py-1"
+                                >{specialty.name}</span
+                            >
+                        {/each}
+                    </p>
+                </div>
+            </li>
+        {/each}
+    </ul>
 </Modal>
 <section class="flex gap-4 justify-between">
     <div class="min-w-[450px] w-[470px]">
         <form
             class=" bg-gray-100 pl-0 rounded pt-5 sticky top-1 h overflow-x-hidden pr-2"
             action=""
-            on:submit={(e) => {
-                e.preventDefault();
-            }}
+            on:submit={handleSubmit}
+
             style="height: calc(100vh - 80px)"
         >
             <div class="overflow-y-scroll h-full pb-10 p-3">
@@ -952,7 +1023,7 @@
                                         >
                                     </div>
                                     <div
-                                        class=" mt-1.5 flex gap-2 items-center bg-gray-100 rounded-full hover:bg-gray-200 max-w-fit pr-3"
+                                        class=" mt-1.5 flex gap-2 items-center bg-gray-200 rounded-full hover:bg-gray-300 max-w-fit pr-3"
                                     >
                                         <span
                                             class="rounded-full overflow-hidden bg-color4 w-7 h-7 justify-center items-center flex"
@@ -961,7 +1032,18 @@
                                                 icon="fa6-solid:user-doctor"
                                             ></iconify-icon>
                                         </span>
-                                        <p>Doctor Kilo Perez</p>
+                                        {#if $form.doctor_id > 0}
+                                            <p
+                                                class="bg-gray-200 rounded-full px-3"
+                                            >
+                                                <b>
+                                                    {$form?.doctor_name}
+                                                    {$form?.doctor_last_name}</b
+                                                >
+                                            </p>
+                                        {:else}
+                                            <p>Selecciona un Doctor</p>
+                                        {/if}
                                         <iconify-icon
                                             icon="iconamoon:arrow-down-2-duotone"
                                         ></iconify-icon>
@@ -978,9 +1060,13 @@
                                     error={$form.errors?.specialty}
                                     inputClasses={"bg-gray-200 px-2"}
                                 >
-                                    <option>Ginecologia</option>
-                                    <option>Ginecologia</option>
-                                    <option>Ginecologia</option>
+                                    {#if $form.doctor_id}
+                                        {#each data.serviceDetails.doctors.data.find((obj) => obj.id == $form.doctor_id)?.specialties as specialty}
+                                            <option value={specialty.id}
+                                                >{specialty.name}</option
+                                            >
+                                        {/each}
+                                    {/if}
                                 </Input>
                             </div>
                         </fieldset>
@@ -1097,7 +1183,7 @@
                                                                                             .value,
                                                                                     },
                                                                                 );
-                                                                            // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.time_between_appointment / 60) }, (_, index) => index)
+                                                                            // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.booked_appointment_settings.time_between_appointment / 60) }, (_, index) => index)
                                                                         }}
                                                                     >
                                                                         {#each optionsShift as shiftOption (shiftOption.value)}
@@ -1140,7 +1226,7 @@
                                                                                             .value,
                                                                                     },
                                                                                 );
-                                                                            // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.time_between_appointment / 60) }, (_, index) => index)
+                                                                            // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.booked_appointment_settings.time_between_appointment / 60) }, (_, index) => index)
                                                                         }}
                                                                         required={true}
                                                                     >
@@ -1441,7 +1527,9 @@
                                             class="flex gap-3 items-center mb-3"
                                         >
                                             <input
-                                                bind:group={$form.time_available_type}
+                                                bind:group={$form
+                                                    .programming_slot
+                                                    .available_now_check}
                                                 type="radio"
                                                 class="w-5 h-5"
                                                 name="time_available_type"
@@ -1453,15 +1541,18 @@
                                             class="flex gap-3 items-center mb-3"
                                         >
                                             <input
-                                                bind:group={$form.time_available_type}
+                                                bind:group={$form
+                                                    .programming_slot
+                                                    .available_now_check}
                                                 type="radio"
                                                 class="w-5 h-5"
-                                                name="time_available_type"
-                                                value={2}
+                                                name="available_now_check"
+                                                value={0}
                                                 on:change={() => {
                                                     if (
-                                                        $form.time_available_type ==
-                                                        2
+                                                        $form.programming_slot
+                                                            .available_now_check ==
+                                                        0
                                                     ) {
                                                         showModalFranja = true;
                                                     }
@@ -1487,18 +1578,24 @@
                                             <input
                                                 type="checkbox"
                                                 class="w-6 h-6"
-                                                bind:checked={$form.allow_max_reservation_time_before_appointment}
+                                                bind:checked={$form
+                                                    .programming_slot
+                                                    .allow_max_reservation_time_before_appointment}
                                             />
                                             <Input
                                                 type="number"
-                                                disabled={!$form.allow_max_reservation_time_before_appointment}
+                                                disabled={!$form
+                                                    .programming_slot
+                                                    .allow_max_reservation_time_before_appointment}
                                                 classes={"w-16 mt-0"}
-                                                bind:value={$form.max_reservation_time_before_appointment}
+                                                bind:value={$form
+                                                    .programming_slot
+                                                    .max_reservation_time_before_appointment}
                                                 error={$form.errors
                                                     ?.max_reservation_time_before_appointment}
                                             />
                                             <span
-                                                class={`${!$form.allow_max_reservation_time_before_appointment ? "opacity-80" : ""}`}
+                                                class={`${!$form.programming_slot.allow_max_reservation_time_before_appointment ? "opacity-80" : ""}`}
                                             >
                                                 días
                                             </span>
@@ -1513,18 +1610,24 @@
                                             <input
                                                 type="checkbox"
                                                 class="w-6 h-6"
-                                                bind:checked={$form.allow_min_reservation_time_before_appointment}
+                                                bind:checked={$form
+                                                    .programming_slot
+                                                    .allow_min_reservation_time_before_appointment}
                                             />
                                             <Input
                                                 type="number"
-                                                disabled={!$form.allow_min_reservation_time_before_appointment}
+                                                disabled={!$form
+                                                    .programming_slot
+                                                    .allow_min_reservation_time_before_appointment}
                                                 classes={"w-16 mt-0"}
-                                                bind:value={$form.min_reservation_time_before_appointment}
+                                                bind:value={$form
+                                                    .programming_slot
+                                                    .min_reservation_time_before_appointment}
                                                 error={$form.errors
                                                     ?.min_reservation_time_before_appointment}
                                             />
                                             <span
-                                                class={`${!$form.allow_min_reservation_time_before_appointment ? "opacity-80" : ""}`}
+                                                class={`${!$form.programming_slot.allow_min_reservation_time_before_appointment ? "opacity-80" : ""}`}
                                             >
                                                 horas
                                             </span>
@@ -1636,7 +1739,7 @@
                                                                                         .value,
                                                                                 },
                                                                             );
-                                                                        // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.time_between_appointment / 60) }, (_, index) => index)
+                                                                        // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.booked_appointment_settings.time_between_appointment / 60) }, (_, index) => index)
                                                                     }}
                                                                     inputClasses={"bg-gray-200 p-3 px-2 border-none appearance-none"}
                                                                 >
@@ -1681,7 +1784,7 @@
                                                                                         .value,
                                                                                 },
                                                                             );
-                                                                        // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.time_between_appointment / 60) }, (_, index) => index)
+                                                                        // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.booked_appointment_settings.time_between_appointment / 60) }, (_, index) => index)
                                                                     }}
                                                                 >
                                                                     <option
@@ -1960,20 +2063,22 @@
                                             </div>
 
                                             <span
-                                                class={`${!$form.time_between_appointment ? "opacity-80" : ""} flex items-center gap-3`}
+                                                class={`${!$form.booked_appointment_settings.time_between_appointment ? "opacity-80" : ""} flex items-center gap-3`}
                                             >
                                                 <input
                                                     type="checkbox"
                                                     class="w-6 h-6"
                                                     name=""
                                                     id=""
-                                                    bind:checked={$form.time_between_appointment}
+                                                    bind:checked={$form
+                                                        .booked_appointment_settings
+                                                        .time_between_appointment}
                                                     on:change={(e) => {
                                                         if (e.target.checked) {
-                                                            $form.time_between_appointment =
+                                                            $form.booked_appointment_settings.time_between_appointment =
                                                                 defaulTtime_between_appointment;
                                                         } else {
-                                                            $form.time_between_appointment = 0;
+                                                            $form.booked_appointment_settings.time_between_appointment = 0;
                                                         }
                                                         updateAllStartAppointmets();
                                                     }}
@@ -1981,16 +2086,22 @@
                                                 <Input
                                                     type="number"
                                                     classes={"w-16 mt-0"}
-                                                    disabled={!$form.time_between_appointment}
+                                                    disabled={!$form
+                                                        .booked_appointment_settings
+                                                        .time_between_appointment}
                                                     inputClasses={"p-3 ray-50 w-16"}
                                                     min={0}
-                                                    value={$form.time_between_appointment ||
+                                                    value={$form
+                                                        .booked_appointment_settings
+                                                        .time_between_appointment ||
                                                         defaulTtime_between_appointment}
                                                     on:change={(e) => {
-                                                        $form.time_between_appointment =
+                                                        $form.booked_appointment_settings.time_between_appointment =
                                                             e.target.value;
                                                         defaulTtime_between_appointment =
-                                                            $form.time_between_appointment;
+                                                            $form
+                                                                .booked_appointment_settings
+                                                                .time_between_appointment;
                                                         updateAllStartAppointmets();
                                                     }}
                                                     error={$form.errors
@@ -1998,7 +2109,7 @@
                                                 />
                                                 <p>minutos</p>
                                             </span>
-                                            {#if $form.time_between_appointment < 0}
+                                            {#if $form.booked_appointment_settings.time_between_appointment < 0}
                                                 <p class="text-red text-sm">
                                                     No puede ser menor a cero
                                                 </p>
@@ -2302,8 +2413,8 @@
                                 >
                                     {#each shift?.appointments as xxx}
                                         <div
-                                            class={`bg-color1 bg-opacity-30 w-[98%] mx-auto h-full rounded-lg ${$form.time_between_appointment < 5 ? "border-b-4 border-color4" : ""}`}
-                                            style={`margin-bottom: ${(+$form.time_between_appointment / 60) * 48}px ;height: ${(GetHeight(shift.start, shift.end) * 48) / ((GetHeight(shift.start, shift.end) * 60) / $form.duration_per_appointment)}px`}
+                                            class={`bg-color1 bg-opacity-30 w-[98%] mx-auto h-full rounded-lg ${$form.booked_appointment_settings.time_between_appointment < 5 ? "border-b-4 border-color4" : ""}`}
+                                            style={`margin-bottom: ${(+$form.booked_appointment_settings.time_between_appointment / 60) * 48}px ;height: ${(GetHeight(shift.start, shift.end) * 48) / ((GetHeight(shift.start, shift.end) * 60) / $form.duration_per_appointment)}px`}
                                         ></div>
                                     {/each}
                                 </div>
@@ -2324,7 +2435,7 @@
                         >
                             <div class=" z-50 px-1 w-full">
                                 <div
-                                    class={`cursor-pointer hover:bg-color1 text-center bg-color3 ${database.calendar[day].current_date < database.headerInfo.today ? "opacity-40" : ""}  w-[98%] h-full mx-auto p-1 rounded-lg ${$form.time_between_appointment < 5 ? "border-b-4 border-color4" : ""}`}
+                                    class={`cursor-pointer hover:bg-color1 text-center bg-color3 ${database.calendar[day].current_date < database.headerInfo.today ? "opacity-40" : ""}  w-[98%] h-full mx-auto p-1 rounded-lg ${$form.booked_appointment_settings.time_between_appointment < 5 ? "border-b-4 border-color4" : ""}`}
                                 >
                                     <h4 class="text-white text-sm">
                                         {appointment.name.split(" ")[0]}
@@ -2345,7 +2456,7 @@
                         <div class=" z-40 px-1 w-full">
                             <!-- svelte-ignore a11y-click-events-have-key-events -->
                             <div
-                                class={`cursor-pointer hover:bg-color1 text-center bg-color3 ${database.calendar[day].current_date < database.headerInfo.today ? "opacity-40" : ""}  w-[98%] h-full mx-auto p-1 rounded-lg ${$form.time_between_appointment < 5 ? "border-b-4 border-color4" : ""}`}
+                                class={`cursor-pointer hover:bg-color1 text-center bg-color3 ${database.calendar[day].current_date < database.headerInfo.today ? "opacity-40" : ""}  w-[98%] h-full mx-auto p-1 rounded-lg ${$form.booked_appointment_settings.time_between_appointment < 5 ? "border-b-4 border-color4" : ""}`}
                                 on:click={() => {
                                     showModalappointments = true;
                                     selectedAppointmentDetails = {
