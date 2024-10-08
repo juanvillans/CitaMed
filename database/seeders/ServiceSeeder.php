@@ -17,7 +17,7 @@ class ServiceSeeder extends Seeder
             'user_id' => 3, 
             'specialty_id' => 1, 
             'title' => 'Consulta General',
-            'availability_json' => json_encode([
+            'availability' => json_encode([
                 'mon' => [ 
                     [
                         'start' => '8:00',
@@ -32,8 +32,8 @@ class ServiceSeeder extends Seeder
                 ] 
             
             ]),
-            'adjust_avability_json' => json_encode([]),
-            'programming_slot_json' => json_encode([
+            'adjust_avability' => json_encode([]),
+            'programming_slot' => json_encode([
                 
                 'available_now_check' => true,
 
@@ -45,14 +45,14 @@ class ServiceSeeder extends Seeder
                     'custom_end_date' => '2024-09-09T04:00:00.000Z'
                 ],
             ]),
-            'booked_appointment_settings_json' => json_encode([
+            'booked_appointment_settings' => json_encode([
 
                 'time_between_appointment' => null,
                 'allow_max_appointment_per_day' => false,
                 'max_appointment_per_day' => 4,
             ]), 
             'description' => 'Esto es una jodida descripcion',
-            'fields_json' => json_encode([
+            'fields' => json_encode([
                 [ 'name' => 'Nombre', 'required' => true, 'default' => true ],
                 [ 'name' => 'Apellido', 'required' => true, 'default' => true ],
                 [ 'name' => 'Correo', 'required' => true, 'default' => false ],
@@ -65,7 +65,7 @@ class ServiceSeeder extends Seeder
             'user_id' => 3, 
             'specialty_id' => 1, 
             'title' => 'Consulta especial',
-            'availability_json' => json_encode([
+            'availability' => json_encode([
                 'mon' => [ 
                     [
                         'start' => '8:00',
@@ -80,8 +80,8 @@ class ServiceSeeder extends Seeder
                 ] 
             
             ]),
-            'adjust_avability_json' => json_encode([]),
-            'programming_slot_json' => json_encode([
+            'adjust_avability' => json_encode([]),
+            'programming_slot' => json_encode([
                 
                 'available_now_check' => true,
 
@@ -93,14 +93,14 @@ class ServiceSeeder extends Seeder
                     'custom_end_date' => '2024-09-09T04:00:00.000Z'
                 ],
             ]), 
-            'booked_appointment_settings_json' => json_encode([
+            'booked_appointment_settings' => json_encode([
 
                 'time_between_appointment' => null,
                 'allow_max_appointment_per_day' => false,
                 'max_appointment_per_day' => 4,
             ]), 
             'description' => 'Esto es una jodida descripcion 2',
-            'fields_json' => json_encode([
+            'fields' => json_encode([
                 [ 'name' => 'Nombre', 'required' => true, 'default' => true ],
                 [ 'name' => 'Apellido', 'required' => true, 'default' => true ],
                 [ 'name' => 'Correo', 'required' => true, 'default' => false ],
