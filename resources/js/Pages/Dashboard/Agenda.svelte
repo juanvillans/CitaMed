@@ -56,7 +56,7 @@
         {/each}
     </div>
 </Modal>
-<a href="/admin/agenda/cita/crear" use:inertia class="btn_create inline-block"
+<a href="/admin/agenda/crear-cita" use:inertia class="btn_create inline-block"
     >Crear Cita</a
 >
 <main>

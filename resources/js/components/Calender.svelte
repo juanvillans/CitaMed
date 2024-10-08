@@ -11,18 +11,19 @@
     export let isAllowed;
     export let thereIsAvailable;
   
+    export let withInput;
     // local vars to help in render
     const weekdays = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sáb"];
     let cells;
   
     // function helpers
     const onChange = date => {
-      console.log({date})
+      // console.log({date})
       dispatch("datechange", new Date(year, month, date));
     };
   
     const allow = (year, month, date) => {
-      console.log({date})
+      // console.log({date})
       if (!date) return true;
       return isAllowed(new Date(year, month, date));
     };
@@ -37,7 +38,7 @@
       allowed: allow(year, month, c),
       availabled: available(c)
     }));
-    $: console.log({cells})
+    // $: console.log({cells})
 
   </script>
   
@@ -88,6 +89,7 @@
     }
     .availabled {
       background: #C9EBF2;
+      border: 1px solid #2477BF;
     }
     .notAvailabled {
       text-decoration: line-through;
@@ -95,7 +97,7 @@
     }
   
     .highlight:hover {
-      background: #397373;
+      background: #6595BF;
       color: #fff;
       cursor: pointer;
       transform: scale(1.3);
@@ -118,8 +120,8 @@
         <div
           on:mousedown={allowed && value ? onChange.bind(this, value) : noop}
           class:cell={true}
-          class:availabled={availabled}
-          class:notAvailabled={!availabled}
+          class:availabled={availabled && !withInput}
+          class:notAvailabled={!availabled  && !withInput}
           class:highlight={allowed && value}
           class:disabled={!allowed}
           class:selected={new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime() === new Date(year, month, value).getTime()}>

@@ -10,27 +10,26 @@
     let showModal = false;
     let sourceDiv;
     let width = 0;
-    let numberOfDays= 7
+    let numberOfDays = 7;
     function updateWidth() {
-        const screenZise = window.innerWidth
-        console.log(screenZise)
+        const screenZise = window.innerWidth;
+        console.log(screenZise);
         if (screenZise <= 1220) {
-            numberOfDays = 5
-        } 
-        if (screenZise <= 1000 ) {
-            
-            numberOfDays = 4
-        } 
-        if (screenZise <= 900 ) {
-            numberOfDays = 3
-        }  
+            numberOfDays = 5;
+        }
+        if (screenZise <= 1000) {
+            numberOfDays = 4;
+        }
+        if (screenZise <= 900) {
+            numberOfDays = 3;
+        }
         if (screenZise <= 730) {
-            numberOfDays = 2
+            numberOfDays = 2;
         }
         if (screenZise >= 1220) {
-            numberOfDays = 7
+            numberOfDays = 7;
         }
-        getNextNDays(focusedDate, numberOfDays)
+        getNextNDays(focusedDate, numberOfDays);
 
         if (sourceDiv) {
             width = sourceDiv.getBoundingClientRect().width;
@@ -59,7 +58,14 @@
         password: null,
     });
     export let data = {
-        availableDays: {7: true, 8:true, 9:true, 10: true, 14:true, 15:true},
+        availableDays: {
+            7: true,
+            8: true,
+            9: true,
+            10: true,
+            14: true,
+            15: true,
+        },
         today: "2024-10-01T04:00:00.000Z",
     };
     let frontCalendar = [];
@@ -83,18 +89,36 @@
         }
 
         frontCalendar = result;
-        focusedDate = startDate
+        focusedDate = startDate;
         return result;
     }
-    let focusedDate = data.today
+    let focusedDate = data.today;
     getNextNDays("2024-10-01T04:00:00.000Z", numberOfDays);
     $: console.log({ frontCalendar });
 </script>
 
 <Alert />
-<section class="bg-background min-h-screen">
-    <header>
-        <iconify-icon icon="fa6-solid:user-doctor"></iconify-icon>
+<section class=" min-h-screen">
+    <header class=" border-b flex p-4">
+        
+        
+        <div class="flex gap-3  "
+        >
+            <span
+                class="rounded-full overflow-hidden bg-color4 w-12 h-12 justify-center items-center flex"
+            >
+                <iconify-icon icon="fa6-solid:user-doctor"></iconify-icon>
+            </span>
+
+            <div class="mt-1">
+                <p><b class="text-xl"> Doctor Kilo</b> </p>
+                <p> <span class="bg-gray-200 rounded-full px-2 py-1 text-opacity-80">Ginecólogo</span></p>
+            </div>
+        </div>
+        <div>
+
+            <h1 class="text-2xl mx-auto"><span class="text-dark  opacity-60">Ginecologia: </span> <span class="text-2xl ">Titulo de la cita</span></h1>
+        </div>
     </header>
 
     <body class="md:flex justify-between">
@@ -105,14 +129,14 @@
                 showDatePickerAlways={true}
                 whitInput={false}
                 thereIsAvailable={(date) => {
-                    if(data.availableDays[date]) {
-                        return true
+                    if (data.availableDays[date]) {
+                        return true;
                     } else {
-                        false
+                        false;
                     }
                 }}
                 isAllowed={(date) => {
-                    console.log(date)
+                    console.log(date);
                     const millisecs = date.getTime();
                     if (millisecs + 25 * 3600 * 1000 < Date.now()) return false;
                     if (millisecs > Date.now() + 3600 * 24 * 45 * 10000)
@@ -128,17 +152,11 @@
                     <!-- <h2 class="text-2xl">{data.headerInfo.month_year}</h2> -->
                 </div>
 
-                <div
-                    class="py-5 w-max pt-10 flex"
-                  
-
-                >
+                <div class="py-5 w-max pt-10 flex">
                     <button
                         class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-12 h-12"
                         on:click={() => {
-                            const start = new Date(
-                                frontCalendar[0].date,
-                            );
+                            const start = new Date(frontCalendar[0].date);
                             const nextDate = new Date(start);
                             nextDate.setDate(start.getDate() - numberOfDays);
                             getNextNDays(nextDate, numberOfDays);
@@ -164,9 +182,15 @@
                                 >
                                     {objDate.day}
                                 </p>
-                                <div class="grid gap-2 mt-7 bg-gray-200">
-                                    <button class="py-2 border-color1 border rounded hover:bg-color3 duration-75 hover:text-white bg-color4 ">8:00AM</button>
-                                    <button class="py-2 border-color1 border rounded hover:bg-color3 duration-75 hover:text-white bg-color4 ">9:00AM</button>
+                                <div class="grid gap-2 mt-7">
+                                    <button
+                                        class="py-2 border-color1 border rounded hover:bg-color3 duration-75 hover:text-white bg-color4"
+                                        >8:00AM</button
+                                    >
+                                    <button
+                                        class="py-2 border-color1 border rounded hover:bg-color3 duration-75 hover:text-white bg-color4"
+                                        >9:00AM</button
+                                    >
                                 </div>
                             </li>
                         {/each}
@@ -192,4 +216,3 @@
         </div>
     </body>
 </section>
-
