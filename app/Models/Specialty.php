@@ -34,12 +34,12 @@ class Specialty extends Model
             'user_id',
             'specialty_id',
             'title',
-            'availability_json',
-            'adjust_avability_json',
-            'programming_slot_json',
-            'booked_appointment_settings_json',
+            'availability',
+            'adjust_avability',
+            'programming_slot',
+            'booked_appointment_settings',
             'description',
-            'fields_json',
+            'fields',
         );       
     }
 }
