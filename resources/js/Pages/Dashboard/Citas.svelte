@@ -22,8 +22,8 @@
     let defaulTtime_between_appointment = 30;
 
     export let data = {};
-
     console.log(data);
+
 
     let acordion = {
         franja: false,
@@ -299,6 +299,10 @@
             { name: "Teléfono", required: true },
         ],
         time_available_type: 1,
+
+        doctor_id: null,
+      doctor_name: '',
+      doctor_last_name: ''
     });
     let optionValue = "";
 
@@ -538,7 +542,7 @@
         // }
         // updateShiftsForCalendar();
         // console.log($form.adjusted_availability);}
-        console.log($form.programming_slot.interval_date);
+        // console.log($form.programming_slot.interval_date);
         // console.log($form);
     }
 
@@ -641,9 +645,9 @@
     }
 
     function handleSubmit(event) {
-        console.log('xxx')
         event.preventDefault();
         $form.clearErrors();
+        console.log({$form})
         $form.post("/admin/agenda/crear-cita", {
             onError: (errors) => {
                 if (errors.data) {
@@ -925,11 +929,8 @@
                 class="flex gap-3 border rounded cursor-pointer hover:bg-gray-100 hover:border-dark p-4"
                 on:click={() => {
                     $form.doctor_id = doctor.id;
-                    $form = {
-                        ...$form,
-                        doctor_name: doctor.name,
-                        doctor_last_name: doctor.last_name,
-                    };
+                    $form.doctor_name = doctor.name,
+                    $form.doctor_last_name = doctor.last_name
                     showModalDoctor = false;
                 }}
             >
