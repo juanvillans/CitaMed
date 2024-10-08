@@ -43,7 +43,7 @@ class AgendaController extends Controller
                 'dataToCreateService' => $dataToCreateService,
             ],
 
-            'form' => $dataOfService,
+            'formDatabase' => $dataOfService,
             
         ]);
 
@@ -57,7 +57,7 @@ class AgendaController extends Controller
             'data' => [
                 'dataToCreateService' => $dataToCreateService,
             ],
-            'form' => null,
+            'formDatabase' => null,
         ]);
     }
 
