@@ -302,7 +302,8 @@
 
         doctor_id: null,
       doctor_name: '',
-      doctor_last_name: ''
+      doctor_last_name: '',
+      specialty_id: "",
     });
     let optionValue = "";
 
@@ -931,6 +932,7 @@
                     $form.doctor_id = doctor.id;
                     $form.doctor_name = doctor.name,
                     $form.doctor_last_name = doctor.last_name
+                    $form.specialty_id = doctor.specialties[0].id
                     showModalDoctor = false;
                 }}
             >
@@ -1028,8 +1030,8 @@
                                     labelClasses={"font-bold"}
                                     label={"Especialidad"}
                                     classes={"mt-3 w-auto"}
-                                    value={$form.specialty}
-                                    error={$form.errors?.specialty}
+                                    bind:value={$form.specialty_id}
+                                    error={$form.errors?.specialty_id}
                                     inputClasses={"bg-gray-200 px-2"}
                                 >
                                     {#if $form.doctor_id}
