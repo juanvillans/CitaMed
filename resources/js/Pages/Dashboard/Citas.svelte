@@ -24,7 +24,6 @@
     export let data = {};
     console.log(data);
 
-
     let acordion = {
         franja: false,
         ajustesCitasReservadas: false,
@@ -37,7 +36,8 @@
     let showModalForm = false;
     let showModalDoctor = false;
     let newItem = { name: "", required: false };
-    let form = useForm({
+
+    let defaultFrontForm = {
         title: "",
         duration_per_appointment: "60",
         availability: {
@@ -208,10 +208,10 @@
             available_now_check: 1,
             interval_date: {
                 start_now_check: false,
-                custom_start_date: "2024-12-30T04:00:00.000Z",
+                custom_start_date: "2024-01-01T04:00:00.000Z",
 
                 end_never_check: false,
-                custom_end_date: "2024-09-09T04:00:00.000Z",
+                custom_end_date: "2024-11-09T04:00:00.000Z",
             },
             allow_max_reservation_time_before_appointment: true,
             allow_min_reservation_time_before_appointment: true,
@@ -301,10 +301,23 @@
         time_available_type: 1,
 
         doctor_id: null,
-      doctor_name: '',
-      doctor_last_name: '',
-      specialty_id: "",
-    });
+        doctor_name: "",
+        doctor_last_name: "",
+        specialty_id: "",
+    };
+    export let formDatabase = {}
+    console.log({formDatabase})
+    let form = useForm(formDatabase?.data || defaultFrontForm );
+    // $form = ...formDatabase || ...defaultFrontForm  }
+    console.log({ $form });
+    if (formDatabase.data) {
+        JSON.parse($form.availability)
+        JSON.parse($form.adjusted_availability)
+        JSON.parse($form.fields)
+        JSON.parse($form.programming_slot)
+        JSON.parse($form.booked_appointment_settings)
+        
+    }
     let optionValue = "";
 
     const optionsShift = [
@@ -539,7 +552,6 @@
 
     $: {
         // if(searchDoctor) {
-
         // }
         // updateShiftsForCalendar();
         // console.log($form.adjusted_availability);}
@@ -648,7 +660,7 @@
     function handleSubmit(event) {
         event.preventDefault();
         $form.clearErrors();
-        console.log({$form})
+        console.log({ $form });
         $form.post("/admin/agenda/crear-cita", {
             onError: (errors) => {
                 if (errors.data) {
@@ -752,6 +764,7 @@
         <span>
             <DatePicker
                 on:datechange={(d) => {
+                    console.log(d.detail);
                     $form.programming_slot.interval_date.start_now_check = false;
                     $form.programming_slot.custom_start_date = d.detail;
                 }}
@@ -930,9 +943,9 @@
                 class="flex gap-3 border rounded cursor-pointer hover:bg-gray-100 hover:border-dark p-4"
                 on:click={() => {
                     $form.doctor_id = doctor.id;
-                    $form.doctor_name = doctor.name,
-                    $form.doctor_last_name = doctor.last_name
-                    $form.specialty_id = doctor.specialties[0].id
+                    ($form.doctor_name = doctor.name),
+                        ($form.doctor_last_name = doctor.last_name);
+                    $form.specialty_id = doctor.specialties[0].id;
                     showModalDoctor = false;
                 }}
             >
@@ -964,7 +977,6 @@
             class=" bg-gray-100 pl-0 rounded pt-5 sticky top-1 h overflow-x-hidden pr-2"
             action=""
             on:submit={handleSubmit}
-
             style="height: calc(100vh - 80px)"
         >
             <div class="overflow-y-scroll h-full pb-10 p-3">
