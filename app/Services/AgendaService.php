@@ -66,12 +66,12 @@ class AgendaService
             'user_id' => $serviceData['doctor_id'],
             'specialty_id' => $serviceData['specialty_id'],
             'title' => $serviceData['title'],
-            'availability_json' => json_encode($serviceData['availability']),
-            'adjust_avability_json' => json_encode($serviceData['adjusted_availability']),
-            'programming_slot_json' => json_encode($serviceData['programming_slot']),
-            'booked_appointment_settings_json' => json_encode($serviceData['booked_appointment_settings']),
+            'availability' => json_encode($serviceData['availability']),
+            'adjust_avability' => json_encode($serviceData['adjusted_availability']),
+            'programming_slot' => json_encode($serviceData['programming_slot']),
+            'booked_appointment_settings' => json_encode($serviceData['booked_appointment_settings']),
             'description' => $serviceData['description'],
-            'fields_json' => json_encode($serviceData['fields']),
+            'fields' => json_encode($serviceData['fields']),
         ]);
 
         return $newService;
