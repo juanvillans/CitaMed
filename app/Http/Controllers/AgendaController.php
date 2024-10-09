@@ -32,32 +32,34 @@ class AgendaController extends Controller
         ]);
     }
 
-    public function service(Service $service)
+    public function service(Request $request, Service $service)
     {
         $dataToCreateService = $this->agendaService->getDataToCreateService();   
         $dataOfService = $this->agendaService->getServiceDetails($service);   
+        $calendar = $this->agendaService->getCalendar($service, $request->all());
         
         return inertia('Dashboard/Citas',[
             
             'data' => [
                 'dataToCreateService' => $dataToCreateService,
             ],
-
             'formDatabase' => $dataOfService,
+            'calendar' => $calendar,
             
         ]);
 
     }
 
-    public function createService(){
+    public function createService(Request $request){
 
         $dataToCreateService = $this->agendaService->getDataToCreateService();   
-
+        $calendar = $this->agendaService->getCalendar(null, $request->all());
         return inertia('Dashboard/Citas',[
             'data' => [
                 'dataToCreateService' => $dataToCreateService,
             ],
             'formDatabase' => null,
+            'calendar' => $calendar,
         ]);
     }
 
@@ -92,43 +94,30 @@ class AgendaController extends Controller
             return redirect()->back()->withErrors(['data' => $e->getMessage()]);
         }
     }
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+
+    public function destroyService(Service $service){
+
+        DB::beginTransaction();
+
+        try 
+        {
+
+            $this->agendaService->deleteService($service);
+
+            DB::commit();
+
+            return redirect()->back()->with(['message' => 'Cita eliminada con éxito']);
+
+        }
+        catch (\Throwable $e)
+        {   
+            
+            DB::rollback();
+            
+            return redirect()->back()->withErrors(['data' => $e->getMessage()]);
+        }
+
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    
 }

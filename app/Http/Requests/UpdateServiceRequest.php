@@ -23,19 +23,15 @@ class UpdateServiceRequest extends FormRequest
     {
         return [
         
-            // 'user_id' => ['required',],
-            // 'specialty_id' => ['required',],
-            // 'title' => ['required',],
-            // 'description' => ['required',],
-            // 'duration_per_appointment' => ['required',],
-            // 'schedule_json' => ['required',],
-            // 'start_date_agenda' => ['required',],
-            // 'end_date_agenda' => ['required',],
-            // 'max_reservation_time_before_appointment' => ['required',],
-            // 'min_reservation_time_before_appointment' => ['required',],
-            // 'adjust_avability_json' => ['required',],
-            // 'duration_between_appointment' => ['required',],
-            // 'max_reservations_per_day' => ['required',],
+            "doctor_id" => ['required'],
+            "specialty_id" => ['required'],
+            "title" => ['required'],
+            "availability" => ['required'],
+            "adjusted_availability" => ['required'],
+            "programming_slot" => ['required'],
+            "booked_appointment_settings" => ['required'],
+            "description" => ['required'],
+            "fields" => ['required'],
 
         ];
     }
