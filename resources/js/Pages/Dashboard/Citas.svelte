@@ -22,7 +22,9 @@
     let defaulTtime_between_appointment = 30;
 
     export let data = {};
+    export let formDatabase = {};
     console.log(data);
+    console.log(formDatabase);
 
     let acordion = {
         franja: false,
@@ -937,7 +939,7 @@
 <Modal bind:showModal={showModalDoctor}>
     <p slot="header">Selecciona un Doctor</p>
     <ul class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-        {#each data.serviceDetails.doctors.data as doctor}
+        {#each data.dataToCreateService.doctors.data as doctor}
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <li
                 class="flex gap-3 border rounded cursor-pointer hover:bg-gray-100 hover:border-dark p-4"
@@ -1047,7 +1049,7 @@
                                     inputClasses={"bg-gray-200 px-2"}
                                 >
                                     {#if $form.doctor_id}
-                                        {#each data.serviceDetails.doctors.data.find((obj) => obj.id == $form.doctor_id)?.specialties as specialty}
+                                        {#each data.dataToCreateService.doctors.data.find((obj) => obj.id == $form.doctor_id)?.specialties as specialty}
                                             <option value={specialty.id}
                                                 >{specialty.name}</option
                                             >
