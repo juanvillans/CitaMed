@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             SpecialtySeeder::class,
             UserSeeder::class,
             ServiceSeeder::class,
+            AppointmentSeeder::class,
         ]);
     }
 
