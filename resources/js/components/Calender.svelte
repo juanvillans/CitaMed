@@ -10,7 +10,7 @@
     export let year;
     export let isAllowed;
     export let thereIsAvailable;
-  
+    console.log(date)
     export let withInput;
     // local vars to help in render
     const weekdays = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sáb"];

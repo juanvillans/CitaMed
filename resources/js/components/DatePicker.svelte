@@ -26,26 +26,33 @@
         document.removeEventListener("mousedown", handleClickOutside);
     });
     // props
-    export let thereIsAvailable = ()  => false;
+    export let thereIsAvailable = () => false;
     export let isAllowed = () => true;
     export let selected = new Date();
-    export let withInput = true
-    export let showDatePickerAlways = false
+    export let withInput = true;
+    export let showDatePickerAlways = false;
     let options = {
         weekday: "short",
         year: "numeric",
         month: "short",
         day: "numeric",
     };
+    const formatter = new Intl.DateTimeFormat("es-VE", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        timeZone: "UTC", // Specify UTC
+    });
     // state
-    let date, month, year, showDatePicker,formattedDate;
+    let date, month, year, showDatePicker, formattedDate;
     // so that these change with props
     $: {
         date = new Date(selected).getDate();
         month = new Date(selected).getMonth();
         year = new Date(selected).getFullYear();
-        formattedDate = new Date(selected).toLocaleDateString("es-VE", options);
-        // console.log(formattedDate)
+        formattedDate = formatter.format(new Date(selected));
+        console.log({ selected, formattedDate });
     }
     let datePickerPosition = "below"; // 'above' or 'below'
     let inputElement; // Reference for the input element
@@ -57,12 +64,10 @@
     };
 
     const next = () => {
-
         if (month === 11) {
             month = 0;
             year = year + 1;
         } else {
-
             month = month + 1;
         }
         if (withInput == false) {
@@ -74,14 +79,11 @@
     };
 
     const prev = () => {
-        
         if (month === 0) {
             month = 11;
             year -= 1;
-           
         } else {
             month -= 1;
-
         }
 
         if (withInput == false) {
@@ -117,11 +119,11 @@
         return () =>
             window.removeEventListener("resize", calculateDatePickerPosition);
     });
-    $: console.log({withInput})
+    $: console.log({ withInput });
 </script>
 
 <div class="relative">
-    {#if withInput }
+    {#if withInput}
         <input
             bind:this={inputElement}
             type="text"
@@ -129,7 +131,6 @@
             value={formattedDate}
             class="px-2 py-2 w-[148px] bg-gray-200 rounded"
         />
-        
     {/if}
     {#if showDatePicker || showDatePickerAlways}
         <div
