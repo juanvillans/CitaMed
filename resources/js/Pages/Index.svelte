@@ -127,7 +127,7 @@
                 on:datechange={(e) => getNextNDays(e.detail, numberOfDays)}
                 selected={focusedDate}
                 showDatePickerAlways={true}
-                whitInput={false}
+                withInput={false}
                 thereIsAvailable={(date) => {
                     if (data.availableDays[date]) {
                         return true;

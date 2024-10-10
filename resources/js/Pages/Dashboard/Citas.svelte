@@ -307,12 +307,11 @@
         doctor_last_name: "",
         specialty_id: "",
     };
-    export let formDatabase = {}
-    console.log({formDatabase})
+    // let defaultFrontCalendar =
     let form = useForm(formDatabase?.data || defaultFrontForm );
     // $form = ...formDatabase || ...defaultFrontForm  }
     console.log({ $form });
-    if (formDatabase.data) {
+    if (formDatabase?.data) {
         JSON.parse($form.availability)
         JSON.parse($form.adjusted_availability)
         JSON.parse($form.fields)
@@ -2305,26 +2304,29 @@
     <section>
         <header class=" sticky top-0 pt-1 bg-gray-100 z-30 calendarHeader">
             <div class="flex gap-4 items-center">
-                <button
+                <a
+                use:inertia href={`${window.location.href}?startWeek=${database.calendar.headerInfo.today}&to=today`}
                     class="text-md font-bold border border-gray-300 rounded-md p-2 px-6 hover:bg-gray-200"
-                    >Hoy</button
+                    >Hoy</a
                 >
                 <div class="mx-5 flex gap-2">
-                    <button
+                    <a  use:inertia href={`${window.location.href}?startWeek=${database.calendar.mon.current_date}&to=prev`}
                         class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
+                      title="Ir una semana atraz"
                     >
                         <iconify-icon
                             icon="iconamoon:arrow-left-2-bold"
                             class="relative left-2"
-                        ></iconify-icon></button
+                        ></iconify-icon></a
                     >
-                    <button
+                    <a  use:inertia href={`${window.location.href}?startWeek=${database.calendar.mon.current_date}&to=next`}
                         class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
+                      title="Ir a la semana siguiente"
                     >
                         <iconify-icon
                             icon="iconamoon:arrow-right-2-bold"
                             class="relative left-2"
-                        ></iconify-icon></button
+                        ></iconify-icon></a
                     >
                 </div>
                 <h2 class="text-2xl">{database.headerInfo.month_year}</h2>
