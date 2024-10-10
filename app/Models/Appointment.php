@@ -19,6 +19,8 @@ class Appointment extends Model
         'other_fields',
         'start',
         'end',
+        'date',
+        'status',
     ];
 
 

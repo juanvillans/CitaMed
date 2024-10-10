@@ -22,6 +22,8 @@ return new class extends Migration
             $table->json('other_fields');
             $table->time('start');
             $table->time('end');
+            $table->string('date');
+            $table->string('status');
             $table->timestamps();
         });
     }

@@ -21,7 +21,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [AppController::class, 'index'])->name('landpage');
 Route::get('/admin/login', [AppController::class, 'loginForm'])->name('login');
 Route::post('/admin/login', [UserController::class, 'login']);
-Route::get('/admin/logout', [UserController::class, 'logout'])->middleware('auth')->name('logout');         
+Route::get('/admin/logout', [UserController::class, 'logout'])->middleware('auth')->name('logout');  
+Route::get('/cita/{service}',[AgendaController::class,'service'])->name('service');
+
 
 Route::middleware(['auth'])->prefix('admin')->group(function () 
 {

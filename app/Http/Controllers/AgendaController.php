@@ -34,8 +34,8 @@ class AgendaController extends Controller
 
     public function service(Request $request, Service $service)
     {
-        $dataToCreateService = $this->agendaService->getDataToCreateService();   
-        $dataOfService = $this->agendaService->getServiceDetails($service);   
+        // $dataToCreateService = $this->agendaService->getDataToCreateService();   
+        // $dataOfService = $this->agendaService->getServiceDetails($service);   
         $calendar = $this->agendaService->getCalendar($service, $request->all());
         
         return inertia('Dashboard/Citas',[
@@ -54,7 +54,7 @@ class AgendaController extends Controller
 
         $dataToCreateService = $this->agendaService->getDataToCreateService();   
         $calendar = $this->agendaService->getCalendar(null, $request->all());
-        
+
         return inertia('Dashboard/Citas',[
             'data' => [
                 'dataToCreateService' => $dataToCreateService,

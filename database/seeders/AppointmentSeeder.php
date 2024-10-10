@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Appointment;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -23,6 +24,8 @@ class AppointmentSeeder extends Seeder
             'other_fields' => json_encode(['fotocopia del esternon a color' => 'aqui esta']),
             'start' => '8:00',
             'end' => '9:00',
+            'date' => Carbon::now()->addWeek()->startOfWeek()->toISOString(),
+            'status' => 'OPEN',
         ]);
 
         Appointment::create([
@@ -35,6 +38,9 @@ class AppointmentSeeder extends Seeder
             'other_fields' => json_encode(['como esta la bola?' => 'medio girada']),
             'start' => '8:00',
             'end' => '9:00',
+            'date' => Carbon::now()->addWeek()->startOfWeek()->toISOString(),
+            'status' => 'OPEN',
+
         ]);
     }
 }

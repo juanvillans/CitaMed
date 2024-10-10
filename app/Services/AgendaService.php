@@ -163,7 +163,22 @@ class AgendaService
 
     private function insertAppointments($service,$calendar){
         
-        $service->load('appointments');
+        $service->load(['appointments' => function($query){
+            
+            $query->where('status','OPEN');
+        }]);
+
+        foreach($service->appointments as $appointment){
+            
+            $day = strtolower(Carbon::parse($appointment->date)->format('D'));
+            
+            if($calendar['calendar'][$day]['current_date'] == $appointment->date){
+                dd('si');
+            }
+
+            dd('no');
+        }
+
 
         return $calendar;
 
