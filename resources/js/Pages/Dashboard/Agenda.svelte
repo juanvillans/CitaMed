@@ -43,14 +43,7 @@
                 </div>
 
                 <div class="description mt-3 text-gray-600">
-                    {calendar.description} Lorem ipsum dolor sit amet consectetur
-                    adipisicing elit. Veritatis ullam ipsam recusandae laboriosam
-                    magni, adipisci earum voluptatum mollitia nihil possimus a beatae
-                    eos voluptate non voluptatibus pariatur eligendi officia vero.
-                    Maiores a deserunt, impedit eaque nam repellendus id, atque eveniet
-                    voluptas facilis praesentium doloremque perferendis recusandae
-                    quisquam natus voluptatibus, quos quaerat quia minus? Minima,
-                    id repellendus soluta eaque voluptas at.
+                    {calendar.description} 
                 </div>
             </a>
         {/each}

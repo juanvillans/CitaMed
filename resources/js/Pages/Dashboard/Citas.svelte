@@ -16,8 +16,11 @@
     let editor;
     let descriptionLength = 0;
     let currentDate = new Date().toISOString();
+    console.log({currentDate})
     const onDateChange = (d, indx) => {
-        $form.adjusted_availability[indx].date = d.detail.toISOString();
+        $form.adjusted_availability[indx].date = d.detail
+            .toISOString()
+            ;
     };
     let defaulTtime_between_appointment = 30;
 
@@ -26,8 +29,7 @@
     export let calendar = {};
     console.log(data);
     console.log(formDatabase);
-    console.log(calendar);
-
+    console.log({ calendar });
 
     let acordion = {
         franja: false,
@@ -41,7 +43,8 @@
     let showModalForm = false;
     let showModalDoctor = false;
     let newItem = { name: "", required: false };
-    let form = useForm({
+
+    let defaultFrontForm = {
         title: "",
         duration_per_appointment: "60",
         availability: {
@@ -224,64 +227,7 @@
             min_reservation_time_before_appointment: 40,
         },
         adjusted_availability: [
-            {
-                date: "2024-09-09",
-                shifts: [
-                    {
-                        start: "09:00",
-                        end: "12:00",
-                        appointments: [
-                            {
-                                start_appo: "09:00",
-                            },
-                            {
-                                start_appo: "10:30",
-                            },
-                        ],
-                    },
-                    {
-                        start: "14:00",
-                        end: "18:00",
-                        appointments: [
-                            {
-                                start_appo: "14:00",
-                            },
-                            {
-                                start_appo: "15:30",
-                            },
-                            {
-                                start_appo: "17:00",
-                            },
-                        ],
-                    },
-                ],
-            },
-            {
-                date: "2024-09-20",
-                shifts: [
-                    {
-                        start: "08:00",
-                        end: "16:00",
-                        appointments: [
-                            {
-                                start_appo: "08:00",
-                            },
-                            {
-                                start_appo: "09:30",
-                            },
-                            {
-                                start_appo: "11:00",
-                            },
-                            {
-                                start_appo: "12:30",
-                            },
-                            {
-                                start_appo: "14:00",
-                            },
-                        ],
-                    },
-                ],
-            },
+          
         ],
         booked_appointment_settings: {
             time_between_appointment: null,
@@ -305,10 +251,21 @@
         time_available_type: 1,
 
         doctor_id: null,
-      doctor_name: '',
-      doctor_last_name: '',
-      specialty_id: "",
-    });
+        doctor_name: "",
+        doctor_last_name: "",
+        specialty_id: "",
+    };
+    // let defaultFrontCalendar =
+    let form = useForm(formDatabase?.data || defaultFrontForm);
+    // $form = ...formDatabase || ...defaultFrontForm  }
+    console.log({ $form });
+    if (formDatabase?.data) {
+        JSON.parse($form.availability);
+        JSON.parse($form.adjusted_availability);
+        JSON.parse($form.fields);
+        JSON.parse($form.programming_slot);
+        JSON.parse($form.booked_appointment_settings);
+    }
     let optionValue = "";
 
     const optionsShift = [
@@ -474,48 +431,7 @@
         return +endHours - +startHours;
     };
 
-    let database = {
-        headerInfo: {
-            month_year: "Septiembre de 2024",
-            today: "2024-09-10",
-        },
-        calendar: {
-            mon: {
-                current_date: "2024-09-09",
-                appointments: [
-                    {
-                        name: "Clarck Kent",
-                        last_name: "Lopez",
-                        ci: "27253194",
-                        phone: "04124393123",
-                        email: "clarito@gmail.com",
-                        start: "09:00",
-                        end: "10:00",
-                    },
-                ],
-            },
-            tue: { current_date: "2024-09-10", appointments: [] },
-            wed: { current_date: "2024-09-11", appointments: [] },
-            thu: {
-                current_date: "2024-09-12",
-                appointments: [
-                    {
-                        name: "Bruce javier",
-                        last_name: "Wayne Henriquez",
-                        ci: "27253194",
-                        phone: "04124393123",
-                        email: "brunito14@gmail.com",
-                        start: "14:00",
-                        end: "15:00",
-                    },
-                ],
-            },
-            fri: { current_date: "2024-09-13", appointments: [] },
-            sat: { current_date: "2024-09-14", appointments: [] },
-            sun: { current_date: "2024-09-15", appointments: [] },
-        },
-    };
-    let databaseCurrentDate = new Date(database.headerInfo.today);
+    let databaseCurrentDate = new Date(calendar.headerInfo.today);
     const formatter = new Intl.DateTimeFormat("en-US", { weekday: "short" });
 
     // Get the abbreviated weekday name
@@ -526,9 +442,10 @@
     let shiftsForCalendar = {};
 
     function updateShiftsForCalendar() {
-        Object.entries(database.calendar).forEach(([key, value], indx) => {
+        console.log($form.adjusted_availability);
+        Object.entries(calendar.calendar).forEach(([key, value], indx) => {
             let isItAjustedShift = $form.adjusted_availability.findIndex(
-                (arrDates) => arrDates.date == value.current_date,
+                (arrDates) => arrDates.date.slice(0, 10) == value.current_date.slice(0, 10),
             );
             shiftsForCalendar = {
                 ...shiftsForCalendar,
@@ -538,15 +455,15 @@
                         : $form.availability[key],
             };
         });
+        console.log({ shiftsForCalendar });
     }
     // let searchDoctor = "";
 
     $: {
         // if(searchDoctor) {
-
         // }
         // updateShiftsForCalendar();
-        // console.log($form.adjusted_availability);}
+        console.log($form.adjusted_availability);
         // console.log($form.programming_slot.interval_date);
         // console.log($form);
     }
@@ -584,7 +501,7 @@
     }
 
     const GetStartAppointmets = (shift) => {
-        console.log({ shift });
+        // console.log({ shift });
         // console.log($form.booked_appointment_settings.time_between_appointment);
         let forAppointments = [];
         let amountOfAppointments = calculateAppointments(
@@ -652,7 +569,7 @@
     function handleSubmit(event) {
         event.preventDefault();
         $form.clearErrors();
-        console.log({$form})
+        console.log({ $form });
         $form.post("/admin/agenda/crear-cita", {
             onError: (errors) => {
                 if (errors.data) {
@@ -756,6 +673,7 @@
         <span>
             <DatePicker
                 on:datechange={(d) => {
+                    console.log(d.detail);
                     $form.programming_slot.interval_date.start_now_check = false;
                     $form.programming_slot.custom_start_date = d.detail;
                 }}
@@ -795,8 +713,9 @@
             <DatePicker
                 on:datechange={(d) => {
                     $form.programming_slot.interval_date.end_never_check = false;
-                    $form.programming_slot.custom_end_date =
-                        d.detail.toISOString();
+                    $form.programming_slot.custom_end_date = d.detail
+                        .toISOString()
+                        ;
                 }}
                 selected={$form.programming_slot.custom_end_date}
                 isAllowed={(date) => {
@@ -934,9 +853,9 @@
                 class="flex gap-3 border rounded cursor-pointer hover:bg-gray-100 hover:border-dark p-4"
                 on:click={() => {
                     $form.doctor_id = doctor.id;
-                    $form.doctor_name = doctor.name,
-                    $form.doctor_last_name = doctor.last_name
-                    $form.specialty_id = doctor.specialties[0].id
+                    ($form.doctor_name = doctor.name),
+                        ($form.doctor_last_name = doctor.last_name);
+                    $form.specialty_id = doctor.specialties[0].id;
                     showModalDoctor = false;
                 }}
             >
@@ -968,7 +887,6 @@
             class=" bg-gray-100 pl-0 rounded pt-5 sticky top-1 h overflow-x-hidden pr-2"
             action=""
             on:submit={handleSubmit}
-
             style="height: calc(100vh - 80px)"
         >
             <div class="overflow-y-scroll h-full pb-10 p-3">
@@ -1977,6 +1895,13 @@
                                                     {
                                                         start: "08:00",
                                                         end: "16:00",
+                                                        appointments:
+                                                            GetStartAppointmets(
+                                                                {
+                                                                    start: "08:00",
+                                                                    end: "16:00",
+                                                                },
+                                                            ),
                                                     },
                                                 ],
                                             },
@@ -2295,29 +2220,37 @@
     <section>
         <header class=" sticky top-0 pt-1 bg-gray-100 z-30 calendarHeader">
             <div class="flex gap-4 items-center">
-                <button
+                <a
+                    use:inertia
+                    href={`${window.location.href}?startWeek=${calendar.headerInfo.today}&to=today`}
                     class="text-md font-bold border border-gray-300 rounded-md p-2 px-6 hover:bg-gray-200"
-                    >Hoy</button
+                    >Hoy</a
                 >
                 <div class="mx-5 flex gap-2">
-                    <button
+                    <a
+                        use:inertia
+                        href={`${window.location.href}?startWeek=${calendar.calendar.mon.current_date}&to=prev`}
                         class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
+                        title="Ir una semana atraz"
                     >
                         <iconify-icon
                             icon="iconamoon:arrow-left-2-bold"
                             class="relative left-2"
-                        ></iconify-icon></button
+                        ></iconify-icon></a
                     >
-                    <button
+                    <a
+                        use:inertia
+                        href={`${window.location.href}?startWeek=${calendar.calendar.mon.current_date}&to=next`}
                         class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
+                        title="Ir a la semana siguiente"
                     >
                         <iconify-icon
                             icon="iconamoon:arrow-right-2-bold"
                             class="relative left-2"
-                        ></iconify-icon></button
+                        ></iconify-icon></a
                     >
                 </div>
-                <h2 class="text-2xl">{database.headerInfo.month_year}</h2>
+                <h2 class="text-2xl">{calendar.headerInfo.month_year}</h2>
             </div>
 
             <div
@@ -2327,17 +2260,17 @@
             >
                 <div class="w-10 max-w-[40px]"></div>
                 <ul class="flex listCalendarHeader">
-                    {#each Object.entries(database.calendar) as [day, values], indxDay (day)}
+                    {#each Object.entries(calendar.calendar) as [day, values], indxDay (day)}
                         <li
                             class="flex flex-col justify-center text-center w-28"
                         >
                             <p
-                                class={` ${values.current_date == database.headerInfo.today ? "text-color1 " : ""}`}
+                                class={` ${values.current_date.slice(0, 10) == calendar.headerInfo.today.slice(0, 10) ? "text-color1 " : ""}`}
                             >
                                 {translateDays[day].toUpperCase()}
                             </p>
                             <p
-                                class={`text-2xl mx-auto w-12 aspect-square rounded-full flex items-center justify-center ${values.current_date == database.headerInfo.today ? "bg-color1 text-gray-50 " : ""}`}
+                                class={`text-2xl mx-auto w-12 aspect-square rounded-full flex items-center justify-center ${values.current_date.slice(0, 10) == calendar.headerInfo.today.slice(0, 10) ? "bg-color1 text-gray-50 " : ""}`}
                             >
                                 {new Date(values.current_date).getUTCDate()}
                             </p>
@@ -2377,7 +2310,7 @@
             {#each Object.entries(shiftsForCalendar) as [day, shifts], indxDay (day)}
                 {#if shifts.length >= 1 && shifts[0].start != ""}
                     <div
-                        class={`gap-2 flex flex-col z-30 ${database.calendar[day].current_date < database.headerInfo.today ? "opacity-40" : ""} `}
+                        class={`gap-2 flex flex-col z-30 ${calendar.calendar[day].current_date < calendar.headerInfo.today.slice(0, 10) ? "opacity-40" : ""} `}
                     >
                         {#each shifts as shift, indx (day + "_" + indx)}
                             <div
@@ -2402,7 +2335,7 @@
                 {/if}
             {/each}
 
-            {#each Object.entries(database.calendar) as [day, values], indxDay (day)}
+            {#each Object.entries(calendar.calendar) as [day, values], indxDay (day)}
                 {#each values.appointments as appointment, indx (day + "_" + indx)}
                     <!-- <Draggable>
                         <div
@@ -2413,7 +2346,7 @@
                         >
                             <div class=" z-50 px-1 w-full">
                                 <div
-                                    class={`cursor-pointer hover:bg-color1 text-center bg-color3 ${database.calendar[day].current_date < database.headerInfo.today ? "opacity-40" : ""}  w-[98%] h-full mx-auto p-1 rounded-lg ${$form.booked_appointment_settings.time_between_appointment < 5 ? "border-b-4 border-color4" : ""}`}
+                                    class={`cursor-pointer hover:bg-color1 text-center bg-color3 ${calendar.calendar[day].current_date < calendar.headerInfo.today ? "opacity-40" : ""}  w-[98%] h-full mx-auto p-1 rounded-lg ${$form.booked_appointment_settings.time_between_appointment < 5 ? "border-b-4 border-color4" : ""}`}
                                 >
                                     <h4 class="text-white text-sm">
                                         {appointment.name.split(" ")[0]}
@@ -2434,7 +2367,7 @@
                         <div class=" z-40 px-1 w-full">
                             <!-- svelte-ignore a11y-click-events-have-key-events -->
                             <div
-                                class={`cursor-pointer hover:bg-color1 text-center bg-color3 ${database.calendar[day].current_date < database.headerInfo.today ? "opacity-40" : ""}  w-[98%] h-full mx-auto p-1 rounded-lg ${$form.booked_appointment_settings.time_between_appointment < 5 ? "border-b-4 border-color4" : ""}`}
+                                class={`cursor-pointer hover:bg-color1 text-center bg-color3 ${calendar.calendar[day].current_date < calendar.headerInfo.today ? "opacity-40" : ""}  w-[98%] h-full mx-auto p-1 rounded-lg ${$form.booked_appointment_settings.time_between_appointment < 5 ? "border-b-4 border-color4" : ""}`}
                                 on:click={() => {
                                     showModalappointments = true;
                                     selectedAppointmentDetails = {
