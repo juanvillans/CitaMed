@@ -76,45 +76,48 @@ class AgendaService
 
         }
 
-        $response = [
+        $calendar = [
             'headerInfo' => [
                 'month_year' => Carbon::now()->format('F \d\e Y'),
-                'today' => Carbon::now()->format('Y-m-d'),
+                'today' => Carbon::now()->toISOString(),
             ],
             'calendar' => [
                 'mon' => [
-                    'current_date' => $startOfWeek->copy()->format('Y-m-d'),
+                    'current_date' => $startOfWeek->copy()->toISOString(),
                     'appointments' => []
                 ],
                 'tue' => [
-                    'current_date' => $startOfWeek->copy()->addDays(1)->format('Y-m-d'),
+                    'current_date' => $startOfWeek->copy()->addDays(1)->toISOString(),
                     'appointments' => []
                 ],
                 'wed' => [
-                    'current_date' => $startOfWeek->copy()->addDays(2)->format('Y-m-d'),
+                    'current_date' => $startOfWeek->copy()->addDays(2)->toISOString(),
                     'appointments' => []
                 ],
                 'thu' => [
-                    'current_date' => $startOfWeek->copy()->addDays(3)->format('Y-m-d'),
+                    'current_date' => $startOfWeek->copy()->addDays(3)->toISOString(),
                     'appointments' => []
                 ],
                 'fri' => [
-                    'current_date' => $startOfWeek->copy()->addDays(4)->format('Y-m-d'),
+                    'current_date' => $startOfWeek->copy()->addDays(4)->toISOString(),
                     'appointments' => []
                 ],
                 'sat' => [
-                    'current_date' => $startOfWeek->copy()->addDays(5)->format('Y-m-d'),
+                    'current_date' => $startOfWeek->copy()->addDays(5)->toISOString(),
                     'appointments' => []
                 ],
                 'sun' => [
-                    'current_date' => $startOfWeek->copy()->addDays(6)->format('Y-m-d'),
+                    'current_date' => $startOfWeek->copy()->addDays(6)->toISOString(),
                     'appointments' => []
                 ],
 
             ]
         ];
 
-        return $response;
+        if($service == null)
+            return $calendar;
+        
+        return $this->insertAppointments($service,$calendar);
     }
 
     public function storeService($serviceData){
@@ -158,6 +161,13 @@ class AgendaService
         return 0;
     }
 
+    private function insertAppointments($service,$calendar){
+        
+        $service->load('appointments');
+
+        return $calendar;
+
+    }
 
     private function generateParamsAccordingToRoleUser(){
 

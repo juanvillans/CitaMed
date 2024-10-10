@@ -31,5 +31,10 @@ class Service extends Model
 
         return $this->belongsTo(Specialty::class);
     }
+
+    public function appointments(){
+
+        return $this->hasMany(Appointment::class);
+    }
     
 }
