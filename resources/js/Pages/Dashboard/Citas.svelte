@@ -215,10 +215,10 @@
             available_now_check: 1,
             interval_date: {
                 start_now_check: false,
-                custom_start_date: "2024-12-30",
+                custom_start_date: "2024-12-30T00:00:00Z",
 
                 end_never_check: false,
-                custom_end_date: "2024-09-09",
+                custom_end_date: "2024-09-09T00:00:00Z",
             },
             allow_max_reservation_time_before_appointment: true,
             allow_min_reservation_time_before_appointment: true,
@@ -463,7 +463,8 @@
         // if(searchDoctor) {
         // }
         // updateShiftsForCalendar();
-        console.log($form.adjusted_availability);
+        // console.log($form.adjusted_availability);
+        console.log($form.programming_slot.interval_date.custom_start_date)
         // console.log($form.programming_slot.interval_date);
         // console.log($form);
     }
@@ -675,14 +676,14 @@
                 on:datechange={(d) => {
                     console.log(d.detail);
                     $form.programming_slot.interval_date.start_now_check = false;
-                    $form.programming_slot.custom_start_date = d.detail;
+                    $form.programming_slot.interval_date.custom_start_date = d.detail.toISOString()
                 }}
-                selected={$form.programming_slot.custom_start_date}
+                selected={$form.programming_slot.interval_date.custom_start_date}
                 isAllowed={(date) => {
                     const millisecs = date.getTime();
                     if (millisecs + 25 * 3600 * 1000 < Date.now()) return false;
-                    if (millisecs > Date.now() + 3600 * 24 * 45 * 1000)
-                        return false;
+                    // if (millisecs > Date.now() + 3600 * 24 * 45 * 1000)
+                    //     return false;
                     return true;
                 }}
             />
@@ -713,16 +714,15 @@
             <DatePicker
                 on:datechange={(d) => {
                     $form.programming_slot.interval_date.end_never_check = false;
-                    $form.programming_slot.custom_end_date = d.detail
-                        .toISOString()
-                        ;
+                    $form.programming_slot.interval_date.custom_end_date = d.detail.toISOString()
+                        
                 }}
-                selected={$form.programming_slot.custom_end_date}
+                selected={$form.programming_slot.interval_date.custom_end_date }
                 isAllowed={(date) => {
                     const millisecs = date.getTime();
                     if (millisecs + 25 * 3600 * 1000 < Date.now()) return false;
-                    if (millisecs > Date.now() + 3600 * 24 * 45 * 1000)
-                        return false;
+                    // if (millisecs > Date.now() + 3600 * 24 * 45 * 1000)
+                    //     return false;
                     return true;
                 }}
             />
