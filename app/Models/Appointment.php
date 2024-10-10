@@ -20,6 +20,7 @@ class Appointment extends Model
         'start',
         'end',
         'date',
+        'carbon_date',
         'status',
     ];
 

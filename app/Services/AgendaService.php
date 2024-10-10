@@ -162,23 +162,25 @@ class AgendaService
     }
 
     private function insertAppointments($service,$calendar){
-        
-        $service->load(['appointments' => function($query){
-            
-            $query->where('status','OPEN');
-        }]);
+
+        $startDate = Carbon::parse($calendar['calendar']['mon']['current_date']);
+        $endDate = Carbon::parse($calendar['calendar']['sun']['current_date']);
+
+            $service->load(['appointments' => function($query) use ($startDate, $endDate){
+                
+                $query->where('status','OPEN')
+                      ->whereBetween('carbon_date',[$startDate, $endDate]);
+            }]);
 
         foreach($service->appointments as $appointment){
             
             $day = strtolower(Carbon::parse($appointment->date)->format('D'));
             
             if($calendar['calendar'][$day]['current_date'] == $appointment->date){
-                dd('si');
+                array_push($calendar['calendar'][$day]['appointments'],$appointment);
             }
 
-            dd('no');
         }
-
 
         return $calendar;
 

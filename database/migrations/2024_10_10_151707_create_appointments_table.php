@@ -24,6 +24,7 @@ return new class extends Migration
             $table->time('end');
             $table->string('date');
             $table->string('status');
+            $table->date('carbon_date');
             $table->timestamps();
         });
     }

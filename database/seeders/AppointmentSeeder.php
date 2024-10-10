@@ -25,6 +25,7 @@ class AppointmentSeeder extends Seeder
             'start' => '8:00',
             'end' => '9:00',
             'date' => Carbon::now()->addWeek()->startOfWeek()->toISOString(),
+            'carbon_date' => Carbon::now()->addWeek()->startOfWeek(),
             'status' => 'OPEN',
         ]);
 
@@ -39,6 +40,7 @@ class AppointmentSeeder extends Seeder
             'start' => '8:00',
             'end' => '9:00',
             'date' => Carbon::now()->addWeek()->startOfWeek()->toISOString(),
+            'carbon_date' => Carbon::now()->addWeek()->startOfWeek(),
             'status' => 'OPEN',
 
         ]);
