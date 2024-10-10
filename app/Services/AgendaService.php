@@ -10,6 +10,7 @@ use App\Models\Service;
 use App\Models\Specialty;
 use App\Models\User;
 use App\Services\UserService;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 
@@ -60,6 +61,62 @@ class AgendaService
         return $response;
     }
 
+    public function getCalendar($service, $params){
+        
+        $startOfWeek = Carbon::now()->startOfWeek();
+        if(isset($params['to']) && isset($params['startOfWeek']) ) {
+
+            if($params['to'] == 'next'){
+                $startOfWeek = Carbon::parse($params['startOfWeek'])->addWeek()->startOfWeek();
+            }
+
+            if($params['to'] == 'prev'){
+                $startOfWeek = Carbon::parse($params['startOfWeek'])->subWeek()->startOfWeek();
+            }
+
+        }
+
+        $response = [
+            'headerInfo' => [
+                'month_year' => Carbon::now()->format('F \d\e Y'),
+                'today' => Carbon::now()->format('Y-m-d'),
+            ],
+            'calendar' => [
+                'mon' => [
+                    'current_date' => $startOfWeek->copy()->format('Y-m-d'),
+                    'appointments' => []
+                ],
+                'tue' => [
+                    'current_date' => $startOfWeek->copy()->addDays(1)->format('Y-m-d'),
+                    'appointments' => []
+                ],
+                'wed' => [
+                    'current_date' => $startOfWeek->copy()->addDays(2)->format('Y-m-d'),
+                    'appointments' => []
+                ],
+                'thu' => [
+                    'current_date' => $startOfWeek->copy()->addDays(3)->format('Y-m-d'),
+                    'appointments' => []
+                ],
+                'fri' => [
+                    'current_date' => $startOfWeek->copy()->addDays(4)->format('Y-m-d'),
+                    'appointments' => []
+                ],
+                'sat' => [
+                    'current_date' => $startOfWeek->copy()->addDays(5)->format('Y-m-d'),
+                    'appointments' => []
+                ],
+                'sun' => [
+                    'current_date' => $startOfWeek->copy()->addDays(6)->format('Y-m-d'),
+                    'appointments' => []
+                ],
+
+            ]
+        ];
+
+        return $response;
+    }
+
     public function storeService($serviceData){
         
         $newService = Service::create([
@@ -76,6 +133,31 @@ class AgendaService
 
         return $newService;
     }
+
+    public function updateService($serviceData, $service){
+
+        $service->update([
+            'user_id' => $serviceData['doctor_id'],
+            'specialty_id' => $serviceData['specialty_id'],
+            'title' => $serviceData['title'],
+            'availability' => json_encode($serviceData['availability']),
+            'adjust_avability' => json_encode($serviceData['adjusted_availability']),
+            'programming_slot' => json_encode($serviceData['programming_slot']),
+            'booked_appointment_settings' => json_encode($serviceData['booked_appointment_settings']),
+            'description' => $serviceData['description'],
+            'fields' => json_encode($serviceData['fields']),
+        ]);
+
+        return 0;
+    }
+
+    public function deleteService($service){
+        
+        $service->delete();
+
+        return 0;
+    }
+
 
     private function generateParamsAccordingToRoleUser(){
 
@@ -99,34 +181,6 @@ class AgendaService
         return $params;
     }
 
-    public function updateService($data, $service){
-
-        // Update service
-        return 0;
-    }
-
-    public function updateUser($data, $user)
-    {
-
-        $user->update([
-            
-            "ci" => $data['ci'],
-            "name" => $data['name'],
-            "last_name" => $data['last_name'],
-            "email" => $data['email'],
-            "search" => $this->generateSearch($data),
-        ]);
-
-        method_exists($user, 'revokeRoles') ? $user->revokeRoles(): null;
-        
-        $user->assignRole($data['role_name']);
-
-        if($user->hasRole('doctor'))
-            $this->assignSpecialties($user,$data);
-
-        return 0;
-
-    }
 
     public function deleteUser($usuario)
     {   

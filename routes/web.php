@@ -31,6 +31,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function ()
     Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda');
     Route::get('/agenda/cita/{service}',[AgendaController::class,'service'])->name('service');
     Route::put('/agenda/cita/{service}', [AgendaController::class, 'updateService'])->name('update-agenda');
+    Route::delete('/agenda/cita/{service}', [AgendaController::class, 'deleteService'])->name('delete-agenda');
 
     Route::get('/agenda/crear-cita',[AgendaController::class,'createService'])->name('crear-service-form');
     Route::post('/agenda/crear-cita',[AgendaController::class,'storeService'])->name('save-service');

@@ -23,8 +23,10 @@
 
     export let data = {};
     export let formDatabase = {};
+    export let calendar = {};
     console.log(data);
     console.log(formDatabase);
+    console.log(calendar);
 
     let acordion = {
         franja: false,
@@ -210,10 +212,10 @@
             available_now_check: 1,
             interval_date: {
                 start_now_check: false,
-                custom_start_date: "2024-01-01T04:00:00.000Z",
+                custom_start_date: "2024-12-30",
 
                 end_never_check: false,
-                custom_end_date: "2024-11-09T04:00:00.000Z",
+                custom_end_date: "2024-09-09",
             },
             allow_max_reservation_time_before_appointment: true,
             allow_min_reservation_time_before_appointment: true,
@@ -223,7 +225,7 @@
         },
         adjusted_availability: [
             {
-                date: "2024-09-09T04:00:00.000Z",
+                date: "2024-09-09",
                 shifts: [
                     {
                         start: "09:00",
@@ -255,7 +257,7 @@
                 ],
             },
             {
-                date: "2024-09-20T04:00:00.000Z",
+                date: "2024-09-20",
                 shifts: [
                     {
                         start: "08:00",
@@ -487,11 +489,11 @@
     let database = {
         headerInfo: {
             month_year: "Septiembre de 2024",
-            today: "2024-09-10T04:00:00.000Z",
+            today: "2024-09-10",
         },
         calendar: {
             mon: {
-                current_date: "2024-09-09T04:00:00.000Z",
+                current_date: "2024-09-09",
                 appointments: [
                     {
                         name: "Clarck Kent",
@@ -504,10 +506,10 @@
                     },
                 ],
             },
-            tue: { current_date: "2024-09-10T04:00:00.000Z", appointments: [] },
-            wed: { current_date: "2024-09-11T04:00:00.000Z", appointments: [] },
+            tue: { current_date: "2024-09-10", appointments: [] },
+            wed: { current_date: "2024-09-11", appointments: [] },
             thu: {
-                current_date: "2024-09-12T04:00:00.000Z",
+                current_date: "2024-09-12",
                 appointments: [
                     {
                         name: "Bruce javier",
@@ -520,9 +522,9 @@
                     },
                 ],
             },
-            fri: { current_date: "2024-09-13T04:00:00.000Z", appointments: [] },
-            sat: { current_date: "2024-09-14T04:00:00.000Z", appointments: [] },
-            sun: { current_date: "2024-09-15T04:00:00.000Z", appointments: [] },
+            fri: { current_date: "2024-09-13", appointments: [] },
+            sat: { current_date: "2024-09-14", appointments: [] },
+            sun: { current_date: "2024-09-15", appointments: [] },
         },
     };
     let databaseCurrentDate = new Date(database.headerInfo.today);
