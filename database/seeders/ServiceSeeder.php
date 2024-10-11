@@ -32,7 +32,7 @@ class ServiceSeeder extends Seeder
                 ] 
             
             ]),
-            'adjust_avability' => json_encode([]),
+            'adjusted_availability' => json_encode([]),
             'programming_slot' => json_encode([
                 
                 'available_now_check' => true,
@@ -80,7 +80,7 @@ class ServiceSeeder extends Seeder
                 ] 
             
             ]),
-            'adjust_avability' => json_encode([]),
+            'adjusted_availability' => json_encode([]),
             'programming_slot' => json_encode([
                 
                 'available_now_check' => true,

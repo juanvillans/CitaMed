@@ -63,15 +63,15 @@ class AgendaService
 
     public function getCalendar($service, $params){
         
-        $startOfWeek = Carbon::now()->startOfWeek();
-        if(isset($params['to']) && isset($params['startOfWeek']) ) {
+        $startOfWeek = Carbon::now()->startOfDay()->startOfWeek();
+        if(isset($params['to']) && isset($params['startWeek']) ) {
 
             if($params['to'] == 'next'){
-                $startOfWeek = Carbon::parse($params['startOfWeek'])->addWeek()->startOfWeek();
+                $startOfWeek = Carbon::parse($params['startWeek'])->addWeek()->startOfWeek();
             }
 
             if($params['to'] == 'prev'){
-                $startOfWeek = Carbon::parse($params['startOfWeek'])->subWeek()->startOfWeek();
+                $startOfWeek = Carbon::parse($params['startWeek'])->subWeek()->startOfWeek();
             }
 
         }

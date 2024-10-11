@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('specialty_id');
             $table->string('title',50);
             $table->json('availability');
-            $table->json('adjust_avability');
+            $table->json('adjusted_availability');
             $table->json('programming_slot');
             $table->json('booked_appointment_settings');
             $table->string('description',255);

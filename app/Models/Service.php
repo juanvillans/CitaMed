@@ -15,7 +15,7 @@ class Service extends Model
         'specialty_id',
         'title',
         'availability',
-        'adjust_avability',
+        'adjusted_availability',
         'programming_slot',
         'booked_appointment_settings',
         'description',
