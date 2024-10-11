@@ -254,14 +254,16 @@
     // let defaultFrontCalendar =
     let form = useForm(formDatabase?.data || defaultFrontForm);
     // $form = ...formDatabase || ...defaultFrontForm  }
-    console.log({ $form });
     if (formDatabase?.data) {
-        JSON.parse($form.availability);
-        JSON.parse($form.adjusted_availability);
-        JSON.parse($form.fields);
-        JSON.parse($form.programming_slot);
-        JSON.parse($form.booked_appointment_settings);
+        $form.availability = JSON.parse($form.availability);
+        $form.adjusted_availability = JSON.parse($form.adjusted_availability);
+        $form.fields = JSON.parse($form.fields);
+        $form.programming_slot = JSON.parse($form.programming_slot);
+        $form.booked_appointment_settings = JSON.parse(
+            $form.booked_appointment_settings,
+        );
     }
+    console.log({ $form });
     let optionValue = "";
 
     const optionsShift = [
@@ -440,7 +442,15 @@
     function updateUrl(type) {
         const currentDate = calendar.calendar.mon.current_date;
         const newUrl = `?startWeek=${currentDate}&to=${type}`;
-        router.get(window.location.pathname, {startWeek:currentDate, to:type}, )
+        router.get(
+            window.location.pathname,
+            { startWeek: currentDate, to: type },
+            {
+                onSuccess: (page) => {
+                    updateShiftsForCalendar();
+                },
+            },
+        );
     }
 
     function updateShiftsForCalendar() {
