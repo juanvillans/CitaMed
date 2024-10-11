@@ -586,6 +586,8 @@
             },
         });
     }
+    let prev_programming_slot ;
+    
 </script>
 
 <Modal
@@ -646,7 +648,11 @@
     >
 </Modal>
 
-<Modal bind:showModal={showModalFranja}>
+<Modal bind:showModal={showModalFranja}
+onClose={() => {
+    prev_programming_slot = $form.programming_slot
+}}
+>
     <p slot="header" class="font-bold text-lg text-gray-500">
         Fechas de inicio y finalización de la ventana de la agenda
     </p>
@@ -731,20 +737,8 @@
 
     <button
         on:click={() => {
-            let valueFixed =
-                customTimePerAppointment.type == "horas"
-                    ? customTimePerAppointment.time * 60
-                    : customTimePerAppointment.time;
-            if (!durationOptions.some((obj) => obj.value == valueFixed)) {
-                let copyDurations = [...durationOptions];
-                (copyDurations[7] = {
-                    value: valueFixed,
+            $form.programming_slot = prev_programming_slot 
 
-                    label: `${customTimePerAppointment.time} ${customTimePerAppointment.type} `,
-                }),
-                    (durationOptions = copyDurations);
-            }
-            // if (customTimePerAppointment.)
 
             ($form.prev_value_duration_per_appointment = valueFixed),
                 ($form.duration_per_appointment = valueFixed),
@@ -1550,10 +1544,10 @@
                                     fechas concretas</small
                                 >
                                 <ul
-                                    class="flex flex-col space-y-2 mt-2 gap-y-1 relative -left-3"
+                                    class="flex flex-col space-y-2  relative -left-3 "
                                 >
                                     {#each $form.adjusted_availability as adjust_date, indxDate}
-                                        <li class="flex gap-2 justify-between">
+                                        <li class="flex gap-2 justify-between mb-3">
                                             <span class="h-max">
                                                 <DatePicker
                                                     on:datechange={(e) =>
@@ -1908,7 +1902,7 @@
                                         ];
                                     }}
                                     for="date1"
-                                    class="cursor-pointer text-color2 font-bold p-1 px-3 rounded hover:bg-color2 hover:bg-opacity-10 mt-3 inline-block"
+                                    class="cursor-pointer text-color2 font-bold p-1 px-3 rounded hover:bg-color2 hover:bg-opacity-10  inline-block"
                                     >Cambiar la diponibilidad en una fecha</button
                                 >
                             </section>
