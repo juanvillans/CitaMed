@@ -16,11 +16,9 @@
     let editor;
     let descriptionLength = 0;
     let currentDate = new Date().toISOString();
-    console.log({currentDate})
+    console.log({ currentDate });
     const onDateChange = (d, indx) => {
-        $form.adjusted_availability[indx].date = d.detail
-            .toISOString()
-            ;
+        $form.adjusted_availability[indx].date = d.detail.toISOString();
     };
     let defaulTtime_between_appointment = 30;
 
@@ -226,9 +224,7 @@
             max_reservation_time_before_appointment: 60,
             min_reservation_time_before_appointment: 40,
         },
-        adjusted_availability: [
-          
-        ],
+        adjusted_availability: [],
         booked_appointment_settings: {
             time_between_appointment: null,
             allow_max_appointment_per_day: false,
@@ -441,11 +437,19 @@
     // console.log({ currentDatabaseDay });
     let shiftsForCalendar = {};
 
+    function updateUrl(type) {
+        const currentDate = calendar.calendar.mon.current_date;
+        const newUrl = `?startWeek=${currentDate}&to=${type}`;
+        router.get(window.location.pathname, {startWeek:currentDate, to:type}, )
+    }
+
     function updateShiftsForCalendar() {
         console.log($form.adjusted_availability);
         Object.entries(calendar.calendar).forEach(([key, value], indx) => {
             let isItAjustedShift = $form.adjusted_availability.findIndex(
-                (arrDates) => arrDates.date.slice(0, 10) == value.current_date.slice(0, 10),
+                (arrDates) =>
+                    arrDates.date.slice(0, 10) ==
+                    value.current_date.slice(0, 10),
             );
             shiftsForCalendar = {
                 ...shiftsForCalendar,
@@ -464,7 +468,7 @@
         // }
         // updateShiftsForCalendar();
         // console.log($form.adjusted_availability);
-        console.log($form.programming_slot.interval_date.custom_start_date)
+        console.log($form.programming_slot.interval_date.custom_start_date);
         // console.log($form.programming_slot.interval_date);
         // console.log($form);
     }
@@ -586,8 +590,7 @@
             },
         });
     }
-    let prev_programming_slot ;
-    
+    let prev_programming_slot;
 </script>
 
 <Modal
@@ -648,10 +651,11 @@
     >
 </Modal>
 
-<Modal bind:showModal={showModalFranja}
-onClose={() => {
-    prev_programming_slot = $form.programming_slot
-}}
+<Modal
+    bind:showModal={showModalFranja}
+    onClose={() => {
+        prev_programming_slot = $form.programming_slot;
+    }}
 >
     <p slot="header" class="font-bold text-lg text-gray-500">
         Fechas de inicio y finalización de la ventana de la agenda
@@ -682,9 +686,11 @@ onClose={() => {
                 on:datechange={(d) => {
                     console.log(d.detail);
                     $form.programming_slot.interval_date.start_now_check = false;
-                    $form.programming_slot.interval_date.custom_start_date = d.detail.toISOString()
+                    $form.programming_slot.interval_date.custom_start_date =
+                        d.detail.toISOString();
                 }}
-                selected={$form.programming_slot.interval_date.custom_start_date}
+                selected={$form.programming_slot.interval_date
+                    .custom_start_date}
                 isAllowed={(date) => {
                     const millisecs = date.getTime();
                     if (millisecs + 25 * 3600 * 1000 < Date.now()) return false;
@@ -720,10 +726,10 @@ onClose={() => {
             <DatePicker
                 on:datechange={(d) => {
                     $form.programming_slot.interval_date.end_never_check = false;
-                    $form.programming_slot.interval_date.custom_end_date = d.detail.toISOString()
-                        
+                    $form.programming_slot.interval_date.custom_end_date =
+                        d.detail.toISOString();
                 }}
-                selected={$form.programming_slot.interval_date.custom_end_date }
+                selected={$form.programming_slot.interval_date.custom_end_date}
                 isAllowed={(date) => {
                     const millisecs = date.getTime();
                     if (millisecs + 25 * 3600 * 1000 < Date.now()) return false;
@@ -737,10 +743,9 @@ onClose={() => {
 
     <button
         on:click={() => {
-            $form.programming_slot = prev_programming_slot 
-
-
-            ($form.prev_value_duration_per_appointment = valueFixed),
+            ($form.programming_slot = prev_programming_slot(
+                ($form.prev_value_duration_per_appointment = valueFixed),
+            )),
                 ($form.duration_per_appointment = valueFixed),
                 (showModal = false);
         }}
@@ -1544,10 +1549,12 @@ onClose={() => {
                                     fechas concretas</small
                                 >
                                 <ul
-                                    class="flex flex-col space-y-2  relative -left-3 "
+                                    class="flex flex-col space-y-2 relative -left-3"
                                 >
                                     {#each $form.adjusted_availability as adjust_date, indxDate}
-                                        <li class="flex gap-2 justify-between mb-3">
+                                        <li
+                                            class="flex gap-2 justify-between mb-3"
+                                        >
                                             <span class="h-max">
                                                 <DatePicker
                                                     on:datechange={(e) =>
@@ -1902,7 +1909,7 @@ onClose={() => {
                                         ];
                                     }}
                                     for="date1"
-                                    class="cursor-pointer text-color2 font-bold p-1 px-3 rounded hover:bg-color2 hover:bg-opacity-10  inline-block"
+                                    class="cursor-pointer text-color2 font-bold p-1 px-3 rounded hover:bg-color2 hover:bg-opacity-10 inline-block"
                                     >Cambiar la diponibilidad en una fecha</button
                                 >
                             </section>
@@ -2214,16 +2221,17 @@ onClose={() => {
     <section>
         <header class=" sticky top-0 pt-1 bg-gray-100 z-30 calendarHeader">
             <div class="flex gap-4 items-center">
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-missing-attribute -->
                 <a
-                    use:inertia
-                    href={`${window.location.href}?startWeek=${calendar.headerInfo.today}&to=today`}
+                    on:click|preventDefault={() => updateUrl("today")}
                     class="text-md font-bold border border-gray-300 rounded-md p-2 px-6 hover:bg-gray-200"
                     >Hoy</a
                 >
                 <div class="mx-5 flex gap-2">
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <a
-                        use:inertia
-                        href={`${window.location.href}?startWeek=${calendar.calendar.mon.current_date}&to=prev`}
+                        on:click|preventDefault={() => updateUrl("prev")}
                         class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
                         title="Ir una semana atraz"
                     >
@@ -2233,8 +2241,7 @@ onClose={() => {
                         ></iconify-icon></a
                     >
                     <a
-                        use:inertia
-                        href={`${window.location.href}?startWeek=${calendar.calendar.mon.current_date}&to=next`}
+                        on:click|preventDefault={() => updateUrl("next")}
                         class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
                         title="Ir a la semana siguiente"
                     >
