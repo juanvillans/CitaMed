@@ -6,6 +6,7 @@
 	import 'iconify-icon';
 	import { navStatus } from '../stores/navStatus';
     import {  page } from "@inertiajs/svelte";
+    import Alert from "./Alert.svelte";
     let mainWidth;
     let screenWidth;
 
@@ -30,6 +31,7 @@
     //   <div class="alert">{$page.props.flash.message}</div>
     // }
 </script>
+<Alert />
 
 <svelte:head>
 

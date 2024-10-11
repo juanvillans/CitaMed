@@ -5,7 +5,7 @@
     import axios from "axios";
     import debounce from "lodash/debounce";
 
-    import Alert from "../../components/Alert.svelte";
+    // import Alert from "../../components/Alert.svelte";
     import Especialidades from "../../components/Especialidades.svelte";
     import { displayAlert } from "../../stores/alertStore";
     import { useForm, inertia } from "@inertiajs/svelte";
@@ -81,49 +81,26 @@
                     showModal = false;
                 },
             });
-
         } else if (submitStatus == "Editar") {
             $formCreate.put(`/admin/usuarios/${$formCreate.id}`, {
-            onError: (errors) => {
-                if (errors.data) {
-                    displayAlert({ type: "error", message: errors.data });
-                }
-            },
-            onSuccess: (mensaje) => {
-                $formCreate.reset();
-                displayAlert({
-                    type: "success",
-                    message: "Ok todo salió bien",
-                });
-                showModal = false;
-                selectedRow = { status: false, id: 0, row: {} };
-            },
-        });
+                onError: (errors) => {
+                    if (errors.data) {
+                        displayAlert({ type: "error", message: errors.data });
+                    }
+                },
+                onSuccess: (mensaje) => {
+                    $formCreate.reset();
+                    displayAlert({
+                        type: "success",
+                        message: "Ok todo salió bien",
+                    });
+                    showModal = false;
+                    selectedRow = { status: false, id: 0, row: {} };
+                },
+            });
         }
-        
     }
 
-    function handleEdit(event) {
-        event.preventDefault();
-        console.log("editando");
-        $formEdit.clearErrors();
-        $formEdit.put(`/admin/usuarios/${$formEdit.id}`, {
-            onError: (errors) => {
-                if (errors.data) {
-                    displayAlert({ type: "error", message: errors.data });
-                }
-            },
-            onSuccess: (mensaje) => {
-                $formEdit.reset();
-                displayAlert({
-                    type: "success",
-                    message: "Ok todo salió bien",
-                });
-                showModalCreateSpecialties = false;
-                selectedRow = { status: false, id: 0, row: {} };
-            },
-        });
-    }
 
     function handleDelete(id) {
         $formCreate.delete(`/admin/usuarios/${id}`, {
@@ -141,7 +118,6 @@
                 selectedRow = { status: false, id: 0, row: {} };
             },
         });
-        
     }
 
     function fillFormToEdit() {
@@ -166,7 +142,6 @@
     <title>Usuarios</title>
 </svelte:head>
 
-<Alert />
 <Modal
     showModal={selectSpecialityModal}
     onClose={() => {
@@ -195,7 +170,6 @@
 </Modal>
 
 <Modal bind:showModal modalClasses={"max-w-[560px]"}>
-
     <form
         id="a-form"
         on:submit={handleSubmit}
@@ -322,7 +296,7 @@
                     ...emptyDataForm,
                 });
                 setTimeout(() => {
-                    $formCreate.reset()
+                    $formCreate.reset();
                 }, 100);
             }
             e.preventDefault();
@@ -333,7 +307,11 @@
     >
     <!-- svelte-ignore missing-declaration -->
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <a class="cursor-pointer border-b py-2 px-3 hover:bg-color4" on:click={() => showModalCreateSpecialties= true}>Especialidades de la institución</a>
+    <a
+        class="cursor-pointer border-b py-2 px-3 hover:bg-color4"
+        on:click={() => (showModalCreateSpecialties = true)}
+        >Especialidades de la institución</a
+    >
 </div>
 <Table
     {selectedRow}
@@ -369,10 +347,11 @@
                         };
                         $formCreate.defaults({
                             ...row,
-                            specialties_ids : row.specialties.map(obj => obj.id)
+                            specialties_ids: row.specialties.map(
+                                (obj) => obj.id,
+                            ),
                         });
                         $formCreate.clearErrors();
-
                     } else {
                         selectedRow = {
                             status: false,
@@ -394,10 +373,12 @@
                 <!-- <td>{row.sex}</td> -->
                 <td>{row.phone_number}</td>
                 <!-- <td>{row.rep_name} {row.rep_last_name}</td> -->
-                <td
+                <td class="flex gap-3"
                     >{#if row.specialties.length != 0}
                         {#each row.specialties as specialty (specialty.id)}
-                            {specialty.name + " "}
+                            <span class="px-3 py-1 rounded-full bg-gray-100">
+                                {specialty.name + " "}
+                            </span>
                         {/each}
                     {:else}
                         <span class="opacity-60">No tiene</span>

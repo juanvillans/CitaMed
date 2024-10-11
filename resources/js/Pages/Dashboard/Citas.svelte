@@ -7,7 +7,6 @@
     import Calender from "../../components/Calender.svelte";
     import Draggable from "../../components/Draggable.svelte";
     import Editor from "cl-editor/src/Editor.svelte";
-    import Alert from "../../components/Alert.svelte";
     import { displayAlert } from "../../stores/alertStore";
 
     import DatePicker from "../../components/DatePicker.svelte";
@@ -44,7 +43,7 @@
 
     let defaultFrontForm = {
         title: "",
-        duration_per_appointment: "60",
+        duration_per_appointment: 60,
         availability: {
             mon: [
                 {
@@ -232,8 +231,6 @@
         },
 
         prev_value_duration_per_appointment: "",
-        duration_per_appointment_type: "",
-        max_appointment_per_day: 4,
 
         description: "",
 
@@ -263,7 +260,7 @@
             $form.booked_appointment_settings,
         );
     }
-    console.log({$form});
+    console.log({ $form });
     let optionValue = "";
 
     const optionsShift = [
@@ -373,13 +370,14 @@
             $form.prev_value_duration_per_appointment;
     }
     let durationOptions = [
-        { value: "15", label: "15 minutos" },
-        { value: "30", label: "30 minutos" },
-        { value: "45", label: "45 minutos" },
-        { value: "60", label: "1 hora" },
-        { value: "90", label: "1,5 horas" },
-        { value: "120", label: "2 horas" },
-        { value: "999999", label: "personalizar..." },
+        { value: 15, label: "15 minutos" },
+        { value: 30, label: "30 minutos" },
+        { value: 45, label: "45 minutos" },
+        { value: 60, label: "1 hora" },
+
+        { value: 90, label: "1,5 horas" },
+        { value: 120, label: "2 horas" },
+        { value: 999999, label: "personalizar..." },
     ];
 
     function timeDifference(startTime, endTime) {
@@ -478,9 +476,10 @@
         // }
         // updateShiftsForCalendar();
         // console.log($form.adjusted_availability);
-        console.log($form.programming_slot.interval_date.custom_start_date);
+        // console.log($form.programming_slot.interval_date.custom_start_date);
         // console.log($form.programming_slot.interval_date);
-        // console.log($form);
+        console.log($form);
+        
     }
 
     $: $form, updateShiftsForCalendar();
@@ -531,8 +530,8 @@
             });
             lastTime = addMinutes(
                 lastTime,
-                +$form.duration_per_appointment +
-                    +$form.booked_appointment_settings.time_between_appointment,
+                $form.duration_per_appointment +
+                    $form.booked_appointment_settings.time_between_appointment,
             );
         }
         console.log({ forAppointments });
@@ -586,20 +585,26 @@
         $form.clearErrors();
         console.log({ $form });
         $form.post("/admin/agenda/crear-cita", {
+            // preserveState: true,
             onError: (errors) => {
                 if (errors.data) {
                     displayAlert({ type: "error", message: errors.data });
                 }
             },
-            onSuccess: (mensaje) => {
-                $form.reset();
+            onSuccess: (page) => {
+                // $form.reset();
+                // console.log({ ...page.props.formDatabase }, page)
+                $form.defaults({ ...page.props.formDatabase.data });
+                $form.reset()
                 displayAlert({
-                    type: "success",
-                    message: "Ok todo salió bien",
-                });
+                        type: "success",
+                        message: "Ok todo salió bien",
+                    });
             },
         });
+        console.log($form);
     }
+
     let prev_programming_slot;
 </script>
 
@@ -636,12 +641,12 @@
         on:click={() => {
             let valueFixed =
                 customTimePerAppointment.type == "horas"
-                    ? customTimePerAppointment.time * 60
-                    : customTimePerAppointment.time;
+                    ? +customTimePerAppointment.time * 60
+                    : +customTimePerAppointment.time;
             if (!durationOptions.some((obj) => obj.value == valueFixed)) {
                 let copyDurations = [...durationOptions];
                 (copyDurations[7] = {
-                    value: valueFixed,
+                    value: +valueFixed,
 
                     label: `${customTimePerAppointment.time} ${customTimePerAppointment.type} `,
                 }),
@@ -649,8 +654,8 @@
             }
             // if (customTimePerAppointment.)
 
-            ($form.prev_value_duration_per_appointment = valueFixed),
-                ($form.duration_per_appointment = valueFixed),
+            ($form.prev_value_duration_per_appointment = +valueFixed),
+                ($form.duration_per_appointment = +valueFixed),
                 (showModal = false);
             updateAllStartAppointmets();
         }}
@@ -998,7 +1003,8 @@
                                         $form.duration_per_appointment = "";
                                     } else {
                                         $form.duration_per_appointment =
-                                            e.target.value;
+                                            +e.target.value;
+                                        console.log(e.target.value, 5);
                                         updateAllStartAppointmets();
                                     }
                                     // console.log('se ejecutó esto?')
@@ -1007,9 +1013,9 @@
                                 inputClasses={"bg-gray-200 px-2"}
                             >
                                 {#each durationOptions.slice().sort((a, b) => {
-                                    return parseInt(a.value) - parseInt(b.value);
+                                    return a.value - b.value;
                                 }) as { value, label }}
-                                    <option {value}>{label}</option>
+                                    <option value={+value}>{label}</option>
                                 {/each}
                             </Input>
                         </fieldset>
@@ -2045,16 +2051,20 @@
                                             </div>
 
                                             <span
-                                                class={`${!$form.allow_max_appointment_per_day ? "opacity-80" : ""} flex items-center gap-3`}
+                                                class={`${!$form.booked_appointment_settings.allow_max_appointment_per_day ? "opacity-80" : ""} flex items-center gap-3`}
                                             >
                                                 <input
                                                     type="checkbox"
                                                     class="w-6 h-6"
-                                                    bind:checked={$form.allow_max_appointment_per_day}
+                                                    bind:checked={$form
+                                                        .booked_appointment_settings
+                                                        .allow_max_appointment_per_day}
                                                 />
                                                 <Input
                                                     type="number"
-                                                    disabled={!$form.allow_max_appointment_per_day}
+                                                    disabled={!$form
+                                                        .booked_appointment_settings
+                                                        .allow_max_appointment_per_day}
                                                     classes={"w-16 mt-0"}
                                                     inputClasses={"p-3 ray-50 w-16"}
                                                     bind:value={$form.max_appointment_per_day}
@@ -2235,14 +2245,14 @@
                 <!-- svelte-ignore a11y-missing-attribute -->
                 <a
                     on:click|preventDefault={() => updateUrl("today")}
-                    class="text-md font-bold border border-gray-300 rounded-md p-2 px-6 hover:bg-gray-200"
+                    class="text-md font-bold border border-gray-300 rounded-md p-2 cursor-pointer px-6 hover:bg-gray-200"
                     >Hoy</a
                 >
                 <div class="mx-5 flex gap-2">
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <a
                         on:click|preventDefault={() => updateUrl("prev")}
-                        class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
+                        class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center flex cursor-pointer text-center w-10"
                         title="Ir una semana atraz"
                     >
                         <iconify-icon
@@ -2252,7 +2262,7 @@
                     >
                     <a
                         on:click|preventDefault={() => updateUrl("next")}
-                        class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center w-10"
+                        class="text-2xl text-gray-900 rounded-full aspect-square hover:bg-gray-200 flex items-center flex cursor-pointer text-center w-10"
                         title="Ir a la semana siguiente"
                     >
                         <iconify-icon
