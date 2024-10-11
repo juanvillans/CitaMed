@@ -26,12 +26,14 @@ class CreateServiceRequest extends FormRequest
             "doctor_id" => ['required'],
             "specialty_id" => ['required'],
             "title" => ['required'],
+            "duration_per_appointment" => ['required'],
             "availability" => ['required'],
             "adjusted_availability" => ['required'],
             "programming_slot" => ['required'],
             "booked_appointment_settings" => ['required'],
             "description" => ['required'],
             "fields" => ['required'],
+
 
         ];
     }

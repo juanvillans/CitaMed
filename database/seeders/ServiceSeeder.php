@@ -32,6 +32,7 @@ class ServiceSeeder extends Seeder
                 ] 
             
             ]),
+            'duration_per_appointment' => 60,
             'adjusted_availability' => json_encode([]),
             'programming_slot' => json_encode([
                 
@@ -80,6 +81,7 @@ class ServiceSeeder extends Seeder
                 ] 
             
             ]),
+            'duration_per_appointment' => 60,
             'adjusted_availability' => json_encode([]),
             'programming_slot' => json_encode([
                 
