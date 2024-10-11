@@ -263,7 +263,7 @@
             $form.booked_appointment_settings,
         );
     }
-    console.log({ $form });
+    console.log({$form});
     let optionValue = "";
 
     const optionsShift = [

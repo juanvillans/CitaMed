@@ -43,7 +43,7 @@
                 </div>
 
                 <div class="description mt-3 text-gray-600">
-                    {calendar.description} 
+                    {@html calendar.description} 
                 </div>
             </a>
         {/each}

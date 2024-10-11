@@ -23,12 +23,12 @@
     --ligthGreen: #54ffaf;
     --background: rgb(245, 245, 245);
 }
-.text-editor ul  {
+.text-editor ul, .description ul  {
     list-style-type: disc !important;
     padding: inherit !important;
     margin-left: 25px !important;
 }
-.text-editor ol {
+.text-editor ol, .description ol {
     list-style-type: decimal !important;
     padding: inherit !important;
     margin-left: 25px !important;
