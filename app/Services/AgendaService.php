@@ -126,6 +126,7 @@ class AgendaService
             'user_id' => $serviceData['doctor_id'],
             'specialty_id' => $serviceData['specialty_id'],
             'title' => $serviceData['title'],
+            'duration_per_appointment' => $serviceData['duration_per_appointment'],
             'availability' => json_encode($serviceData['availability']),
             'adjusted_availability' => json_encode($serviceData['adjusted_availability']),
             'programming_slot' => json_encode($serviceData['programming_slot']),
