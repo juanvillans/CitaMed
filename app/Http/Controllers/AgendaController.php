@@ -66,9 +66,23 @@ class AgendaController extends Controller
 
     public function storeService(CreateServiceRequest $serviceData){
 
-        $serviceCreated = $this->agendaService->storeService($serviceData->all());
+        DB::beginTransaction();
 
-        return redirect('/admin/agenda/cita/'.$serviceCreated->id)->with(['message' => 'Cita creada con éxito']);
+        try {
+
+            $serviceCreated = $this->agendaService->storeService($serviceData->all());
+            
+            DB::commit();
+            
+            return redirect('/admin/agenda/cita/'.$serviceCreated->id)->with(['message' => 'Cita creada con éxito']);
+        
+        } catch (\Throwable $e) {
+            
+            DB::rollback();
+            
+            return redirect()->back()->withErrors(['data' => $e->getMessage()]);
+        }
+
 
     }
 
