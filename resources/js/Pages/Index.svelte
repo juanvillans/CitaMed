@@ -100,10 +100,7 @@
 <Alert />
 <section class=" min-h-screen">
     <header class=" border-b flex p-4">
-        
-        
-        <div class="flex gap-3  "
-        >
+        <div class="flex gap-3">
             <span
                 class="rounded-full overflow-hidden bg-color4 w-12 h-12 justify-center items-center flex"
             >
@@ -111,13 +108,25 @@
             </span>
 
             <div class="mt-1">
-                <p><b class="text-xl"> Doctor Kilo</b> </p>
-                <p> <span class="bg-gray-200 rounded-full px-2 py-1 text-opacity-80">Ginecólogo</span></p>
+                <p><b class="text-xl"> Doctor Kilo</b></p>
+                <p>
+                    <span
+                        class="bg-gray-200 rounded-full px-2 py-1 text-opacity-80"
+                        >Ginecólogo</span
+                    >
+                </p>
             </div>
         </div>
         <div>
-
-            <h1 class="text-2xl mx-auto"><span class="text-dark  opacity-60">Ginecologia: </span> <span class="text-2xl ">Titulo de la cita</span></h1>
+            <h1 class="text-2xl mx-auto">
+                <span class="text-dark opacity-60">Ginecologia: </span>
+                <span class="text-2xl">Titulo de la cita</span>
+            </h1>
+            <div class="flex gap-3">
+                <iconify-icon icon="lets-icons:time-atack" class="mt-1 text-xl text-gray-500"
+                ></iconify-icon>
+                <p>Citas de 60 minutos</p>
+            </div>
         </div>
     </header>
 
