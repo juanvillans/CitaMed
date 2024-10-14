@@ -33,6 +33,16 @@ class ServiceSeeder extends Seeder
             
             ]),
             'duration_per_appointment' => 60,
+            'duration_options' => json_encode([
+                [ "value" => 15, "label" => "15 minutos" ],
+                [ "value" => 30, "label" => "30 minutos" ],
+                [ "value" => 45, "label" => "45 minutos" ],
+                [ "value" => 60, "label" => "1 hora" ],
+
+                [ "value" => 90, "label" => "1,5 horas" ],
+                [ "value" => 120, "label" => "2 horas" ],
+                [ "value" => 999999, "label" => "Personalizar..." ]
+            ]),
             'adjusted_availability' => json_encode([]),
             'programming_slot' => json_encode([
                 
@@ -82,6 +92,16 @@ class ServiceSeeder extends Seeder
             
             ]),
             'duration_per_appointment' => 60,
+            'duration_options' => json_encode([
+                [ "value" => 15, "label" => "15 minutos" ],
+                [ "value" => 30, "label" => "30 minutos" ],
+                [ "value" => 45, "label" => "45 minutos" ],
+                [ "value" => 60, "label" => "1 hora" ],
+
+                [ "value" => 90, "label" => "1,5 horas" ],
+                [ "value" => 120, "label" => "2 horas" ],
+                [ "value" => 999999, "label" => "Personalizar..." ]
+            ]),
             'adjusted_availability' => json_encode([]),
             'programming_slot' => json_encode([
                 

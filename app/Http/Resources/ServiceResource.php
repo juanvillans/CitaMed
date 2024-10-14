@@ -25,6 +25,7 @@ class ServiceResource extends JsonResource
             'specialty_name' => $this->specialty_name,
             'title' => $this->title,
             'duration_per_appointment' => $this->duration_per_appointment,
+            'duration_options' => $this->duration_options,
             'availability' => $this->availability,
             'adjusted_availability' => $this->adjusted_availability,
             'programming_slot' => $this->programming_slot,
