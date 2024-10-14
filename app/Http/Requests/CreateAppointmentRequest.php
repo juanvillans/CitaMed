@@ -32,8 +32,6 @@ class CreateAppointmentRequest extends FormRequest
             'start' => ['required'],
             'end' => ['required'],
             'date' => ['required'],
-            'carbon_date' => ['required'],
-            'status' => ['required'],
         ];
     }
 }
