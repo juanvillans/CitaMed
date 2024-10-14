@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AppController;
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\UserController;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [AppController::class, 'index'])->name('landpage');
+Route::get('/reservar',[AppointmentController::class, 'index'])->name('reservar-cita');
 Route::get('/admin/login', [AppController::class, 'loginForm'])->name('login');
 Route::post('/admin/login', [UserController::class, 'login']);
 Route::get('/admin/logout', [UserController::class, 'logout'])->middleware('auth')->name('logout');  
