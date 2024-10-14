@@ -15,6 +15,7 @@ class ServiceResource extends JsonResource
     public function toArray(Request $request): array
     {
 
+
         return [
             'id' => $this->id,
             'doctor_id' => $this->user_id,
@@ -22,7 +23,7 @@ class ServiceResource extends JsonResource
             'doctor_last_name' => $this->user->last_name,
             'doctor_ci' => $this->user->ci,
             'specialty_id' => $this->specialty_id,
-            'specialty_name' => $this->specialty_name,
+            'specialty_name' => $this->specialty->name,
             'title' => $this->title,
             'duration_per_appointment' => $this->duration_per_appointment,
             'duration_options' => $this->duration_options,
