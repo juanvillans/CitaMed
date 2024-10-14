@@ -127,6 +127,7 @@ class AgendaService
             'specialty_id' => $serviceData['specialty_id'],
             'title' => $serviceData['title'],
             'duration_per_appointment' => $serviceData['duration_per_appointment'],
+            'duration_options' => json_encode($serviceData['duration_options']),
             'availability' => json_encode($serviceData['availability']),
             'adjusted_availability' => json_encode($serviceData['adjusted_availability'] ?? []) ,
             'programming_slot' => json_encode($serviceData['programming_slot']),
@@ -144,6 +145,8 @@ class AgendaService
             'user_id' => $serviceData['doctor_id'],
             'specialty_id' => $serviceData['specialty_id'],
             'title' => $serviceData['title'],
+            'duration_per_appointment' => $serviceData['duration_per_appointment'],
+            'duration_options' => json_encode($serviceData['duration_options']),
             'availability' => json_encode($serviceData['availability']),
             'adjusted_availability' => json_encode($serviceData['adjusted_availability']),
             'programming_slot' => json_encode($serviceData['programming_slot']),
@@ -210,41 +213,8 @@ class AgendaService
     }
 
 
-    public function deleteUser($usuario)
-    {   
-        $authUserId = auth()->id();
-        $usuario->id == $authUserId ? throw new Exception("No puedes eliminar tu propio usuario", 401) : null;
 
-        $usuario->specialties()->detach();
-        $usuario->roles()->detach();
-
-        $usuario->delete();
-
-        return 0;
-    }
-
-    private function assignSpecialties($user, $data)
-    {
-
-        if(!isset($data['specialties_ids']) || count($data['specialties_ids']) == 0 )
-            throw new Exception("El doctor debe tener alguna especialidad seleccionada", 401);
-        
-        $user->specialties()->sync($data['specialties_ids']);
-
-        return 0;
-            
-    }
-
-    private function generateSearch($data)
-    {
-        $search = $data['ci'] . " "
-                 .$data['name'] . " "
-                 .$data['last_name'] . " "
-                 .$data['email'] . " "
-                 .$data['phone_number'] . " ";
-        
-        return $search;
-    }
+    
     
 
 }
