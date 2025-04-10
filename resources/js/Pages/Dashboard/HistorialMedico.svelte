@@ -39,7 +39,7 @@
         last_name: "",
         email: "",
         phone_number: "",
-        role_name: "doctor",
+        role_name: "",
         specialties: [],
         specialties_ids: [],
     };

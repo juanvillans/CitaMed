@@ -10,24 +10,30 @@
     let showModal = false;
     let sourceDiv;
     let width = 0;
-    let numberOfDays = 7;
+    let numberOfDays = 0;
+
+    onMount(() => {
+        console.log('mounte')
+        updateWidth(); // Set the initial width
+        window.addEventListener("resize", updateWidth);
+    });
+
+    onDestroy(() => {
+        window.removeEventListener("resize", updateWidth);
+    });
     function updateWidth() {
-        const screenZise = window.innerWidth;
-        console.log(screenZise);
-        if (screenZise <= 1220) {
-            numberOfDays = 5;
-        }
-        if (screenZise <= 1000) {
-            numberOfDays = 4;
-        }
-        if (screenZise <= 900) {
-            numberOfDays = 3;
-        }
-        if (screenZise <= 730) {
-            numberOfDays = 2;
-        }
-        if (screenZise >= 1220) {
+        const screenSize = window.innerWidth;
+        console.log(screenSize);
+        if (screenSize >= 1220) {
             numberOfDays = 7;
+        } else if (screenSize <= 1220 && screenSize > 1000) {
+            numberOfDays = 5;
+        } else if (screenSize <= 1000 && screenSize > 900) {
+            numberOfDays = 4;
+        } else if (screenSize <= 900 && screenSize > 460) {
+            numberOfDays = 3;
+        } else if (screenSize <= 460) {
+            numberOfDays = 2;
         }
         getNextNDays(focusedDate, numberOfDays);
 
@@ -44,14 +50,7 @@
         sat: "Sáb",
         sun: "Dom",
     };
-    onMount(() => {
-        updateWidth(); // Set the initial width
-        window.addEventListener("resize", updateWidth);
-    });
-
-    onDestroy(() => {
-        window.removeEventListener("resize", updateWidth);
-    });
+   
 
     let form = useForm({
         ci: null,
@@ -98,8 +97,8 @@
 </script>
 
 <Alert />
-<section class=" min-h-screen">
-    <header class=" border-b flex p-4">
+<section class=" min-h-screen w-11/12 mx-auto max-w-[1480px]">
+    <header class=" border-b flex flex-col md:flex-row p-4 gap-5">
         <div class="flex gap-3">
             <span
                 class="rounded-full overflow-hidden bg-color4 w-12 h-12 justify-center items-center flex"
@@ -118,12 +117,14 @@
             </div>
         </div>
         <div>
-            <h1 class="text-2xl mx-auto">
+            <h1 class="text-lg md:text-2xl mx-auto">
                 <span class="text-dark opacity-60">Ginecologia: </span>
-                <span class="text-2xl">Titulo de la cita</span>
+                <span class="text-lg md:text-2xl">Titulo de la cita</span>
             </h1>
             <div class="flex gap-3">
-                <iconify-icon icon="lets-icons:time-atack" class="mt-1 text-xl text-gray-500"
+                <iconify-icon
+                    icon="lets-icons:time-atack"
+                    class="mt-1 text-xl text-gray-500"
                 ></iconify-icon>
                 <p>Citas de 60 minutos</p>
             </div>
@@ -156,7 +157,7 @@
         </div>
 
         <div>
-            <header class=" sticky top-0 pt-1 bg-gray-100 z-30 calendarHeader">
+            <header class=" sticky top-0 pt-1 w-fit mx-auto bg-gray-100 z-30 calendarHeader">
                 <div class="flex gap-4 items-center">
                     <!-- <h2 class="text-2xl">{data.headerInfo.month_year}</h2> -->
                 </div>
@@ -179,7 +180,7 @@
                     <ul class="flex listCalendarHeader gap-2">
                         {#each frontCalendar as objDate (objDate.day)}
                             <li
-                                class="flex flex-col justify-center text-center w-28"
+                                class="flex text-sm xl:text-base flex-col justify-center text-center w-24 xl:w-28"
                             >
                                 <p
                                     class={` ${objDate.date == data.today ? "text-color1 " : ""}`}
@@ -187,7 +188,7 @@
                                     {objDate.weekday.toUpperCase()}
                                 </p>
                                 <p
-                                    class={`text-2xl mx-auto w-12 aspect-square rounded-full flex items-center justify-center ${objDate.date == data.today ? "bg-color1 text-gray-50 " : ""}`}
+                                    class={`text-lg xl:text-2xl mx-auto w-9 xl:w-12 aspect-square rounded-full flex items-center justify-center ${objDate.date == data.today ? "bg-color1 text-gray-50 " : ""}`}
                                 >
                                     {objDate.day}
                                 </p>

@@ -17,7 +17,11 @@
             href: "/admin/agenda",
             name: "Agenda",
         },
-
+        {
+            icon: "mdi:google-classroom",
+            href: "/admin/historial-medico",
+            name: "Historial Médico",
+        },
         {
             icon: "streamline:payment-10",
             href: "/admin/pagos",

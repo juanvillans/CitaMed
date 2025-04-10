@@ -247,6 +247,16 @@
         doctor_name: "",
         doctor_last_name: "",
         specialty_id: "",
+        duration_options: [
+            { value: 15, label: "15 minutos" },
+            { value: 30, label: "30 minutos" },
+            { value: 45, label: "45 minutos" },
+            { value: 60, label: "1 hora" },
+
+            { value: 90, label: "1,5 horas" },
+            { value: 120, label: "2 horas" },
+            { value: 999999, label: "personalizar..." },
+        ],
     };
     // let defaultFrontCalendar =
     let form = useForm(formDatabase?.data || defaultFrontForm);
@@ -259,6 +269,7 @@
         $form.booked_appointment_settings = JSON.parse(
             $form.booked_appointment_settings,
         );
+        $form.duration_options = JSON.parse($form.duration_options);
     }
     console.log({ $form });
     let optionValue = "";
@@ -369,16 +380,6 @@
         $form.duration_per_appointment =
             $form.prev_value_duration_per_appointment;
     }
-    let durationOptions = [
-        { value: 15, label: "15 minutos" },
-        { value: 30, label: "30 minutos" },
-        { value: 45, label: "45 minutos" },
-        { value: 60, label: "1 hora" },
-
-        { value: 90, label: "1,5 horas" },
-        { value: 120, label: "2 horas" },
-        { value: 999999, label: "personalizar..." },
-    ];
 
     function timeDifference(startTime, endTime) {
         // console.log(endTime);
@@ -436,7 +437,10 @@
         .toLowerCase();
     // console.log({ currentDatabaseDay });
     let shiftsForCalendar = {};
-
+    let typePage = window.location.pathname.includes("crear-cita")
+        ? "crear"
+        : "editar";
+    $: console.log(typePage);
     function updateUrl(type) {
         const currentDate = calendar.calendar.mon.current_date;
         const newUrl = `?startWeek=${currentDate}&to=${type}`;
@@ -454,11 +458,14 @@
     function updateShiftsForCalendar() {
         console.log($form.adjusted_availability);
         Object.entries(calendar.calendar).forEach(([key, value], indx) => {
-            let isItAjustedShift = $form.adjusted_availability.findIndex(
-                (arrDates) =>
-                    arrDates.date.slice(0, 10) ==
-                    value.current_date.slice(0, 10),
-            );
+            let isItAjustedShift =
+                $form?.adjusted_availability.length > 0
+                    ? $form?.adjusted_availability?.findIndex(
+                          (arrDates) =>
+                              arrDates.date.slice(0, 10) ==
+                              value.current_date.slice(0, 10),
+                      )
+                    : -1;
             shiftsForCalendar = {
                 ...shiftsForCalendar,
                 [key]:
@@ -479,7 +486,6 @@
         // console.log($form.programming_slot.interval_date.custom_start_date);
         // console.log($form.programming_slot.interval_date);
         console.log($form);
-        
     }
 
     $: $form, updateShiftsForCalendar();
@@ -549,7 +555,7 @@
         });
 
         let newAdjustedAvaibility = [];
-        $form.adjusted_availability.forEach((obj) => {
+        $form?.adjusted_availability.forEach((obj) => {
             newAdjustedAvaibility.push({
                 ...obj,
                 shifts: obj.shifts.map((shift) => ({
@@ -583,29 +589,51 @@
     function handleSubmit(event) {
         event.preventDefault();
         $form.clearErrors();
-        console.log({ $form });
-        $form.post("/admin/agenda/crear-cita", {
-            // preserveState: true,
-            onError: (errors) => {
-                if (errors.data) {
-                    displayAlert({ type: "error", message: errors.data });
-                }
-            },
-            onSuccess: (page) => {
-                // $form.reset();
-                // console.log({ ...page.props.formDatabase }, page)
-                $form.defaults({ ...page.props.formDatabase.data });
-                $form.reset()
-                displayAlert({
+        // console.log({ $form });
+        if (typePage == "crear") {
+            $form.post(`${window.location.pathname}`, {
+                // preserveState: true,
+                onError: (errors) => {
+                    if (errors.data) {
+                        displayAlert({ type: "error", message: errors.data });
+                    }
+                },
+                onSuccess: (page) => {
+                    displayAlert({
                         type: "success",
                         message: "Ok todo salió bien",
                     });
-            },
-        });
-        console.log($form);
+                    displayAlert({ type: "error", message: "error" });
+
+                    $form.defaults({ ...page.props.formDatabase.data });
+                    $form.reset();
+                },
+            });
+        } else {
+            $form.put(`${window.location.pathname}/${form.id}`, {
+                // preserveState: true,
+                onError: (errors) => {
+                    if (errors.data) {
+                        displayAlert({ type: "error", message: errors.data });
+                    }
+                },
+                onSuccess: (page) => {
+                    displayAlert({
+                        type: "success",
+                        message: "Ok todo salió bien",
+                    });
+                    displayAlert({ type: "error", message: "error" });
+
+                    $form.defaults({ ...page.props.formDatabase.data });
+                    $form.reset();
+                },
+            });
+        }
+        // console.log($form);
     }
 
     let prev_programming_slot;
+    let openedLeftSection = typePage == "crear" ? "form" : "panel";
 </script>
 
 <Modal
@@ -643,14 +671,16 @@
                 customTimePerAppointment.type == "horas"
                     ? +customTimePerAppointment.time * 60
                     : +customTimePerAppointment.time;
-            if (!durationOptions.some((obj) => obj.value == valueFixed)) {
-                let copyDurations = [...durationOptions];
+            if (
+                !$form.duration_options.some((obj) => obj.value == valueFixed)
+            ) {
+                let copyDurations = [...$form.duration_options];
                 (copyDurations[7] = {
                     value: +valueFixed,
 
                     label: `${customTimePerAppointment.time} ${customTimePerAppointment.type} `,
                 }),
-                    (durationOptions = copyDurations);
+                    ($form.duration_options = copyDurations);
             }
             // if (customTimePerAppointment.)
 
@@ -895,196 +925,784 @@
         {/each}
     </ul>
 </Modal>
-<section class="flex gap-4 justify-between">
-    <div class="min-w-[450px] w-[470px]">
-        <form
-            class=" bg-gray-100 pl-0 rounded pt-5 sticky top-1 h overflow-x-hidden pr-2"
-            action=""
-            on:submit={handleSubmit}
-            style="height: calc(100vh - 80px)"
-        >
-            <div class="overflow-y-scroll h-full pb-10 p-3">
-                {#if formPage == 1}
-                    <div class="relative">
-                        <fieldset
-                            class="border-b border-gray-300 items-center pb-4"
-                        >
-                            <h2>CONFIGURAR CITAS DISPONIBLES</h2>
+<section class="flex gap-4 justify-between ">
+    <div class="min-w-[450px] w-[470px] relative">
+        {#if openedLeftSection == "form"}
+            <form
+                class=" bg-gray-100 pl-0 rounded pt-5 sticky top-1 h overflow-x-hidden pr-2"
+                action=""
+                on:submit={handleSubmit}
+                style="height: calc(100vh - 80px)"
+            >
+            <button class="absolute right-3 text-xl top-0" title="Cancelar" on:click={()=> openedLeftSection = "panel"}>
+                <iconify-icon icon="material-symbols:close"></iconify-icon>
+            </button>
+                <div class="overflow-y-scroll h-full pb-10 p-3">
+                    {#if formPage == 1}
+                        <div class="relative">
+                            <fieldset
+                                class="border-b border-gray-300 items-center pb-4"
+                            >
+                                <h2>CONFIGURAR CITAS DISPONIBLES</h2>
 
-                            <Input
-                                type="text"
-                                required={true}
-                                label={"Titulo"}
-                                labelClasses={"font-bold w-11/12 mb-3"}
-                                inputClasses={"text-2xl  p-1 px-3 bg-gray-200 w-11/12 "}
-                                bind:value={$form.title}
-                                error={$form.errors?.title}
-                            />
-                            <div class="flex justify-between">
-                                <button
-                                    type="button"
-                                    on:click={() => {
-                                        showModalDoctor = true;
-                                    }}
-                                >
-                                    <div class="mt-3 text-left">
-                                        <span class="text-left font-bold"
-                                            >Doctor</span
-                                        >
-                                    </div>
-                                    <div
-                                        class=" mt-1.5 flex gap-2 items-center bg-gray-200 rounded-full hover:bg-gray-300 max-w-fit pr-3"
+                                <Input
+                                    type="text"
+                                    required={true}
+                                    label={"Titulo"}
+                                    labelClasses={"font-bold w-11/12 mb-3"}
+                                    inputClasses={"text-2xl  p-1 px-3 bg-gray-200 w-11/12 "}
+                                    bind:value={$form.title}
+                                    error={$form.errors?.title}
+                                />
+                                <div class="flex justify-between">
+                                    <button
+                                        type="button"
+                                        on:click={() => {
+                                            showModalDoctor = true;
+                                        }}
                                     >
-                                        <span
-                                            class="rounded-full overflow-hidden bg-color4 w-7 h-7 justify-center items-center flex"
-                                        >
-                                            <iconify-icon
-                                                icon="fa6-solid:user-doctor"
-                                            ></iconify-icon>
-                                        </span>
-                                        {#if $form.doctor_id > 0}
-                                            <p
-                                                class="bg-gray-200 rounded-full px-3"
+                                        <div class="mt-3 text-left">
+                                            <span class="text-left font-bold"
+                                                >Doctor</span
                                             >
-                                                <b>
-                                                    {$form?.doctor_name}
-                                                    {$form?.doctor_last_name}</b
+                                        </div>
+                                        <div
+                                            class=" mt-1.5 flex gap-2 items-center bg-gray-200 rounded-full hover:bg-gray-300 max-w-fit pr-3"
+                                        >
+                                            <span
+                                                class="rounded-full overflow-hidden bg-color4 w-7 h-7 justify-center items-center flex"
+                                            >
+                                                <iconify-icon
+                                                    icon="fa6-solid:user-doctor"
+                                                ></iconify-icon>
+                                            </span>
+                                            {#if $form.doctor_id > 0}
+                                                <p
+                                                    class="bg-gray-200 rounded-full px-3"
                                                 >
-                                            </p>
-                                        {:else}
-                                            <p>Selecciona un Doctor</p>
-                                        {/if}
-                                        <iconify-icon
-                                            icon="iconamoon:arrow-down-2-duotone"
-                                        ></iconify-icon>
-                                    </div>
-                                </button>
+                                                    <b>
+                                                        {$form?.doctor_name}
+                                                        {$form?.doctor_last_name}</b
+                                                    >
+                                                </p>
+                                            {:else}
+                                                <p>Selecciona un Doctor</p>
+                                            {/if}
+                                            <iconify-icon
+                                                icon="iconamoon:arrow-down-2-duotone"
+                                            ></iconify-icon>
+                                        </div>
+                                    </button>
 
+                                    <Input
+                                        type="select"
+                                        required={true}
+                                        labelClasses={"font-bold"}
+                                        label={"Especialidad"}
+                                        classes={"mt-3 w-auto"}
+                                        bind:value={$form.specialty_id}
+                                        error={$form.errors?.specialty_id}
+                                        inputClasses={"bg-gray-200 px-2"}
+                                    >
+                                        {#if $form.doctor_id}
+                                            {#each data.dataToCreateService.doctors.data.find((obj) => obj.id == $form.doctor_id)?.specialties as specialty}
+                                                <option value={specialty.id}
+                                                    >{specialty.name}</option
+                                                >
+                                            {/each}
+                                        {/if}
+                                    </Input>
+                                </div>
+                            </fieldset>
+
+                            <fieldset
+                                class="border-b border-gray-300 flex gap-4 pb-4"
+                            >
+                                <iconify-icon
+                                    icon="lets-icons:time-atack"
+                                    class="mt-4"
+                                ></iconify-icon>
                                 <Input
                                     type="select"
                                     required={true}
                                     labelClasses={"font-bold"}
-                                    label={"Especialidad"}
+                                    label={"Duración de cada cita"}
                                     classes={"mt-3 w-auto"}
-                                    bind:value={$form.specialty_id}
-                                    error={$form.errors?.specialty_id}
+                                    value={$form.duration_per_appointment}
+                                    on:change={(e) => {
+                                        if (e.target.value == "999999") {
+                                            $form.prev_value_duration_per_appointment =
+                                                $form.duration_per_appointment;
+                                            showModal = true;
+                                            $form.duration_per_appointment = "";
+                                        } else {
+                                            $form.duration_per_appointment =
+                                                +e.target.value;
+                                            console.log(e.target.value, 5);
+                                            updateAllStartAppointmets();
+                                        }
+                                        // console.log('se ejecutó esto?')
+                                    }}
+                                    error={$form.errors
+                                        ?.duration_per_appointment}
                                     inputClasses={"bg-gray-200 px-2"}
                                 >
-                                    {#if $form.doctor_id}
-                                        {#each data.dataToCreateService.doctors.data.find((obj) => obj.id == $form.doctor_id)?.specialties as specialty}
-                                            <option value={specialty.id}
-                                                >{specialty.name}</option
-                                            >
-                                        {/each}
-                                    {/if}
+                                    {#each $form.duration_options
+                                        .slice()
+                                        .sort((a, b) => {
+                                            return a.value - b.value;
+                                        }) as { value, label }}
+                                        <option value={+value}>{label}</option>
+                                    {/each}
                                 </Input>
-                            </div>
-                        </fieldset>
+                            </fieldset>
 
-                        <fieldset
-                            class="border-b border-gray-300 flex gap-4 pb-4"
-                        >
-                            <iconify-icon
-                                icon="lets-icons:time-atack"
-                                class="mt-4"
-                            ></iconify-icon>
-                            <Input
-                                type="select"
-                                required={true}
-                                labelClasses={"font-bold"}
-                                label={"Duración de cada cita"}
-                                classes={"mt-3 w-auto"}
-                                value={$form.duration_per_appointment}
-                                on:change={(e) => {
-                                    if (e.target.value == "999999") {
-                                        $form.prev_value_duration_per_appointment =
-                                            $form.duration_per_appointment;
-                                        showModal = true;
-                                        $form.duration_per_appointment = "";
-                                    } else {
-                                        $form.duration_per_appointment =
-                                            +e.target.value;
-                                        console.log(e.target.value, 5);
-                                        updateAllStartAppointmets();
-                                    }
-                                    // console.log('se ejecutó esto?')
-                                }}
-                                error={$form.errors?.duration_per_appointment}
-                                inputClasses={"bg-gray-200 px-2"}
+                            <fieldset
+                                class="mt-6 border-b border-gray-300 pb-5 flex gap-4"
                             >
-                                {#each durationOptions.slice().sort((a, b) => {
-                                    return a.value - b.value;
-                                }) as { value, label }}
-                                    <option value={+value}>{label}</option>
-                                {/each}
-                            </Input>
-                        </fieldset>
-
-                        <fieldset
-                            class="mt-6 border-b border-gray-300 pb-5 flex gap-4"
-                        >
-                            <span>
-                                <iconify-icon icon="icon-park-outline:time"
-                                ></iconify-icon>
-                            </span>
-                            <section>
-                                <legend class="font-bold"
-                                    >Disponibilidad general</legend
-                                >
-                                <small
-                                    >Indica qué disponibilidad sueles tener para
-                                    citas</small
-                                >
-                                <ul
-                                    class=" flex flex-col space-y-2 mt-4 gap-y-1"
-                                >
-                                    <!-- svelte-ignore empty-block -->
-                                    {#each Object.entries($form.availability) as [day, shifts] (day)}
-                                        <li class="flex gap-4 justify-">
-                                            <span class="w-9 mt-2"
-                                                >{translateDays[day]}</span
-                                            >
-                                            {#if shifts.length >= 1}
-                                                <div
-                                                    class="gap-2 flex flex-col"
+                                <span>
+                                    <iconify-icon icon="icon-park-outline:time"
+                                    ></iconify-icon>
+                                </span>
+                                <section>
+                                    <legend class="font-bold"
+                                        >Disponibilidad general</legend
+                                    >
+                                    <small
+                                        >Indica qué disponibilidad sueles tener
+                                        para citas</small
+                                    >
+                                    <ul
+                                        class=" flex flex-col space-y-2 mt-4 gap-y-1"
+                                    >
+                                        <!-- svelte-ignore empty-block -->
+                                        {#each Object.entries($form.availability) as [day, shifts] (day)}
+                                            <li class="flex gap-4 justify-">
+                                                <span class="w-9 mt-2"
+                                                    >{translateDays[day]}</span
                                                 >
-                                                    {#each shifts as shift, indx (day + "_" + indx)}
-                                                        <div>
+                                                {#if shifts.length >= 1}
+                                                    <div
+                                                        class="gap-2 flex flex-col"
+                                                    >
+                                                        {#each shifts as shift, indx (day + "_" + indx)}
+                                                            <div>
+                                                                <div
+                                                                    class="flex gap-3 max-w-[340px]"
+                                                                >
+                                                                    <span
+                                                                        class="flex w-48 items-center justify-between bg-gray-200"
+                                                                    >
+                                                                        <Input
+                                                                            type="select"
+                                                                            classes={"mt-0 border-none flex-1"}
+                                                                            required={true}
+                                                                            inputClasses={"bg-gray-200  p-3 border-none appearance-none"}
+                                                                            bind:value={$form
+                                                                                .availability[
+                                                                                day
+                                                                            ][
+                                                                                indx
+                                                                            ]
+                                                                                .start}
+                                                                            error={$form
+                                                                                .errors
+                                                                                ?.availability?.[
+                                                                                day
+                                                                            ][
+                                                                                indx
+                                                                            ]
+                                                                                .start}
+                                                                            on:change={(
+                                                                                e,
+                                                                            ) => {
+                                                                                console.log(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                );
+
+                                                                                $form.availability[
+                                                                                    day
+                                                                                ][
+                                                                                    indx
+                                                                                ].appointments =
+                                                                                    GetStartAppointmets(
+                                                                                        {
+                                                                                            ...shift,
+                                                                                            start: e
+                                                                                                .target
+                                                                                                .value,
+                                                                                        },
+                                                                                    );
+                                                                                // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.booked_appointment_settings.time_between_appointment / 60) }, (_, index) => index)
+                                                                            }}
+                                                                        >
+                                                                            {#each optionsShift as shiftOption (shiftOption.value)}
+                                                                                {#if indx == 0 || shiftOption.value >= $form.availability[day][indx - 1]?.end}
+                                                                                    <option
+                                                                                        value={shiftOption.value}
+                                                                                    >
+                                                                                        {shiftOption.label}
+                                                                                    </option>
+                                                                                {/if}
+                                                                            {/each}
+                                                                        </Input>
+                                                                        <span
+                                                                            class="p-1 px-1 font-bold"
+                                                                        >
+                                                                            -
+                                                                        </span>
+                                                                        <Input
+                                                                            type="select"
+                                                                            classes={"mt-0 flex-1 text-right"}
+                                                                            inputClasses={"bg-gray-200 text-right p-3 border-none appearance-none"}
+                                                                            bind:value={$form
+                                                                                .availability[
+                                                                                day
+                                                                            ][
+                                                                                indx
+                                                                            ]
+                                                                                .end}
+                                                                            on:change={(
+                                                                                e,
+                                                                            ) => {
+                                                                                $form.availability[
+                                                                                    day
+                                                                                ][
+                                                                                    indx
+                                                                                ].appointments =
+                                                                                    GetStartAppointmets(
+                                                                                        {
+                                                                                            ...shift,
+                                                                                            end: e
+                                                                                                .target
+                                                                                                .value,
+                                                                                        },
+                                                                                    );
+                                                                                // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.booked_appointment_settings.time_between_appointment / 60) }, (_, index) => index)
+                                                                            }}
+                                                                            required={true}
+                                                                        >
+                                                                            <option
+                                                                                value=""
+
+                                                                            ></option>
+                                                                            {#each optionsShift as shiftOption (shiftOption.value)}
+                                                                                {#if shiftOption.value > $form.availability[day][indx].start}
+                                                                                    <option
+                                                                                        value={shiftOption.value}
+                                                                                    >
+                                                                                        {shiftOption.label}
+                                                                                    </option>
+                                                                                {/if}
+                                                                            {/each}
+                                                                        </Input>
+                                                                        <!-- {} -->
+                                                                    </span>
+                                                                    <span
+                                                                        class="grid grid-cols-3 items-center gap-3 text-xl"
+                                                                    >
+                                                                        <button
+                                                                            on:click={(
+                                                                                e,
+                                                                            ) => {
+                                                                                $form.availability[
+                                                                                    day
+                                                                                ] =
+                                                                                    [
+                                                                                        ...$form.availability[
+                                                                                            day
+                                                                                        ].filter(
+                                                                                            (
+                                                                                                v,
+                                                                                                i,
+                                                                                            ) =>
+                                                                                                i !=
+                                                                                                indx,
+                                                                                        ),
+                                                                                    ];
+                                                                            }}
+                                                                            type="button"
+                                                                            class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
+                                                                            title="No disponible"
+                                                                        >
+                                                                            <iconify-icon
+                                                                                icon="ic:baseline-block"
+
+                                                                            ></iconify-icon>
+                                                                        </button>
+                                                                        {#if indx == 0}
+                                                                            <button
+                                                                                on:click={(
+                                                                                    e,
+                                                                                ) => {
+                                                                                    $form.availability[
+                                                                                        day
+                                                                                    ] =
+                                                                                        [
+                                                                                            ...$form
+                                                                                                .availability[
+                                                                                                day
+                                                                                            ],
+                                                                                            {
+                                                                                                start:
+                                                                                                    (
+                                                                                                        +shifts[
+                                                                                                            shifts.length -
+                                                                                                                1
+                                                                                                        ].end.split(
+                                                                                                            ":",
+                                                                                                        )[0] +
+                                                                                                        1
+                                                                                                    )
+                                                                                                        .toString()
+                                                                                                        .padStart(
+                                                                                                            2,
+                                                                                                            "0",
+                                                                                                        ) +
+                                                                                                    ":00",
+                                                                                                end:
+                                                                                                    (
+                                                                                                        +shifts[
+                                                                                                            shifts.length -
+                                                                                                                1
+                                                                                                        ].end.split(
+                                                                                                            ":",
+                                                                                                        )[0] +
+                                                                                                        2
+                                                                                                    )
+                                                                                                        .toString()
+                                                                                                        .padStart(
+                                                                                                            2,
+                                                                                                            "0",
+                                                                                                        ) +
+                                                                                                    ":00",
+                                                                                                appointments:
+                                                                                                    GetStartAppointmets(
+                                                                                                        {
+                                                                                                            start:
+                                                                                                                (
+                                                                                                                    +shifts[
+                                                                                                                        shifts.length -
+                                                                                                                            1
+                                                                                                                    ].end.split(
+                                                                                                                        ":",
+                                                                                                                    )[0] +
+                                                                                                                    1
+                                                                                                                )
+                                                                                                                    .toString()
+                                                                                                                    .padStart(
+                                                                                                                        2,
+                                                                                                                        "0",
+                                                                                                                    ) +
+                                                                                                                ":00",
+                                                                                                            end:
+                                                                                                                (
+                                                                                                                    +shifts[
+                                                                                                                        shifts.length -
+                                                                                                                            1
+                                                                                                                    ].end.split(
+                                                                                                                        ":",
+                                                                                                                    )[0] +
+                                                                                                                    2
+                                                                                                                )
+                                                                                                                    .toString()
+                                                                                                                    .padStart(
+                                                                                                                        2,
+                                                                                                                        "0",
+                                                                                                                    ) +
+                                                                                                                ":00",
+                                                                                                        },
+                                                                                                    ),
+                                                                                            },
+                                                                                        ];
+                                                                                }}
+                                                                                type="button"
+                                                                                class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
+                                                                                title="Añadir otro turno a este día"
+                                                                            >
+                                                                                <iconify-icon
+                                                                                    icon="gala:add"
+
+                                                                                ></iconify-icon>
+                                                                            </button>
+                                                                            <button
+                                                                                on:click={(
+                                                                                    e,
+                                                                                ) => {
+                                                                                    let copyDay =
+                                                                                        [
+                                                                                            ...$form
+                                                                                                .availability[
+                                                                                                day
+                                                                                            ],
+                                                                                        ]; // Shallow copy for array of objects
+                                                                                    Object.keys(
+                                                                                        $form.availability,
+                                                                                    ).forEach(
+                                                                                        (
+                                                                                            days,
+                                                                                        ) => {
+                                                                                            $form.availability[
+                                                                                                days
+                                                                                            ] =
+                                                                                                copyDay.map(
+                                                                                                    (
+                                                                                                        shift,
+                                                                                                    ) => ({
+                                                                                                        ...shift,
+                                                                                                    }),
+                                                                                                ); // Create a new object for each shift
+                                                                                        },
+                                                                                    );
+                                                                                }}
+                                                                                type="button"
+                                                                                class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
+                                                                                title="Copiar este horario en todos"
+                                                                            >
+                                                                                <iconify-icon
+                                                                                    class="text-2xl"
+                                                                                    icon="material-symbols-light:content-copy-outline"
+
+                                                                                ></iconify-icon>
+                                                                            </button>
+                                                                        {/if}
+                                                                    </span>
+                                                                </div>
+                                                                <div
+                                                                    class="relative pr-3"
+                                                                >
+                                                                    <p
+                                                                        class="text-red text-sm leading-4"
+                                                                    >
+                                                                        {#if timeDifference($form.availability[day][indx].start, $form.availability[day][indx].end) < $form.duration_per_appointment}
+                                                                            La
+                                                                            duración
+                                                                            de
+                                                                            la
+                                                                            cita
+                                                                            es
+                                                                            mayor
+                                                                            que
+                                                                            el
+                                                                            intervalo
+                                                                            de
+                                                                            tiempo
+                                                                        {/if}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        {/each}
+                                                    </div>
+                                                {:else}
+                                                    <p
+                                                        class="opacity-60 w-48 py-2"
+                                                    >
+                                                        No disponible
+                                                    </p>
+                                                    <span
+                                                        class="grid grid-cols-3 items-center gap-3 text-xl"
+                                                    >
+                                                        <span> </span>
+
+                                                        <button
+                                                            on:click={(e) => {
+                                                                $form.availability[
+                                                                    day
+                                                                ] = [
+                                                                    ...$form
+                                                                        .availability[
+                                                                        day
+                                                                    ],
+                                                                    {
+                                                                        start: "08:00",
+                                                                        end: "16:00",
+                                                                        appointments:
+                                                                            GetStartAppointmets(
+                                                                                {
+                                                                                    start: "08:00",
+                                                                                    end: "16:00",
+                                                                                },
+                                                                            ),
+                                                                    },
+                                                                ];
+                                                            }}
+                                                            type="button"
+                                                            class="relative cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
+                                                            title="Añadir otro turno a este día"
+                                                        >
+                                                            <iconify-icon
+                                                                icon="gala:add"
+                                                            ></iconify-icon>
+                                                        </button>
+                                                        <span> </span>
+                                                    </span>
+                                                {/if}
+                                            </li>
+                                        {/each}
+                                    </ul>
+                                </section>
+                            </fieldset>
+
+                            <fieldset
+                                class="mt-2 border-b border-gray-300 pb-4 flex gap-4"
+                            >
+                                <span>
+                                    <iconify-icon
+                                        icon="fa-solid:exchange-alt"
+                                        class="pt-2"
+                                    ></iconify-icon>
+                                </span>
+                                <section class="w-full">
+                                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                    <div
+                                        class="p-2 flex justify-between hover:bg-gray-200 cursor-pointer w-full"
+                                        on:click={(e) => {
+                                            acordion.franja = !acordion.franja;
+                                        }}
+                                    >
+                                        <div>
+                                            <legend class="font-bold"
+                                                >Franja de programación</legend
+                                            >
+                                            <small class="inline-block">
+                                                {#if acordion.franja}
+                                                    Limita el rango de tiempo en
+                                                    que se puede agendar una
+                                                    cita
+                                                {:else}
+                                                    Desde 60 días de antelación
+                                                    hasta 4 horas antes
+                                                {/if}
+                                            </small>
+                                        </div>
+                                        <iconify-icon
+                                            icon="iconamoon:arrow-down-2-duotone"
+                                        ></iconify-icon>
+                                    </div>
+                                    {#if acordion.franja}
+                                        <div class="p-2 mt-1">
+                                            <label
+                                                class="flex gap-3 items-center mb-3"
+                                            >
+                                                <input
+                                                    bind:group={$form
+                                                        .programming_slot
+                                                        .available_now_check}
+                                                    type="radio"
+                                                    class="w-5 h-5"
+                                                    name="time_available_type"
+                                                    value={1}
+                                                />
+                                                <span>Ya disponible</span>
+                                            </label>
+                                            <label
+                                                class="flex gap-3 items-center mb-3"
+                                            >
+                                                <input
+                                                    bind:group={$form
+                                                        .programming_slot
+                                                        .available_now_check}
+                                                    type="radio"
+                                                    class="w-5 h-5"
+                                                    name="available_now_check"
+                                                    value={0}
+                                                    on:change={() => {
+                                                        if (
+                                                            $form
+                                                                .programming_slot
+                                                                .available_now_check ==
+                                                            0
+                                                        ) {
+                                                            showModalFranja = true;
+                                                        }
+                                                    }}
+                                                />
+                                                <div class="leading-4">
+                                                    <p>
+                                                        Fechas de inicio y
+                                                        finalización
+                                                    </p>
+                                                    <small
+                                                        >Limita el intervalo de
+                                                        fechas en todas las
+                                                        citas</small
+                                                    >
+                                                </div>
+                                            </label>
+
+                                            <small
+                                                class="mt-4 mb-2 inline-block"
+                                                >Tiempo máximo de antelación con
+                                                el que se puede reservar una
+                                                cita
+                                            </small>
+                                            <span
+                                                class={`flex items-center gap-3`}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    class="w-6 h-6"
+                                                    bind:checked={$form
+                                                        .programming_slot
+                                                        .allow_max_reservation_time_before_appointment}
+                                                />
+                                                <Input
+                                                    type="number"
+                                                    disabled={!$form
+                                                        .programming_slot
+                                                        .allow_max_reservation_time_before_appointment}
+                                                    classes={"w-16 mt-0"}
+                                                    bind:value={$form
+                                                        .programming_slot
+                                                        .max_reservation_time_before_appointment}
+                                                    error={$form.errors
+                                                        ?.max_reservation_time_before_appointment}
+                                                />
+                                                <span
+                                                    class={`${!$form.programming_slot.allow_max_reservation_time_before_appointment ? "opacity-80" : ""}`}
+                                                >
+                                                    días
+                                                </span>
+                                            </span>
+                                            <small
+                                                class="mt-4 mb-2 inline-block"
+                                                >Tiempo mínimo antes del inicio
+                                                de la cita para poder reservarla
+                                            </small>
+                                            <span
+                                                class={` flex items-center gap-3`}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    class="w-6 h-6"
+                                                    bind:checked={$form
+                                                        .programming_slot
+                                                        .allow_min_reservation_time_before_appointment}
+                                                />
+                                                <Input
+                                                    type="number"
+                                                    disabled={!$form
+                                                        .programming_slot
+                                                        .allow_min_reservation_time_before_appointment}
+                                                    classes={"w-16 mt-0"}
+                                                    bind:value={$form
+                                                        .programming_slot
+                                                        .min_reservation_time_before_appointment}
+                                                    error={$form.errors
+                                                        ?.min_reservation_time_before_appointment}
+                                                />
+                                                <span
+                                                    class={`${!$form.programming_slot.allow_min_reservation_time_before_appointment ? "opacity-80" : ""}`}
+                                                >
+                                                    horas
+                                                </span>
+                                            </span>
+                                        </div>
+                                    {/if}
+                                </section>
+                            </fieldset>
+
+                            <fieldset
+                                class="mt-2 border-b border-gray-300 pb-4 flex gap-1"
+                            >
+                                <span class="pt-2">
+                                    <iconify-icon
+                                        icon="ant-design:reload-time-outline"
+                                    ></iconify-icon>
+                                </span>
+                                <section class="p-2">
+                                    <legend class="font-bold"
+                                        >Disponibilidad ajustada</legend
+                                    >
+                                    <small class="mb-5 inline-block"
+                                        >Indica a qué horas estás disponible en
+                                        fechas concretas</small
+                                    >
+                                    <ul
+                                        class="flex flex-col space-y-2 relative -left-3"
+                                    >
+                                        {#each $form.adjusted_availability as adjust_date, indxDate}
+                                            <li
+                                                class="flex gap-2 justify-between mb-3"
+                                            >
+                                                <span class="h-max">
+                                                    <DatePicker
+                                                        on:datechange={(e) =>
+                                                            onDateChange(
+                                                                e,
+                                                                indxDate,
+                                                            )}
+                                                        selected={adjust_date.date}
+                                                        isAllowed={(date) => {
+                                                            const millisecs =
+                                                                date.getTime();
+                                                            if (
+                                                                millisecs +
+                                                                    25 *
+                                                                        3600 *
+                                                                        1000 <
+                                                                Date.now()
+                                                            )
+                                                                return false;
+                                                            if (
+                                                                millisecs >
+                                                                Date.now() +
+                                                                    3600 *
+                                                                        24 *
+                                                                        45 *
+                                                                        10000
+                                                            )
+                                                                return false;
+                                                            return true;
+                                                        }}
+                                                    />
+                                                    {#if $form?.adjusted_availability.some((obj, i) => obj.date == adjust_date.date && i != indxDate)}
+                                                        <p
+                                                            class="text-red text-sm leading-4"
+                                                        >
+                                                            Fechas iguales han
+                                                            sido añadidas más de
+                                                            una vez
+                                                        </p>
+                                                    {/if}
+                                                </span>
+                                                <!-- <input
+                                    type="date"
+                                    class="px-2 p-1 flex-grow-0 h-10"
+                                    bind:value={$form.adjusted_availability[
+                                        indxDate
+                                    ].date}
+                                /> -->
+                                                {#if adjust_date.shifts.length >= 1}
+                                                    <div
+                                                        class="gap-2 flex flex-col"
+                                                    >
+                                                        {#each adjust_date.shifts as shift, indxShift}
                                                             <div
-                                                                class="flex gap-3 max-w-[340px]"
+                                                                class="flex gap-3"
                                                             >
                                                                 <span
                                                                     class="flex w-48 items-center justify-between bg-gray-200"
                                                                 >
                                                                     <Input
                                                                         type="select"
-                                                                        classes={"mt-0 border-none flex-1"}
-                                                                        required={true}
-                                                                        inputClasses={"bg-gray-200  p-3 border-none appearance-none"}
+                                                                        classes={"mt-0 border-none flex-auto text-center"}
                                                                         bind:value={$form
-                                                                            .availability[
-                                                                            day
-                                                                        ][indx]
-                                                                            .start}
-                                                                        error={$form
-                                                                            .errors
-                                                                            ?.availability?.[
-                                                                            day
-                                                                        ][indx]
-                                                                            .start}
+                                                                            .adjusted_availability[
+                                                                            indxDate
+                                                                        ]
+                                                                            .shifts[
+                                                                            indxShift
+                                                                        ].start}
                                                                         on:change={(
                                                                             e,
                                                                         ) => {
-                                                                            console.log(
-                                                                                e
-                                                                                    .target
-                                                                                    .value,
-                                                                            );
-
-                                                                            $form.availability[
-                                                                                day
-                                                                            ][
-                                                                                indx
+                                                                            $form.adjusted_availability[
+                                                                                indxDate
+                                                                            ].shifts[
+                                                                                indxShift
                                                                             ].appointments =
                                                                                 GetStartAppointmets(
                                                                                     {
@@ -1096,9 +1714,10 @@
                                                                                 );
                                                                             // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.booked_appointment_settings.time_between_appointment / 60) }, (_, index) => index)
                                                                         }}
+                                                                        inputClasses={"bg-gray-200 p-3 px-2 border-none appearance-none"}
                                                                     >
                                                                         {#each optionsShift as shiftOption (shiftOption.value)}
-                                                                            {#if indx == 0 || shiftOption.value >= $form.availability[day][indx - 1]?.end}
+                                                                            {#if indxShift == 0 || shiftOption.value >= adjust_date.shifts[indxShift - 1]?.end}
                                                                                 <option
                                                                                     value={shiftOption.value}
                                                                                 >
@@ -1114,20 +1733,22 @@
                                                                     </span>
                                                                     <Input
                                                                         type="select"
-                                                                        classes={"mt-0 flex-1 text-right"}
-                                                                        inputClasses={"bg-gray-200 text-right p-3 border-none appearance-none"}
+                                                                        classes={"mt-0 flex-auto text-center"}
+                                                                        inputClasses={"bg-gray-200 p-3  px-2 border-none appearance-none"}
                                                                         bind:value={$form
-                                                                            .availability[
-                                                                            day
-                                                                        ][indx]
-                                                                            .end}
+                                                                            .adjusted_availability[
+                                                                            indxDate
+                                                                        ]
+                                                                            .shifts[
+                                                                            indxShift
+                                                                        ].end}
                                                                         on:change={(
                                                                             e,
                                                                         ) => {
-                                                                            $form.availability[
-                                                                                day
-                                                                            ][
-                                                                                indx
+                                                                            $form.adjusted_availability[
+                                                                                indxDate
+                                                                            ].shifts[
+                                                                                indxShift
                                                                             ].appointments =
                                                                                 GetStartAppointmets(
                                                                                     {
@@ -1139,14 +1760,13 @@
                                                                                 );
                                                                             // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.booked_appointment_settings.time_between_appointment / 60) }, (_, index) => index)
                                                                         }}
-                                                                        required={true}
                                                                     >
                                                                         <option
                                                                             value=""
 
                                                                         ></option>
                                                                         {#each optionsShift as shiftOption (shiftOption.value)}
-                                                                            {#if shiftOption.value > $form.availability[day][indx].start}
+                                                                            {#if shiftOption.value > $form.adjusted_availability[indxDate].shifts[indxShift].start}
                                                                                 <option
                                                                                     value={shiftOption.value}
                                                                                 >
@@ -1155,30 +1775,28 @@
                                                                             {/if}
                                                                         {/each}
                                                                     </Input>
-                                                                    <!-- {} -->
                                                                 </span>
                                                                 <span
-                                                                    class="grid grid-cols-3 items-center gap-3 text-xl"
+                                                                    class="grid grid-cols-3 items-center gap-4 text-xl flex-auto"
                                                                 >
                                                                     <button
                                                                         on:click={(
                                                                             e,
                                                                         ) => {
-                                                                            $form.availability[
-                                                                                day
+                                                                            $form.adjusted_availability[
+                                                                                indxDate
                                                                             ] =
-                                                                                [
-                                                                                    ...$form.availability[
-                                                                                        day
-                                                                                    ].filter(
+                                                                                {
+                                                                                    ...adjust_date,
+                                                                                    shifts: adjust_date.shifts.filter(
                                                                                         (
                                                                                             v,
                                                                                             i,
                                                                                         ) =>
                                                                                             i !=
-                                                                                            indx,
+                                                                                            indxShift,
                                                                                     ),
-                                                                                ];
+                                                                                };
                                                                         }}
                                                                         type="button"
                                                                         class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
@@ -1189,91 +1807,58 @@
 
                                                                         ></iconify-icon>
                                                                     </button>
-                                                                    {#if indx == 0}
+                                                                    {#if indxShift == 0}
                                                                         <button
                                                                             on:click={(
                                                                                 e,
                                                                             ) => {
-                                                                                $form.availability[
-                                                                                    day
+                                                                                $form.adjusted_availability[
+                                                                                    indxDate
                                                                                 ] =
-                                                                                    [
-                                                                                        ...$form
-                                                                                            .availability[
-                                                                                            day
-                                                                                        ],
-                                                                                        {
-                                                                                            start:
-                                                                                                (
-                                                                                                    +shifts[
-                                                                                                        shifts.length -
-                                                                                                            1
-                                                                                                    ].end.split(
-                                                                                                        ":",
-                                                                                                    )[0] +
-                                                                                                    1
-                                                                                                )
-                                                                                                    .toString()
-                                                                                                    .padStart(
-                                                                                                        2,
-                                                                                                        "0",
-                                                                                                    ) +
-                                                                                                ":00",
-                                                                                            end:
-                                                                                                (
-                                                                                                    +shifts[
-                                                                                                        shifts.length -
-                                                                                                            1
-                                                                                                    ].end.split(
-                                                                                                        ":",
-                                                                                                    )[0] +
-                                                                                                    2
-                                                                                                )
-                                                                                                    .toString()
-                                                                                                    .padStart(
-                                                                                                        2,
-                                                                                                        "0",
-                                                                                                    ) +
-                                                                                                ":00",
-                                                                                            appointments:
-                                                                                                GetStartAppointmets(
-                                                                                                    {
-                                                                                                        start:
-                                                                                                            (
-                                                                                                                +shifts[
-                                                                                                                    shifts.length -
-                                                                                                                        1
-                                                                                                                ].end.split(
-                                                                                                                    ":",
-                                                                                                                )[0] +
+                                                                                    {
+                                                                                        ...adjust_date,
+                                                                                        shifts: [
+                                                                                            ...adjust_date.shifts,
+                                                                                            {
+                                                                                                start:
+                                                                                                    (
+                                                                                                        +adjust_date.shifts[
+                                                                                                            adjust_date
+                                                                                                                .shifts
+                                                                                                                .length -
                                                                                                                 1
-                                                                                                            )
-                                                                                                                .toString()
-                                                                                                                .padStart(
-                                                                                                                    2,
-                                                                                                                    "0",
-                                                                                                                ) +
-                                                                                                            ":00",
-                                                                                                        end:
-                                                                                                            (
-                                                                                                                +shifts[
-                                                                                                                    shifts.length -
-                                                                                                                        1
-                                                                                                                ].end.split(
-                                                                                                                    ":",
-                                                                                                                )[0] +
-                                                                                                                2
-                                                                                                            )
-                                                                                                                .toString()
-                                                                                                                .padStart(
-                                                                                                                    2,
-                                                                                                                    "0",
-                                                                                                                ) +
-                                                                                                            ":00",
-                                                                                                    },
-                                                                                                ),
-                                                                                        },
-                                                                                    ];
+                                                                                                        ].end.split(
+                                                                                                            ":",
+                                                                                                        )[0] +
+                                                                                                        1
+                                                                                                    )
+                                                                                                        .toString()
+                                                                                                        .padStart(
+                                                                                                            2,
+                                                                                                            "0",
+                                                                                                        ) +
+                                                                                                    ":00",
+                                                                                                end:
+                                                                                                    (
+                                                                                                        +adjust_date.shifts[
+                                                                                                            adjust_date
+                                                                                                                .shifts
+                                                                                                                .length -
+                                                                                                                1
+                                                                                                        ].end.split(
+                                                                                                            ":",
+                                                                                                        )[0] +
+                                                                                                        2
+                                                                                                    )
+                                                                                                        .toString()
+                                                                                                        .padStart(
+                                                                                                            2,
+                                                                                                            "0",
+                                                                                                        ) +
+                                                                                                    ":00",
+                                                                                            },
+                                                                                        ],
+                                                                                    };
                                                                             }}
                                                                             type="button"
                                                                             class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
@@ -1288,953 +1873,501 @@
                                                                             on:click={(
                                                                                 e,
                                                                             ) => {
-                                                                                let copyDay =
-                                                                                    [
-                                                                                        ...$form
-                                                                                            .availability[
-                                                                                            day
-                                                                                        ],
-                                                                                    ]; // Shallow copy for array of objects
-                                                                                Object.keys(
-                                                                                    $form.availability,
-                                                                                ).forEach(
-                                                                                    (
-                                                                                        days,
-                                                                                    ) => {
-                                                                                        $form.availability[
-                                                                                            days
-                                                                                        ] =
-                                                                                            copyDay.map(
-                                                                                                (
-                                                                                                    shift,
-                                                                                                ) => ({
-                                                                                                    ...shift,
-                                                                                                }),
-                                                                                            ); // Create a new object for each shift
-                                                                                    },
-                                                                                );
+                                                                                $form.adjusted_availability =
+                                                                                    $form?.adjusted_availability.filter(
+                                                                                        (
+                                                                                            v,
+                                                                                            i,
+                                                                                        ) =>
+                                                                                            i !=
+                                                                                            indxDate,
+                                                                                    );
                                                                             }}
                                                                             type="button"
                                                                             class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
-                                                                            title="Copiar este horario en todos"
+                                                                            title="Eliminar esta fecha"
                                                                         >
                                                                             <iconify-icon
-                                                                                class="text-2xl"
-                                                                                icon="material-symbols-light:content-copy-outline"
+                                                                                icon="ic:outline-close"
 
                                                                             ></iconify-icon>
+                                                                            <!-- <iconify-icon
+                                                        class="text-2xl"
+                                                        icon="material-symbols-light:content-copy-outline"
+                                                    ></iconify-icon> -->
                                                                         </button>
                                                                     {/if}
                                                                 </span>
                                                             </div>
-                                                            <div
-                                                                class="relative pr-3"
-                                                            >
-                                                                <p
-                                                                    class="text-red text-sm leading-4"
-                                                                >
-                                                                    {#if timeDifference($form.availability[day][indx].start, $form.availability[day][indx].end) < $form.duration_per_appointment}
-                                                                        La
-                                                                        duración
-                                                                        de la
-                                                                        cita es
-                                                                        mayor
-                                                                        que el
-                                                                        intervalo
-                                                                        de
-                                                                        tiempo
-                                                                    {/if}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    {/each}
-                                                </div>
-                                            {:else}
-                                                <p class="opacity-60 w-48 py-2">
-                                                    No disponible
-                                                </p>
-                                                <span
-                                                    class="grid grid-cols-3 items-center gap-3 text-xl"
-                                                >
-                                                    <span> </span>
-
-                                                    <button
-                                                        on:click={(e) => {
-                                                            $form.availability[
-                                                                day
-                                                            ] = [
-                                                                ...$form
-                                                                    .availability[
-                                                                    day
-                                                                ],
-                                                                {
-                                                                    start: "08:00",
-                                                                    end: "16:00",
-                                                                    appointments:
-                                                                        GetStartAppointmets(
-                                                                            {
-                                                                                start: "08:00",
-                                                                                end: "16:00",
-                                                                            },
-                                                                        ),
-                                                                },
-                                                            ];
-                                                        }}
-                                                        type="button"
-                                                        class="relative cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
-                                                        title="Añadir otro turno a este día"
-                                                    >
-                                                        <iconify-icon
-                                                            icon="gala:add"
-                                                        ></iconify-icon>
-                                                    </button>
-                                                    <span> </span>
-                                                </span>
-                                            {/if}
-                                        </li>
-                                    {/each}
-                                </ul>
-                            </section>
-                        </fieldset>
-
-                        <fieldset
-                            class="mt-2 border-b border-gray-300 pb-4 flex gap-4"
-                        >
-                            <span>
-                                <iconify-icon
-                                    icon="fa-solid:exchange-alt"
-                                    class="pt-2"
-                                ></iconify-icon>
-                            </span>
-                            <section class="w-full">
-                                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                                <div
-                                    class="p-2 flex justify-between hover:bg-gray-200 cursor-pointer w-full"
-                                    on:click={(e) => {
-                                        acordion.franja = !acordion.franja;
-                                    }}
-                                >
-                                    <div>
-                                        <legend class="font-bold"
-                                            >Franja de programación</legend
-                                        >
-                                        <small class="inline-block">
-                                            {#if acordion.franja}
-                                                Limita el rango de tiempo en que
-                                                se puede agendar una cita
-                                            {:else}
-                                                Desde 60 días de antelación
-                                                hasta 4 horas antes
-                                            {/if}
-                                        </small>
-                                    </div>
-                                    <iconify-icon
-                                        icon="iconamoon:arrow-down-2-duotone"
-                                    ></iconify-icon>
-                                </div>
-                                {#if acordion.franja}
-                                    <div class="p-2 mt-1">
-                                        <label
-                                            class="flex gap-3 items-center mb-3"
-                                        >
-                                            <input
-                                                bind:group={$form
-                                                    .programming_slot
-                                                    .available_now_check}
-                                                type="radio"
-                                                class="w-5 h-5"
-                                                name="time_available_type"
-                                                value={1}
-                                            />
-                                            <span>Ya disponible</span>
-                                        </label>
-                                        <label
-                                            class="flex gap-3 items-center mb-3"
-                                        >
-                                            <input
-                                                bind:group={$form
-                                                    .programming_slot
-                                                    .available_now_check}
-                                                type="radio"
-                                                class="w-5 h-5"
-                                                name="available_now_check"
-                                                value={0}
-                                                on:change={() => {
-                                                    if (
-                                                        $form.programming_slot
-                                                            .available_now_check ==
-                                                        0
-                                                    ) {
-                                                        showModalFranja = true;
-                                                    }
-                                                }}
-                                            />
-                                            <div class="leading-4">
-                                                <p>
-                                                    Fechas de inicio y
-                                                    finalización
-                                                </p>
-                                                <small
-                                                    >Limita el intervalo de
-                                                    fechas en todas las citas</small
-                                                >
-                                            </div>
-                                        </label>
-
-                                        <small class="mt-4 mb-2 inline-block"
-                                            >Tiempo máximo de antelación con el
-                                            que se puede reservar una cita
-                                        </small>
-                                        <span class={`flex items-center gap-3`}>
-                                            <input
-                                                type="checkbox"
-                                                class="w-6 h-6"
-                                                bind:checked={$form
-                                                    .programming_slot
-                                                    .allow_max_reservation_time_before_appointment}
-                                            />
-                                            <Input
-                                                type="number"
-                                                disabled={!$form
-                                                    .programming_slot
-                                                    .allow_max_reservation_time_before_appointment}
-                                                classes={"w-16 mt-0"}
-                                                bind:value={$form
-                                                    .programming_slot
-                                                    .max_reservation_time_before_appointment}
-                                                error={$form.errors
-                                                    ?.max_reservation_time_before_appointment}
-                                            />
-                                            <span
-                                                class={`${!$form.programming_slot.allow_max_reservation_time_before_appointment ? "opacity-80" : ""}`}
-                                            >
-                                                días
-                                            </span>
-                                        </span>
-                                        <small class="mt-4 mb-2 inline-block"
-                                            >Tiempo mínimo antes del inicio de
-                                            la cita para poder reservarla
-                                        </small>
-                                        <span
-                                            class={` flex items-center gap-3`}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                class="w-6 h-6"
-                                                bind:checked={$form
-                                                    .programming_slot
-                                                    .allow_min_reservation_time_before_appointment}
-                                            />
-                                            <Input
-                                                type="number"
-                                                disabled={!$form
-                                                    .programming_slot
-                                                    .allow_min_reservation_time_before_appointment}
-                                                classes={"w-16 mt-0"}
-                                                bind:value={$form
-                                                    .programming_slot
-                                                    .min_reservation_time_before_appointment}
-                                                error={$form.errors
-                                                    ?.min_reservation_time_before_appointment}
-                                            />
-                                            <span
-                                                class={`${!$form.programming_slot.allow_min_reservation_time_before_appointment ? "opacity-80" : ""}`}
-                                            >
-                                                horas
-                                            </span>
-                                        </span>
-                                    </div>
-                                {/if}
-                            </section>
-                        </fieldset>
-
-                        <fieldset
-                            class="mt-2 border-b border-gray-300 pb-4 flex gap-1"
-                        >
-                            <span class="pt-2">
-                                <iconify-icon
-                                    icon="ant-design:reload-time-outline"
-                                ></iconify-icon>
-                            </span>
-                            <section class="p-2">
-                                <legend class="font-bold"
-                                    >Disponibilidad ajustada</legend
-                                >
-                                <small class="mb-5 inline-block"
-                                    >Indica a qué horas estás disponible en
-                                    fechas concretas</small
-                                >
-                                <ul
-                                    class="flex flex-col space-y-2 relative -left-3"
-                                >
-                                    {#each $form.adjusted_availability as adjust_date, indxDate}
-                                        <li
-                                            class="flex gap-2 justify-between mb-3"
-                                        >
-                                            <span class="h-max">
-                                                <DatePicker
-                                                    on:datechange={(e) =>
-                                                        onDateChange(
-                                                            e,
-                                                            indxDate,
-                                                        )}
-                                                    selected={adjust_date.date}
-                                                    isAllowed={(date) => {
-                                                        const millisecs =
-                                                            date.getTime();
-                                                        if (
-                                                            millisecs +
-                                                                25 *
-                                                                    3600 *
-                                                                    1000 <
-                                                            Date.now()
-                                                        )
-                                                            return false;
-                                                        if (
-                                                            millisecs >
-                                                            Date.now() +
-                                                                3600 *
-                                                                    24 *
-                                                                    45 *
-                                                                    10000
-                                                        )
-                                                            return false;
-                                                        return true;
-                                                    }}
-                                                />
-                                                {#if $form.adjusted_availability.some((obj, i) => obj.date == adjust_date.date && i != indxDate)}
+                                                        {/each}
+                                                    </div>
+                                                {:else}
                                                     <p
-                                                        class="text-red text-sm leading-4"
+                                                        class="opacity-60 w-48 py-2"
                                                     >
-                                                        Fechas iguales han sido
-                                                        añadidas más de una vez
+                                                        No disponible
                                                     </p>
-                                                {/if}
-                                            </span>
-                                            <!-- <input
-                                    type="date"
-                                    class="px-2 p-1 flex-grow-0 h-10"
-                                    bind:value={$form.adjusted_availability[
-                                        indxDate
-                                    ].date}
-                                /> -->
-                                            {#if adjust_date.shifts.length >= 1}
-                                                <div
-                                                    class="gap-2 flex flex-col"
-                                                >
-                                                    {#each adjust_date.shifts as shift, indxShift}
-                                                        <div class="flex gap-3">
-                                                            <span
-                                                                class="flex w-48 items-center justify-between bg-gray-200"
-                                                            >
-                                                                <Input
-                                                                    type="select"
-                                                                    classes={"mt-0 border-none flex-auto text-center"}
-                                                                    bind:value={$form
-                                                                        .adjusted_availability[
-                                                                        indxDate
-                                                                    ].shifts[
-                                                                        indxShift
-                                                                    ].start}
-                                                                    on:change={(
-                                                                        e,
-                                                                    ) => {
-                                                                        $form.adjusted_availability[
-                                                                            indxDate
-                                                                        ].shifts[
-                                                                            indxShift
-                                                                        ].appointments =
-                                                                            GetStartAppointmets(
-                                                                                {
-                                                                                    ...shift,
-                                                                                    start: e
-                                                                                        .target
-                                                                                        .value,
-                                                                                },
-                                                                            );
-                                                                        // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.booked_appointment_settings.time_between_appointment / 60) }, (_, index) => index)
-                                                                    }}
-                                                                    inputClasses={"bg-gray-200 p-3 px-2 border-none appearance-none"}
-                                                                >
-                                                                    {#each optionsShift as shiftOption (shiftOption.value)}
-                                                                        {#if indxShift == 0 || shiftOption.value >= adjust_date.shifts[indxShift - 1]?.end}
-                                                                            <option
-                                                                                value={shiftOption.value}
-                                                                            >
-                                                                                {shiftOption.label}
-                                                                            </option>
-                                                                        {/if}
-                                                                    {/each}
-                                                                </Input>
-                                                                <span
-                                                                    class="p-1 px-1 font-bold"
-                                                                >
-                                                                    -
-                                                                </span>
-                                                                <Input
-                                                                    type="select"
-                                                                    classes={"mt-0 flex-auto text-center"}
-                                                                    inputClasses={"bg-gray-200 p-3  px-2 border-none appearance-none"}
-                                                                    bind:value={$form
-                                                                        .adjusted_availability[
-                                                                        indxDate
-                                                                    ].shifts[
-                                                                        indxShift
-                                                                    ].end}
-                                                                    on:change={(
-                                                                        e,
-                                                                    ) => {
-                                                                        $form.adjusted_availability[
-                                                                            indxDate
-                                                                        ].shifts[
-                                                                            indxShift
-                                                                        ].appointments =
-                                                                            GetStartAppointmets(
-                                                                                {
-                                                                                    ...shift,
-                                                                                    end: e
-                                                                                        .target
-                                                                                        .value,
-                                                                                },
-                                                                            );
-                                                                        // Array.from({ length: calculateAppointments(GetHeight(shift.start, shift.end), $form.duration_per_appointment / 60, $form.booked_appointment_settings.time_between_appointment / 60) }, (_, index) => index)
-                                                                    }}
-                                                                >
-                                                                    <option
-                                                                        value=""
-                                                                    ></option>
-                                                                    {#each optionsShift as shiftOption (shiftOption.value)}
-                                                                        {#if shiftOption.value > $form.adjusted_availability[indxDate].shifts[indxShift].start}
-                                                                            <option
-                                                                                value={shiftOption.value}
-                                                                            >
-                                                                                {shiftOption.label}
-                                                                            </option>
-                                                                        {/if}
-                                                                    {/each}
-                                                                </Input>
-                                                            </span>
-                                                            <span
-                                                                class="grid grid-cols-3 items-center gap-4 text-xl flex-auto"
-                                                            >
-                                                                <button
-                                                                    on:click={(
-                                                                        e,
-                                                                    ) => {
-                                                                        $form.adjusted_availability[
-                                                                            indxDate
-                                                                        ] = {
-                                                                            ...adjust_date,
-                                                                            shifts: adjust_date.shifts.filter(
-                                                                                (
-                                                                                    v,
-                                                                                    i,
-                                                                                ) =>
-                                                                                    i !=
-                                                                                    indxShift,
-                                                                            ),
-                                                                        };
-                                                                    }}
-                                                                    type="button"
-                                                                    class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
-                                                                    title="No disponible"
-                                                                >
-                                                                    <iconify-icon
-                                                                        icon="ic:baseline-block"
+                                                    <span
+                                                        class="grid grid-cols-3 items-center gap-3 text-xl pt-1.5"
+                                                    >
+                                                        <span> </span>
 
-                                                                    ></iconify-icon>
-                                                                </button>
-                                                                {#if indxShift == 0}
-                                                                    <button
-                                                                        on:click={(
-                                                                            e,
-                                                                        ) => {
-                                                                            $form.adjusted_availability[
-                                                                                indxDate
-                                                                            ] =
-                                                                                {
-                                                                                    ...adjust_date,
-                                                                                    shifts: [
-                                                                                        ...adjust_date.shifts,
-                                                                                        {
-                                                                                            start:
-                                                                                                (
-                                                                                                    +adjust_date.shifts[
-                                                                                                        adjust_date
-                                                                                                            .shifts
-                                                                                                            .length -
-                                                                                                            1
-                                                                                                    ].end.split(
-                                                                                                        ":",
-                                                                                                    )[0] +
-                                                                                                    1
-                                                                                                )
-                                                                                                    .toString()
-                                                                                                    .padStart(
-                                                                                                        2,
-                                                                                                        "0",
-                                                                                                    ) +
-                                                                                                ":00",
-                                                                                            end:
-                                                                                                (
-                                                                                                    +adjust_date.shifts[
-                                                                                                        adjust_date
-                                                                                                            .shifts
-                                                                                                            .length -
-                                                                                                            1
-                                                                                                    ].end.split(
-                                                                                                        ":",
-                                                                                                    )[0] +
-                                                                                                    2
-                                                                                                )
-                                                                                                    .toString()
-                                                                                                    .padStart(
-                                                                                                        2,
-                                                                                                        "0",
-                                                                                                    ) +
-                                                                                                ":00",
-                                                                                        },
-                                                                                    ],
-                                                                                };
-                                                                        }}
-                                                                        type="button"
-                                                                        class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
-                                                                        title="Añadir otro turno a este día"
-                                                                    >
-                                                                        <iconify-icon
-                                                                            icon="gala:add"
-
-                                                                        ></iconify-icon>
-                                                                    </button>
-                                                                    <button
-                                                                        on:click={(
-                                                                            e,
-                                                                        ) => {
-                                                                            $form.adjusted_availability =
-                                                                                $form.adjusted_availability.filter(
-                                                                                    (
-                                                                                        v,
-                                                                                        i,
-                                                                                    ) =>
-                                                                                        i !=
-                                                                                        indxDate,
-                                                                                );
-                                                                        }}
-                                                                        type="button"
-                                                                        class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
-                                                                        title="Eliminar esta fecha"
-                                                                    >
-                                                                        <iconify-icon
-                                                                            icon="ic:outline-close"
-
-                                                                        ></iconify-icon>
-                                                                        <!-- <iconify-icon
-                                                        class="text-2xl"
-                                                        icon="material-symbols-light:content-copy-outline"
-                                                    ></iconify-icon> -->
-                                                                    </button>
-                                                                {/if}
-                                                            </span>
-                                                        </div>
-                                                    {/each}
-                                                </div>
-                                            {:else}
-                                                <p class="opacity-60 w-48 py-2">
-                                                    No disponible
-                                                </p>
-                                                <span
-                                                    class="grid grid-cols-3 items-center gap-3 text-xl pt-1.5"
-                                                >
-                                                    <span> </span>
-
-                                                    <button
-                                                        on:click={(e) => {
-                                                            $form.adjusted_availability[
-                                                                indxDate
-                                                            ] = {
-                                                                ...$form
-                                                                    .adjusted_availability[
+                                                        <button
+                                                            on:click={(e) => {
+                                                                $form.adjusted_availability[
                                                                     indxDate
-                                                                ],
-                                                                shifts: [
-                                                                    ...adjust_date.shifts,
+                                                                ] = {
+                                                                    ...$form
+                                                                        .adjusted_availability[
+                                                                        indxDate
+                                                                    ],
+                                                                    shifts: [
+                                                                        ...adjust_date.shifts,
+                                                                        {
+                                                                            start: "08:00",
+                                                                            end: "16:00",
+                                                                        },
+                                                                    ],
+                                                                };
+                                                            }}
+                                                            type="button"
+                                                            class="relative cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
+                                                            title="Añadir otro turno a este día"
+                                                        >
+                                                            <iconify-icon
+                                                                icon="gala:add"
+                                                            ></iconify-icon>
+                                                        </button>
+                                                        <button
+                                                            on:click={(e) => {
+                                                                $form.adjusted_availability =
+                                                                    $form?.adjusted_availability.filter(
+                                                                        (
+                                                                            v,
+                                                                            i,
+                                                                        ) =>
+                                                                            i !=
+                                                                            indxDate,
+                                                                    );
+                                                            }}
+                                                            type="button"
+                                                            class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
+                                                            title="Eliminar esta fecha"
+                                                        >
+                                                            <iconify-icon
+                                                                icon="ic:outline-close"
+                                                            ></iconify-icon>
+                                                            <!-- <iconify-icon
+                                    class="text-2xl"
+                                    icon="material-symbols-light:content-copy-outline"
+                                ></iconify-icon> -->
+                                                        </button>
+                                                        <span> </span>
+                                                    </span>
+                                                {/if}
+                                            </li>
+                                        {/each}
+                                    </ul>
+                                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                    <button
+                                        type="button"
+                                        on:click={() => {
+                                            $form.adjusted_availability = [
+                                                ...$form.adjusted_availability,
+                                                {
+                                                    date: currentDate,
+                                                    shifts: [
+                                                        {
+                                                            start: "08:00",
+                                                            end: "16:00",
+                                                            appointments:
+                                                                GetStartAppointmets(
                                                                     {
                                                                         start: "08:00",
                                                                         end: "16:00",
                                                                     },
-                                                                ],
-                                                            };
-                                                        }}
-                                                        type="button"
-                                                        class="relative cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
-                                                        title="Añadir otro turno a este día"
-                                                    >
-                                                        <iconify-icon
-                                                            icon="gala:add"
-                                                        ></iconify-icon>
-                                                    </button>
-                                                    <button
-                                                        on:click={(e) => {
-                                                            $form.adjusted_availability =
-                                                                $form.adjusted_availability.filter(
-                                                                    (v, i) =>
-                                                                        i !=
-                                                                        indxDate,
-                                                                );
-                                                        }}
-                                                        type="button"
-                                                        class="cursor-pointer hover:font-bold hover:bg-gray-200 rounded-full"
-                                                        title="Eliminar esta fecha"
-                                                    >
-                                                        <iconify-icon
-                                                            icon="ic:outline-close"
-                                                        ></iconify-icon>
-                                                        <!-- <iconify-icon
-                                    class="text-2xl"
-                                    icon="material-symbols-light:content-copy-outline"
-                                ></iconify-icon> -->
-                                                    </button>
-                                                    <span> </span>
-                                                </span>
-                                            {/if}
-                                        </li>
-                                    {/each}
-                                </ul>
-                                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                                <button
-                                    type="button"
-                                    on:click={() => {
-                                        $form.adjusted_availability = [
-                                            ...$form.adjusted_availability,
-                                            {
-                                                date: currentDate,
-                                                shifts: [
-                                                    {
-                                                        start: "08:00",
-                                                        end: "16:00",
-                                                        appointments:
-                                                            GetStartAppointmets(
-                                                                {
-                                                                    start: "08:00",
-                                                                    end: "16:00",
-                                                                },
-                                                            ),
-                                                    },
-                                                ],
-                                            },
-                                        ];
-                                    }}
-                                    for="date1"
-                                    class="cursor-pointer text-color2 font-bold p-1 px-3 rounded hover:bg-color2 hover:bg-opacity-10 inline-block"
-                                    >Cambiar la diponibilidad en una fecha</button
-                                >
-                            </section>
-                        </fieldset>
+                                                                ),
+                                                        },
+                                                    ],
+                                                },
+                                            ];
+                                        }}
+                                        for="date1"
+                                        class="cursor-pointer text-color2 font-bold p-1 px-3 rounded hover:bg-color2 hover:bg-opacity-10 inline-block"
+                                        >Cambiar la diponibilidad en una fecha</button
+                                    >
+                                </section>
+                            </fieldset>
 
-                        <fieldset class="mt-2 pb-4 flex gap-4">
-                            <span>
-                                <iconify-icon
-                                    class="pt-2"
-                                    icon="mdi:calendar-check"
-                                ></iconify-icon>
-                            </span>
-                            <section>
-                                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                                <div
-                                    class="p-2 flex justify-between hover:bg-gray-200 cursor-pointer w-full"
-                                    on:click={(e) => {
-                                        acordion.ajustesCitasReservadas =
-                                            !acordion.ajustesCitasReservadas;
-                                    }}
-                                >
-                                    <div>
-                                        <legend class="font-bold"
-                                            >Ajustes de citas reservadas</legend
-                                        >
-                                        <small class="leading-4 inline-block">
-                                            Gestionar las citas reservadas que
-                                            aparecerán en tu calendario</small
-                                        >
+                            <fieldset class="mt-2 pb-4 flex gap-4">
+                                <span>
+                                    <iconify-icon
+                                        class="pt-2"
+                                        icon="mdi:calendar-check"
+                                    ></iconify-icon>
+                                </span>
+                                <section>
+                                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                    <div
+                                        class="p-2 flex justify-between hover:bg-gray-200 cursor-pointer w-full"
+                                        on:click={(e) => {
+                                            acordion.ajustesCitasReservadas =
+                                                !acordion.ajustesCitasReservadas;
+                                        }}
+                                    >
+                                        <div>
+                                            <legend class="font-bold"
+                                                >Ajustes de citas reservadas</legend
+                                            >
+                                            <small
+                                                class="leading-4 inline-block"
+                                            >
+                                                Gestionar las citas reservadas
+                                                que aparecerán en tu calendario</small
+                                            >
+                                        </div>
+                                        {#if acordion.ajustesCitasReservadas}
+                                            <iconify-icon
+                                                icon="iconamoon:arrow-up-2-duotone"
+                                            ></iconify-icon>
+                                        {:else}
+                                            <iconify-icon
+                                                icon="iconamoon:arrow-down-2-duotone"
+                                            ></iconify-icon>
+                                        {/if}
                                     </div>
                                     {#if acordion.ajustesCitasReservadas}
-                                        <iconify-icon
-                                            icon="iconamoon:arrow-up-2-duotone"
-                                        ></iconify-icon>
-                                    {:else}
-                                        <iconify-icon
-                                            icon="iconamoon:arrow-down-2-duotone"
-                                        ></iconify-icon>
-                                    {/if}
-                                </div>
-                                {#if acordion.ajustesCitasReservadas}
-                                    <div class="p-2 mt-1">
-                                        <div>
-                                            <div class="leading-5 mb-1">
-                                                <p
-                                                    class="mt-2 inline-block font-bold"
-                                                >
-                                                    Duración del periodo entre
-                                                    citas
-                                                </p>
-                                                <small class="inline-block">
-                                                    Añade tiempo entre una cita
-                                                    y otra
-                                                </small>
-                                            </div>
+                                        <div class="p-2 mt-1">
+                                            <div>
+                                                <div class="leading-5 mb-1">
+                                                    <p
+                                                        class="mt-2 inline-block font-bold"
+                                                    >
+                                                        Duración del periodo
+                                                        entre citas
+                                                    </p>
+                                                    <small class="inline-block">
+                                                        Añade tiempo entre una
+                                                        cita y otra
+                                                    </small>
+                                                </div>
 
-                                            <span
-                                                class={`${!$form.booked_appointment_settings.time_between_appointment ? "opacity-80" : ""} flex items-center gap-3`}
-                                            >
-                                                <input
-                                                    type="checkbox"
-                                                    class="w-6 h-6"
-                                                    name=""
-                                                    id=""
-                                                    bind:checked={$form
-                                                        .booked_appointment_settings
-                                                        .time_between_appointment}
-                                                    on:change={(e) => {
-                                                        if (e.target.checked) {
+                                                <span
+                                                    class={`${!$form.booked_appointment_settings.time_between_appointment ? "opacity-80" : ""} flex items-center gap-3`}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        class="w-6 h-6"
+                                                        name=""
+                                                        id=""
+                                                        bind:checked={$form
+                                                            .booked_appointment_settings
+                                                            .time_between_appointment}
+                                                        on:change={(e) => {
+                                                            if (
+                                                                e.target.checked
+                                                            ) {
+                                                                $form.booked_appointment_settings.time_between_appointment =
+                                                                    defaulTtime_between_appointment;
+                                                            } else {
+                                                                $form.booked_appointment_settings.time_between_appointment = 0;
+                                                            }
+                                                            updateAllStartAppointmets();
+                                                        }}
+                                                    />
+                                                    <Input
+                                                        type="number"
+                                                        classes={"w-16 mt-0"}
+                                                        disabled={!$form
+                                                            .booked_appointment_settings
+                                                            .time_between_appointment}
+                                                        inputClasses={"p-3 ray-50 w-16"}
+                                                        min={0}
+                                                        value={$form
+                                                            .booked_appointment_settings
+                                                            .time_between_appointment ||
+                                                            defaulTtime_between_appointment}
+                                                        on:change={(e) => {
                                                             $form.booked_appointment_settings.time_between_appointment =
-                                                                defaulTtime_between_appointment;
-                                                        } else {
-                                                            $form.booked_appointment_settings.time_between_appointment = 0;
-                                                        }
-                                                        updateAllStartAppointmets();
-                                                    }}
-                                                />
-                                                <Input
-                                                    type="number"
-                                                    classes={"w-16 mt-0"}
-                                                    disabled={!$form
-                                                        .booked_appointment_settings
-                                                        .time_between_appointment}
-                                                    inputClasses={"p-3 ray-50 w-16"}
-                                                    min={0}
-                                                    value={$form
-                                                        .booked_appointment_settings
-                                                        .time_between_appointment ||
-                                                        defaulTtime_between_appointment}
-                                                    on:change={(e) => {
-                                                        $form.booked_appointment_settings.time_between_appointment =
-                                                            e.target.value;
-                                                        defaulTtime_between_appointment =
-                                                            $form
-                                                                .booked_appointment_settings
-                                                                .time_between_appointment;
-                                                        updateAllStartAppointmets();
-                                                    }}
-                                                    error={$form.errors
-                                                        ?.time_between_appointment}
-                                                />
-                                                <p>minutos</p>
-                                            </span>
-                                            {#if $form.booked_appointment_settings.time_between_appointment < 0}
-                                                <p class="text-red text-sm">
-                                                    No puede ser menor a cero
-                                                </p>
-                                            {/if}
-                                        </div>
-
-                                        <div>
-                                            <div class="leading-5 mb-1 mt-1">
-                                                <p
-                                                    class="mt-4 inline-block font-bold"
-                                                >
-                                                    Máximo de reservas por día
-                                                </p>
-                                                <small class="inline-block">
-                                                    Limitar cuántas citas
-                                                    reservadas se pueden aceptar
-                                                    en un día
-                                                </small>
+                                                                e.target.value;
+                                                            defaulTtime_between_appointment =
+                                                                $form
+                                                                    .booked_appointment_settings
+                                                                    .time_between_appointment;
+                                                            updateAllStartAppointmets();
+                                                        }}
+                                                        error={$form.errors
+                                                            ?.time_between_appointment}
+                                                    />
+                                                    <p>minutos</p>
+                                                </span>
+                                                {#if $form.booked_appointment_settings.time_between_appointment < 0}
+                                                    <p class="text-red text-sm">
+                                                        No puede ser menor a
+                                                        cero
+                                                    </p>
+                                                {/if}
                                             </div>
 
-                                            <span
-                                                class={`${!$form.booked_appointment_settings.allow_max_appointment_per_day ? "opacity-80" : ""} flex items-center gap-3`}
-                                            >
-                                                <input
-                                                    type="checkbox"
-                                                    class="w-6 h-6"
-                                                    bind:checked={$form
-                                                        .booked_appointment_settings
-                                                        .allow_max_appointment_per_day}
-                                                />
-                                                <Input
-                                                    type="number"
-                                                    disabled={!$form
-                                                        .booked_appointment_settings
-                                                        .allow_max_appointment_per_day}
-                                                    classes={"w-16 mt-0"}
-                                                    inputClasses={"p-3 ray-50 w-16"}
-                                                    bind:value={$form.max_appointment_per_day}
-                                                    error={$form.errors
-                                                        ?.max_appointment_per_day}
-                                                />
-                                            </span>
+                                            <div>
+                                                <div
+                                                    class="leading-5 mb-1 mt-1"
+                                                >
+                                                    <p
+                                                        class="mt-4 inline-block font-bold"
+                                                    >
+                                                        Máximo de reservas por
+                                                        día
+                                                    </p>
+                                                    <small class="inline-block">
+                                                        Limitar cuántas citas
+                                                        reservadas se pueden
+                                                        aceptar en un día
+                                                    </small>
+                                                </div>
+
+                                                <span
+                                                    class={`${!$form.booked_appointment_settings.allow_max_appointment_per_day ? "opacity-80" : ""} flex items-center gap-3`}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        class="w-6 h-6"
+                                                        bind:checked={$form
+                                                            .booked_appointment_settings
+                                                            .allow_max_appointment_per_day}
+                                                    />
+                                                    <Input
+                                                        type="number"
+                                                        disabled={!$form
+                                                            .booked_appointment_settings
+                                                            .allow_max_appointment_per_day}
+                                                        classes={"w-16 mt-0"}
+                                                        inputClasses={"p-3 ray-50 w-16"}
+                                                        bind:value={$form.max_appointment_per_day}
+                                                        error={$form.errors
+                                                            ?.max_appointment_per_day}
+                                                    />
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
-                                {/if}
-                            </section>
-                        </fieldset>
-                    </div>
-                {:else}
-                    <div class="mb-5">
-                        <fieldset
-                            class="border-b border-gray-300 items-center pb-4"
-                        >
-                            <h2>CONFIGURAR CITAS DISPONIBLES</h2>
-
-                            <Input
-                                type="text"
-                                required={true}
-                                label={"Titulo"}
-                                labelClasses={"font-bold w-11/12"}
-                                inputClasses={"text-2xl  p-1 px-3 bg-gray-200 w-11/12 "}
-                                bind:value={$form.title}
-                                error={$form.errors?.title}
-                            />
-                        </fieldset>
-                        <fieldset
-                            class="mt-2 border-b border-gray-300 pb-4 flex gap-1 text-editor"
-                        >
-                            <span class="pt-2">
-                                <iconify-icon icon="pajamas:text-description"
-                                ></iconify-icon>
-                            </span>
-                            <section class="p-2 relative">
-                                <legend class="font-bold">Descripción</legend>
-                                <small class="mb-5 inline-block"
-                                    >Agrega una nota que explique tu servicio.
-                                    Esta aparecerá en tu página de reserva y en
-                                    los correos electrónicos de confirmación.</small
-                                >
-                                <Editor
-                                    actions={[
-                                        "b",
-                                        "i",
-                                        "u",
-                                        "ol",
-                                        "ul",
-                                        "left",
-                                        "center",
-                                        "justify",
-                                    ]}
-                                    html={$form.description}
-                                    on:change={(evt) => {
-                                        descriptionLength = evt.detail.length;
-                                        if (descriptionLength >= 300) {
-                                            $form.setError(
-                                                "description",
-                                                "No puede tener más de 300 caracteres",
-                                            );
-                                        } else {
-                                            $form.clearErrors("description");
-                                        }
-                                        $form.description = evt.detail;
-                                    }}
-                                    contentId="notes-content"
-                                    bind:this={editor}
-                                />
-                                <div
-                                    class={`absolute bottom-0 text-sm opacity-80 right-0 ${$form.errors?.description ? "text-red font-bold" : ""}`}
-                                >
-                                    {descriptionLength} / 300
-                                    {#if $form.errors?.description}
-                                        {$form.errors.description}
                                     {/if}
-                                </div>
-                            </section>
-                        </fieldset>
+                                </section>
+                            </fieldset>
+                        </div>
+                    {:else}
+                        <div class="mb-5">
+                            <fieldset
+                                class="border-b border-gray-300 items-center pb-4"
+                            >
+                                <h2>CONFIGURAR CITAS DISPONIBLES</h2>
 
-                        <fieldset class="mt-2 pb-4 flex gap-4">
-                            <span>
-                                <iconify-icon
-                                    class="pt-3 text-xl opacity-80"
-                                    icon="mdi:form"
-                                ></iconify-icon>
-                            </span>
-                            <section>
-                                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                                <div
-                                    class="p-2 flex justify-between hover:bg-gray-200 cursor-pointer w-full"
-                                    on:click={(e) => {
-                                        acordion.form = !acordion.form;
-                                    }}
-                                >
-                                    <div>
-                                        <legend class="font-bold"
-                                            >Formulario</legend
-                                        >
-                                        <small class="leading-4 inline-block">
-                                            Personaliza el formulario que las
-                                            personas usan para reservar una
-                                            cita.</small
-                                        >
+                                <Input
+                                    type="text"
+                                    required={true}
+                                    label={"Titulo"}
+                                    labelClasses={"font-bold w-11/12"}
+                                    inputClasses={"text-2xl  p-1 px-3 bg-gray-200 w-11/12 "}
+                                    bind:value={$form.title}
+                                    error={$form.errors?.title}
+                                />
+                            </fieldset>
+                            <fieldset
+                                class="mt-2 border-b border-gray-300 pb-4 flex gap-1 text-editor"
+                            >
+                                <span class="pt-2">
+                                    <iconify-icon
+                                        icon="pajamas:text-description"
+                                    ></iconify-icon>
+                                </span>
+                                <section class="p-2 relative">
+                                    <legend class="font-bold"
+                                        >Descripción</legend
+                                    >
+                                    <small class="mb-5 inline-block"
+                                        >Agrega una nota que explique tu
+                                        servicio. Esta aparecerá en tu página de
+                                        reserva y en los correos electrónicos de
+                                        confirmación.</small
+                                    >
+                                    <Editor
+                                        actions={[
+                                            "b",
+                                            "i",
+                                            "u",
+                                            "ol",
+                                            "ul",
+                                            "left",
+                                            "center",
+                                            "justify",
+                                        ]}
+                                        html={$form.description}
+                                        on:change={(evt) => {
+                                            descriptionLength =
+                                                evt.detail.length;
+                                            if (descriptionLength >= 300) {
+                                                $form.setError(
+                                                    "description",
+                                                    "No puede tener más de 300 caracteres",
+                                                );
+                                            } else {
+                                                $form.clearErrors(
+                                                    "description",
+                                                );
+                                            }
+                                            $form.description = evt.detail;
+                                        }}
+                                        contentId="notes-content"
+                                        bind:this={editor}
+                                    />
+                                    <div
+                                        class={`absolute bottom-0 text-sm opacity-80 right-0 ${$form.errors?.description ? "text-red font-bold" : ""}`}
+                                    >
+                                        {descriptionLength} / 300
+                                        {#if $form.errors?.description}
+                                            {$form.errors.description}
+                                        {/if}
+                                    </div>
+                                </section>
+                            </fieldset>
+
+                            <fieldset class="mt-2 pb-4 flex gap-4">
+                                <span>
+                                    <iconify-icon
+                                        class="pt-3 text-xl opacity-80"
+                                        icon="mdi:form"
+                                    ></iconify-icon>
+                                </span>
+                                <section>
+                                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                    <div
+                                        class="p-2 flex justify-between hover:bg-gray-200 cursor-pointer w-full"
+                                        on:click={(e) => {
+                                            acordion.form = !acordion.form;
+                                        }}
+                                    >
+                                        <div>
+                                            <legend class="font-bold"
+                                                >Formulario</legend
+                                            >
+                                            <small
+                                                class="leading-4 inline-block"
+                                            >
+                                                Personaliza el formulario que
+                                                las personas usan para reservar
+                                                una cita.</small
+                                            >
+                                        </div>
+                                        {#if acordion.form}
+                                            <iconify-icon
+                                                icon="iconamoon:arrow-up-2-duotone"
+                                            ></iconify-icon>
+                                        {:else}
+                                            <iconify-icon
+                                                icon="iconamoon:arrow-down-2-duotone"
+                                            ></iconify-icon>
+                                        {/if}
                                     </div>
                                     {#if acordion.form}
-                                        <iconify-icon
-                                            icon="iconamoon:arrow-up-2-duotone"
-                                        ></iconify-icon>
-                                    {:else}
-                                        <iconify-icon
-                                            icon="iconamoon:arrow-down-2-duotone"
-                                        ></iconify-icon>
+                                        <div
+                                            class="flex w-full flex-wrap gap-3 mt-1"
+                                        >
+                                            {#each $form.fields as field (field)}
+                                                <span
+                                                    class="bg-gray-200 bg-opacity-40 border border-gray-300 rounded-full px-3 py-1"
+                                                    >{field.name}*</span
+                                                >
+                                            {/each}
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            on:click={() =>
+                                                (showModalForm = true)}
+                                            for="date1"
+                                            class="block cursor-pointer text-color2 font-bold p-1 px-3 rounded hover:bg-color2 hover:bg-opacity-10 mt-3"
+                                            ><iconify-icon
+                                                class="mr-1"
+                                                icon="gala:add"
+                                            ></iconify-icon> Añadir campo</button
+                                        >
                                     {/if}
-                                </div>
-                                {#if acordion.form}
-                                    <div
-                                        class="flex w-full flex-wrap gap-3 mt-1"
-                                    >
-                                        {#each $form.fields as field (field)}
-                                            <span
-                                                class="bg-gray-200 bg-opacity-40 border border-gray-300 rounded-full px-3 py-1"
-                                                >{field.name}*</span
-                                            >
-                                        {/each}
-                                    </div>
+                                </section>
+                            </fieldset>
+                        </div>
+                    {/if}
+                </div>
 
-                                    <button
-                                        type="button"
-                                        on:click={() => (showModalForm = true)}
-                                        for="date1"
-                                        class="block cursor-pointer text-color2 font-bold p-1 px-3 rounded hover:bg-color2 hover:bg-opacity-10 mt-3"
-                                        ><iconify-icon
-                                            class="mr-1"
-                                            icon="gala:add"
-                                        ></iconify-icon> Añadir campo</button
-                                    >
-                                {/if}
-                            </section>
-                        </fieldset>
+                <div
+                    class="absolute bg-none px-5 py-3 bg-gray-100 left-0 bottom-0 w-full flex justify-between items-center"
+                >
+                    {#if formPage == 1}
+                        <button
+                            on:click={() => (formPage = 2)}
+                            type="button"
+                            class="bg-color3 ml-auto text-white rounded px-4 py-2 cursor-pointer hover:font-bold"
+                            >Siguiente</button
+                        >
+                    {:else}
+                        <button
+                            on:click={() => (formPage = 1)}
+                            type="button"
+                            class="px-4 py-2 cursor-pointer hover:font-bold"
+                            >Volver</button
+                        >
+                        <button
+                            class="bg-color3 text-white rounded px-4 py-2 cursor-pointer hover:font-bold"
+                            type="submit">Guardar</button
+                        >
+                    {/if}
+                </div>
+            </form>
+        {:else}
+            <div>
+                <div class="border rounded p-3 panel-hover">
+                    <div class="flex justify-between">
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="rounded-full overflow-hidden bg-color4 w-9 h-9 justify-center items-center flex"
+                            >
+                                <iconify-icon icon="fa6-solid:user-doctor"
+                                ></iconify-icon>
+                            </span>
+                            <p>{$form.doctor_name} {$form.doctor_last_name}</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button title="Eliminar" on:click={()=> openedLeftSection = "form"}>
+                                <iconify-icon
+                               
+                                    icon="ph:trash"
+                                ></iconify-icon>
+
+                            </button>
+                            
+                            <button title="Editar" on:click={()=> openedLeftSection = "form"}>
+                                <iconify-icon icon="uil:edit"></iconify-icon>
+
+                            </button>
+                        </div>
                     </div>
-                {/if}
-            </div>
+                    <div class="flex items-center">
+                        <h1>{$form.title}</h1>
+                        <span class="mx-2 mt-1.5"> ({$form.specialty_name})</span>
+                    </div>
+                    <div class="flex gap-3 ">
+                        <iconify-icon
+                            icon="lets-icons:time-atack"
+                            class="mt-1 text-xl text-gray-500"
+                        ></iconify-icon>
+                        <p>Citas de {$form.duration_per_appointment} minutos</p>
+                    </div>
+                    <div class="mt-3">
+                        {@html $form.description} 
 
-            <div
-                class="absolute bg-none px-5 py-3 bg-gray-100 left-0 bottom-0 w-full flex justify-between items-center"
-            >
-                {#if formPage == 1}
-                    <button
-                        on:click={() => (formPage = 2)}
-                        type="button"
-                        class="bg-color3 ml-auto text-white rounded px-4 py-2 cursor-pointer hover:font-bold"
-                        >Siguiente</button
-                    >
-                {:else}
-                    <button
-                        on:click={() => (formPage = 1)}
-                        type="button"
-                        class="px-4 py-2 cursor-pointer hover:font-bold"
-                        >Volver</button
-                    >
-                    <button
-                        class="bg-color3 text-white rounded px-4 py-2 cursor-pointer hover:font-bold"
-                        type="submit">Guardar</button
-                    >
-                {/if}
+                    </div>
+
+                </div>
             </div>
-        </form>
+        {/if}
     </div>
 
     <!-- // calendar -->
